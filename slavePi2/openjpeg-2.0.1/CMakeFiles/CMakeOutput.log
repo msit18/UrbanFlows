@@ -1,0 +1,411 @@
+The system is: Linux - 3.18.11+ - armv6l
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /usr/bin/gcc 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/home/pi/openjpeg-2.0.1/CMakeFiles/CompilerIdC/a.out"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2961825921/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2961825921.dir/build.make CMakeFiles/cmTryCompileExec2961825921.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2961825921.dir/testCCompiler.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec2961825921.dir/testCCompiler.c.o   -c /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTryCompileExec2961825921
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2961825921.dir/link.txt --verbose=1
+/usr/bin/gcc         CMakeFiles/cmTryCompileExec2961825921.dir/testCCompiler.c.o  -o cmTryCompileExec2961825921 -rdynamic 
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1310879454/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1310879454.dir/build.make CMakeFiles/cmTryCompileExec1310879454.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1310879454.dir/CMakeCCompilerABI.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec1310879454.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-2.8/Modules/CMakeCCompilerABI.c
+Linking C executable cmTryCompileExec1310879454
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1310879454.dir/link.txt --verbose=1
+/usr/bin/gcc       -v CMakeFiles/cmTryCompileExec1310879454.dir/CMakeCCompilerABI.c.o  -o cmTryCompileExec1310879454 -rdynamic  
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gcc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/arm-linux-gnueabihf/4.6/lto-wrapper
+Target: arm-linux-gnueabihf
+Configured with: ../src/configure -v --with-pkgversion='Debian 4.6.3-14+rpi1' --with-bugurl=file:///usr/share/doc/gcc-4.6/README.Bugs --enable-languages=c,c++,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-4.6 --enable-shared --enable-linker-build-id --with-system-zlib --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --with-gxx-include-dir=/usr/include/c++/4.6 --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --enable-gnu-unique-object --enable-plugin --enable-objc-gc --disable-sjlj-exceptions --with-arch=armv6 --with-fpu=vfp --with-float=hard --enable-checking=release --build=arm-linux-gnueabihf --host=arm-linux-gnueabihf --target=arm-linux-gnueabihf
+Thread model: posix
+gcc version 4.6.3 (Debian 4.6.3-14+rpi1) 
+COMPILER_PATH=/usr/lib/gcc/arm-linux-gnueabihf/4.6/:/usr/lib/gcc/arm-linux-gnueabihf/4.6/:/usr/lib/gcc/arm-linux-gnueabihf/:/usr/lib/gcc/arm-linux-gnueabihf/4.6/:/usr/lib/gcc/arm-linux-gnueabihf/
+LIBRARY_PATH=/usr/lib/gcc/arm-linux-gnueabihf/4.6/:/usr/lib/gcc/arm-linux-gnueabihf/4.6/../../../arm-linux-gnueabihf/:/usr/lib/gcc/arm-linux-gnueabihf/4.6/../../../:/lib/arm-linux-gnueabihf/:/lib/:/usr/lib/arm-linux-gnueabihf/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec1310879454' '-rdynamic' '-march=armv6' '-mfloat-abi=hard' '-mfpu=vfp'
+ /usr/lib/gcc/arm-linux-gnueabihf/4.6/collect2 --sysroot=/ --build-id --no-add-needed --eh-frame-hdr -export-dynamic -dynamic-linker /lib/ld-linux-armhf.so.3 -X --hash-style=both -m armelf_linux_eabi -o cmTryCompileExec1310879454 /usr/lib/gcc/arm-linux-gnueabihf/4.6/../../../arm-linux-gnueabihf/crt1.o /usr/lib/gcc/arm-linux-gnueabihf/4.6/../../../arm-linux-gnueabihf/crti.o /usr/lib/gcc/arm-linux-gnueabihf/4.6/crtbegin.o -L/usr/lib/gcc/arm-linux-gnueabihf/4.6 -L/usr/lib/gcc/arm-linux-gnueabihf/4.6/../../../arm-linux-gnueabihf -L/usr/lib/gcc/arm-linux-gnueabihf/4.6/../../.. -L/lib/arm-linux-gnueabihf -L/usr/lib/arm-linux-gnueabihf CMakeFiles/cmTryCompileExec1310879454.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/arm-linux-gnueabihf/4.6/crtend.o /usr/lib/gcc/arm-linux-gnueabihf/4.6/../../../arm-linux-gnueabihf/crtn.o
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:/usr/bin/make "cmTryCompileExec1310879454/fast"]
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTryCompileExec1310879454.dir/build.make CMakeFiles/cmTryCompileExec1310879454.dir/build]
+  ignore line: [make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp']
+  ignore line: [/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1]
+  ignore line: [Building C object CMakeFiles/cmTryCompileExec1310879454.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec1310879454.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-2.8/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTryCompileExec1310879454]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1310879454.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/gcc       -v CMakeFiles/cmTryCompileExec1310879454.dir/CMakeCCompilerABI.c.o  -o cmTryCompileExec1310879454 -rdynamic  ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/usr/bin/gcc]
+  ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/arm-linux-gnueabihf/4.6/lto-wrapper]
+  ignore line: [Target: arm-linux-gnueabihf]
+  ignore line: [Configured with: ../src/configure -v --with-pkgversion='Debian 4.6.3-14+rpi1' --with-bugurl=file:///usr/share/doc/gcc-4.6/README.Bugs --enable-languages=c,c++,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-4.6 --enable-shared --enable-linker-build-id --with-system-zlib --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --with-gxx-include-dir=/usr/include/c++/4.6 --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --enable-gnu-unique-object --enable-plugin --enable-objc-gc --disable-sjlj-exceptions --with-arch=armv6 --with-fpu=vfp --with-float=hard --enable-checking=release --build=arm-linux-gnueabihf --host=arm-linux-gnueabihf --target=arm-linux-gnueabihf]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 4.6.3 (Debian 4.6.3-14+rpi1) ]
+  ignore line: [COMPILER_PATH=/usr/lib/gcc/arm-linux-gnueabihf/4.6/:/usr/lib/gcc/arm-linux-gnueabihf/4.6/:/usr/lib/gcc/arm-linux-gnueabihf/:/usr/lib/gcc/arm-linux-gnueabihf/4.6/:/usr/lib/gcc/arm-linux-gnueabihf/]
+  ignore line: [LIBRARY_PATH=/usr/lib/gcc/arm-linux-gnueabihf/4.6/:/usr/lib/gcc/arm-linux-gnueabihf/4.6/../../../arm-linux-gnueabihf/:/usr/lib/gcc/arm-linux-gnueabihf/4.6/../../../:/lib/arm-linux-gnueabihf/:/lib/:/usr/lib/arm-linux-gnueabihf/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec1310879454' '-rdynamic' '-march=armv6' '-mfloat-abi=hard' '-mfpu=vfp']
+  link line: [ /usr/lib/gcc/arm-linux-gnueabihf/4.6/collect2 --sysroot=/ --build-id --no-add-needed --eh-frame-hdr -export-dynamic -dynamic-linker /lib/ld-linux-armhf.so.3 -X --hash-style=both -m armelf_linux_eabi -o cmTryCompileExec1310879454 /usr/lib/gcc/arm-linux-gnueabihf/4.6/../../../arm-linux-gnueabihf/crt1.o /usr/lib/gcc/arm-linux-gnueabihf/4.6/../../../arm-linux-gnueabihf/crti.o /usr/lib/gcc/arm-linux-gnueabihf/4.6/crtbegin.o -L/usr/lib/gcc/arm-linux-gnueabihf/4.6 -L/usr/lib/gcc/arm-linux-gnueabihf/4.6/../../../arm-linux-gnueabihf -L/usr/lib/gcc/arm-linux-gnueabihf/4.6/../../.. -L/lib/arm-linux-gnueabihf -L/usr/lib/arm-linux-gnueabihf CMakeFiles/cmTryCompileExec1310879454.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/arm-linux-gnueabihf/4.6/crtend.o /usr/lib/gcc/arm-linux-gnueabihf/4.6/../../../arm-linux-gnueabihf/crtn.o]
+    arg [/usr/lib/gcc/arm-linux-gnueabihf/4.6/collect2] ==> ignore
+    arg [--sysroot=/] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [--no-add-needed] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib/ld-linux-armhf.so.3] ==> ignore
+    arg [-X] ==> ignore
+    arg [--hash-style=both] ==> ignore
+    arg [-m] ==> ignore
+    arg [armelf_linux_eabi] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTryCompileExec1310879454] ==> ignore
+    arg [/usr/lib/gcc/arm-linux-gnueabihf/4.6/../../../arm-linux-gnueabihf/crt1.o] ==> ignore
+    arg [/usr/lib/gcc/arm-linux-gnueabihf/4.6/../../../arm-linux-gnueabihf/crti.o] ==> ignore
+    arg [/usr/lib/gcc/arm-linux-gnueabihf/4.6/crtbegin.o] ==> ignore
+    arg [-L/usr/lib/gcc/arm-linux-gnueabihf/4.6] ==> dir [/usr/lib/gcc/arm-linux-gnueabihf/4.6]
+    arg [-L/usr/lib/gcc/arm-linux-gnueabihf/4.6/../../../arm-linux-gnueabihf] ==> dir [/usr/lib/gcc/arm-linux-gnueabihf/4.6/../../../arm-linux-gnueabihf]
+    arg [-L/usr/lib/gcc/arm-linux-gnueabihf/4.6/../../..] ==> dir [/usr/lib/gcc/arm-linux-gnueabihf/4.6/../../..]
+    arg [-L/lib/arm-linux-gnueabihf] ==> dir [/lib/arm-linux-gnueabihf]
+    arg [-L/usr/lib/arm-linux-gnueabihf] ==> dir [/usr/lib/arm-linux-gnueabihf]
+    arg [CMakeFiles/cmTryCompileExec1310879454.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [-lc] ==> lib [c]
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [/usr/lib/gcc/arm-linux-gnueabihf/4.6/crtend.o] ==> ignore
+    arg [/usr/lib/gcc/arm-linux-gnueabihf/4.6/../../../arm-linux-gnueabihf/crtn.o] ==> ignore
+  remove lib [gcc]
+  remove lib [gcc_s]
+  remove lib [gcc]
+  remove lib [gcc_s]
+  collapse dir [/usr/lib/gcc/arm-linux-gnueabihf/4.6] ==> [/usr/lib/gcc/arm-linux-gnueabihf/4.6]
+  collapse dir [/usr/lib/gcc/arm-linux-gnueabihf/4.6/../../../arm-linux-gnueabihf] ==> [/usr/lib/arm-linux-gnueabihf]
+  collapse dir [/usr/lib/gcc/arm-linux-gnueabihf/4.6/../../..] ==> [/usr/lib]
+  collapse dir [/lib/arm-linux-gnueabihf] ==> [/lib/arm-linux-gnueabihf]
+  collapse dir [/usr/lib/arm-linux-gnueabihf] ==> [/usr/lib/arm-linux-gnueabihf]
+  implicit libs: [c]
+  implicit dirs: [/usr/lib/gcc/arm-linux-gnueabihf/4.6;/usr/lib/arm-linux-gnueabihf;/usr/lib;/lib/arm-linux-gnueabihf]
+
+
+Determining if the include file sys/types.h exists passed with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3944966923/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3944966923.dir/build.make CMakeFiles/cmTryCompileExec3944966923.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3944966923.dir/CheckIncludeFile.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec3944966923.dir/CheckIncludeFile.c.o   -c /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec3944966923
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3944966923.dir/link.txt --verbose=1
+/usr/bin/gcc         CMakeFiles/cmTryCompileExec3944966923.dir/CheckIncludeFile.c.o  -o cmTryCompileExec3944966923 -rdynamic 
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file stdint.h exists passed with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3997320621/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3997320621.dir/build.make CMakeFiles/cmTryCompileExec3997320621.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3997320621.dir/CheckIncludeFile.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec3997320621.dir/CheckIncludeFile.c.o   -c /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec3997320621
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3997320621.dir/link.txt --verbose=1
+/usr/bin/gcc         CMakeFiles/cmTryCompileExec3997320621.dir/CheckIncludeFile.c.o  -o cmTryCompileExec3997320621 -rdynamic 
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file stddef.h exists passed with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3836471680/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3836471680.dir/build.make CMakeFiles/cmTryCompileExec3836471680.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3836471680.dir/CheckIncludeFile.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec3836471680.dir/CheckIncludeFile.c.o   -c /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec3836471680
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3836471680.dir/link.txt --verbose=1
+/usr/bin/gcc         CMakeFiles/cmTryCompileExec3836471680.dir/CheckIncludeFile.c.o  -o cmTryCompileExec3836471680 -rdynamic 
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
+Determining size of unsigned short passed with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2189970368/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2189970368.dir/build.make CMakeFiles/cmTryCompileExec2189970368.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2189970368.dir/CMAKE_SIZEOF_UNSIGNED_SHORT.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec2189970368.dir/CMAKE_SIZEOF_UNSIGNED_SHORT.c.o   -c /home/pi/openjpeg-2.0.1/CMakeFiles/CheckTypeSize/CMAKE_SIZEOF_UNSIGNED_SHORT.c
+Linking C executable cmTryCompileExec2189970368
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2189970368.dir/link.txt --verbose=1
+/usr/bin/gcc         CMakeFiles/cmTryCompileExec2189970368.dir/CMAKE_SIZEOF_UNSIGNED_SHORT.c.o  -o cmTryCompileExec2189970368 -rdynamic 
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file string.h exists passed with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3913716924/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3913716924.dir/build.make CMakeFiles/cmTryCompileExec3913716924.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3913716924.dir/CheckIncludeFile.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec3913716924.dir/CheckIncludeFile.c.o   -c /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec3913716924
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3913716924.dir/link.txt --verbose=1
+/usr/bin/gcc         CMakeFiles/cmTryCompileExec3913716924.dir/CheckIncludeFile.c.o  -o cmTryCompileExec3913716924 -rdynamic 
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file memory.h exists passed with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2781852765/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2781852765.dir/build.make CMakeFiles/cmTryCompileExec2781852765.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2781852765.dir/CheckIncludeFile.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec2781852765.dir/CheckIncludeFile.c.o   -c /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec2781852765
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2781852765.dir/link.txt --verbose=1
+/usr/bin/gcc         CMakeFiles/cmTryCompileExec2781852765.dir/CheckIncludeFile.c.o  -o cmTryCompileExec2781852765 -rdynamic 
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file stdlib.h exists passed with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1975280740/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1975280740.dir/build.make CMakeFiles/cmTryCompileExec1975280740.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1975280740.dir/CheckIncludeFile.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec1975280740.dir/CheckIncludeFile.c.o   -c /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec1975280740
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1975280740.dir/link.txt --verbose=1
+/usr/bin/gcc         CMakeFiles/cmTryCompileExec1975280740.dir/CheckIncludeFile.c.o  -o cmTryCompileExec1975280740 -rdynamic 
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file stdio.h exists passed with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1281524377/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1281524377.dir/build.make CMakeFiles/cmTryCompileExec1281524377.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1281524377.dir/CheckIncludeFile.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec1281524377.dir/CheckIncludeFile.c.o   -c /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec1281524377
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1281524377.dir/link.txt --verbose=1
+/usr/bin/gcc         CMakeFiles/cmTryCompileExec1281524377.dir/CheckIncludeFile.c.o  -o cmTryCompileExec1281524377 -rdynamic 
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file math.h exists passed with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2866902737/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2866902737.dir/build.make CMakeFiles/cmTryCompileExec2866902737.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2866902737.dir/CheckIncludeFile.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec2866902737.dir/CheckIncludeFile.c.o   -c /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec2866902737
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2866902737.dir/link.txt --verbose=1
+/usr/bin/gcc         CMakeFiles/cmTryCompileExec2866902737.dir/CheckIncludeFile.c.o  -o cmTryCompileExec2866902737 -rdynamic 
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file float.h exists passed with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1733027051/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1733027051.dir/build.make CMakeFiles/cmTryCompileExec1733027051.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1733027051.dir/CheckIncludeFile.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec1733027051.dir/CheckIncludeFile.c.o   -c /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec1733027051
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1733027051.dir/link.txt --verbose=1
+/usr/bin/gcc         CMakeFiles/cmTryCompileExec1733027051.dir/CheckIncludeFile.c.o  -o cmTryCompileExec1733027051 -rdynamic 
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file time.h exists passed with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3140182145/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3140182145.dir/build.make CMakeFiles/cmTryCompileExec3140182145.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3140182145.dir/CheckIncludeFile.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec3140182145.dir/CheckIncludeFile.c.o   -c /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec3140182145
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3140182145.dir/link.txt --verbose=1
+/usr/bin/gcc         CMakeFiles/cmTryCompileExec3140182145.dir/CheckIncludeFile.c.o  -o cmTryCompileExec3140182145 -rdynamic 
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file stdarg.h exists passed with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2637198265/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2637198265.dir/build.make CMakeFiles/cmTryCompileExec2637198265.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2637198265.dir/CheckIncludeFile.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec2637198265.dir/CheckIncludeFile.c.o   -c /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec2637198265
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2637198265.dir/link.txt --verbose=1
+/usr/bin/gcc         CMakeFiles/cmTryCompileExec2637198265.dir/CheckIncludeFile.c.o  -o cmTryCompileExec2637198265 -rdynamic 
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file ctype.h exists passed with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2874187720/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2874187720.dir/build.make CMakeFiles/cmTryCompileExec2874187720.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2874187720.dir/CheckIncludeFile.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec2874187720.dir/CheckIncludeFile.c.o   -c /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec2874187720
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2874187720.dir/link.txt --verbose=1
+/usr/bin/gcc         CMakeFiles/cmTryCompileExec2874187720.dir/CheckIncludeFile.c.o  -o cmTryCompileExec2874187720 -rdynamic 
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file assert.h exists passed with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec868868508/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec868868508.dir/build.make CMakeFiles/cmTryCompileExec868868508.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec868868508.dir/CheckIncludeFile.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec868868508.dir/CheckIncludeFile.c.o   -c /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec868868508
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec868868508.dir/link.txt --verbose=1
+/usr/bin/gcc         CMakeFiles/cmTryCompileExec868868508.dir/CheckIncludeFile.c.o  -o cmTryCompileExec868868508 -rdynamic 
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file stdint.h exists passed with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3930099182/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3930099182.dir/build.make CMakeFiles/cmTryCompileExec3930099182.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3930099182.dir/CheckIncludeFile.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec3930099182.dir/CheckIncludeFile.c.o   -c /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec3930099182
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3930099182.dir/link.txt --verbose=1
+/usr/bin/gcc         CMakeFiles/cmTryCompileExec3930099182.dir/CheckIncludeFile.c.o  -o cmTryCompileExec3930099182 -rdynamic 
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file inttypes.h exists passed with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1405865892/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1405865892.dir/build.make CMakeFiles/cmTryCompileExec1405865892.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1405865892.dir/CheckIncludeFile.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec1405865892.dir/CheckIncludeFile.c.o   -c /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec1405865892
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1405865892.dir/link.txt --verbose=1
+/usr/bin/gcc         CMakeFiles/cmTryCompileExec1405865892.dir/CheckIncludeFile.c.o  -o cmTryCompileExec1405865892 -rdynamic 
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file strings.h exists passed with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2085638247/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2085638247.dir/build.make CMakeFiles/cmTryCompileExec2085638247.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2085638247.dir/CheckIncludeFile.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec2085638247.dir/CheckIncludeFile.c.o   -c /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec2085638247
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2085638247.dir/link.txt --verbose=1
+/usr/bin/gcc         CMakeFiles/cmTryCompileExec2085638247.dir/CheckIncludeFile.c.o  -o cmTryCompileExec2085638247 -rdynamic 
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file sys/stat.h exists passed with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1745338410/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1745338410.dir/build.make CMakeFiles/cmTryCompileExec1745338410.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1745338410.dir/CheckIncludeFile.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec1745338410.dir/CheckIncludeFile.c.o   -c /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec1745338410
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1745338410.dir/link.txt --verbose=1
+/usr/bin/gcc         CMakeFiles/cmTryCompileExec1745338410.dir/CheckIncludeFile.c.o  -o cmTryCompileExec1745338410 -rdynamic 
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file unistd.h exists passed with the following output:
+Change Dir: /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1999076963/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1999076963.dir/build.make CMakeFiles/cmTryCompileExec1999076963.dir/build
+make[1]: Entering directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1999076963.dir/CheckIncludeFile.c.o
+/usr/bin/gcc    -o CMakeFiles/cmTryCompileExec1999076963.dir/CheckIncludeFile.c.o   -c /home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec1999076963
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1999076963.dir/link.txt --verbose=1
+/usr/bin/gcc         CMakeFiles/cmTryCompileExec1999076963.dir/CheckIncludeFile.c.o  -o cmTryCompileExec1999076963 -rdynamic 
+make[1]: Leaving directory '/home/pi/openjpeg-2.0.1/CMakeFiles/CMakeTmp'
+
+
