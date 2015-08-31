@@ -1,5 +1,3 @@
-#Current working ssh server file
-
 from twisted.conch import avatar, recvline
 from twisted.conch.interfaces import IConchUser, ISession
 from twisted.conch.ssh import factory, keys, session
@@ -13,21 +11,26 @@ class SSHDemoProtocol(recvline.HistoricRecvLine):
         self.user = user
 
     def connectionMade(self):
+    print "running connectionMade"
         recvline.HistoricRecvLine.connectionMade(self)
-        self.terminal.write("Welcome to my test SSH server.")
+        self.terminal.write("Welcome to my test SSH server.")        
         print "Printed message: welcome to my test SSH server"
         self.terminal.nextLine()
         self.do_help()
         self.showPrompt()
 
     def showPrompt(self):
+    print "running showPrompt"
         self.terminal.write("$ ")
 
     def getCommandFunc(self, cmd):
+    print "running getCommandFunc"
         return getattr(self, 'do_' + cmd, None)
 
     def lineReceived(self, line):
+    print "running lineReceived"
         line = line.strip()
+    print line
         if line:
             cmdAndArgs = line.split()
             cmd = cmdAndArgs[0]
@@ -45,6 +48,7 @@ class SSHDemoProtocol(recvline.HistoricRecvLine):
         self.showPrompt()
 
     def do_help(self):
+    print "running do_help"
         publicMethods = filter(
             lambda funcname: funcname.startswith('do_'), dir(self))
         commands = [cmd.replace('do_', '', 1) for cmd in publicMethods]
@@ -52,19 +56,24 @@ class SSHDemoProtocol(recvline.HistoricRecvLine):
         self.terminal.nextLine()
 
     def do_echo(self, *args):
+    print "running do_echo"
         self.terminal.write(" ".join(args))
         self.terminal.nextLine()
 
     def do_whoami(self):
+    print "running do_whoami"
         self.terminal.write(self.user.username)
+    self.terminal.write("hiPi")
         self.terminal.nextLine()
 
     def do_quit(self):
+    print "running do_quit"
         self.terminal.write("Thanks for playing!")
         self.terminal.nextLine()
         self.terminal.loseConnection()
 
     def do_clear(self):
+    print "running do_clear"
         self.terminal.reset()
 
 class SSHDemoAvatar(avatar.ConchUser):
@@ -76,34 +85,40 @@ class SSHDemoAvatar(avatar.ConchUser):
         self.channelLookup.update({'session': session.SSHSession})
 
     def openShell(self, protocol):
+    print "running openShell"
         serverProtocol = insults.ServerProtocol(SSHDemoProtocol, self)
         serverProtocol.makeConnection(protocol)
         protocol.makeConnection(session.wrapProtocol(serverProtocol))
 
     def getPty(self, terminal, windowSize, attrs):
+    print "running getPty"
         return None
 
     def execCommand(self, protocol, cmd):
-        raise NotImplementedError()
+    print "running execCommand"
+    print cmd
+#        raise NotImplementedError()
 
     def closed(self):
+    print "running closed"
         pass
 
 class SSHDemoRealm(object):
     implements(portal.IRealm)
 
     def requestAvatar(self, avatarId, mind, *interfaces):
+    print "running requestAvatar"
         if IConchUser in interfaces:
             return interfaces[0], SSHDemoAvatar(avatarId), lambda: None
         else:
             raise NotImplementedError("No supported interfaces found.")
 
 def getRSAKeys():
-    with open('/home/michelle/.ssh/id_rsa') as privateBlobFile:
+    with open('/home/pi/.ssh/id_rsa') as privateBlobFile:
         privateBlob = privateBlobFile.read()
         privateKey = keys.Key.fromString(data=privateBlob)
     
-    with open('/home/michelle/.ssh/id_rsa.pub') as publicBlobFile:
+    with open('/home/pi/.ssh/id_rsa.pub') as publicBlobFile:
         publicBlob = publicBlobFile.read()
         publicKey = keys.Key.fromString(data=publicBlob)
 
@@ -113,7 +128,7 @@ if __name__ == "__main__":
     sshFactory = factory.SSHFactory()
     sshFactory.portal = portal.Portal(SSHDemoRealm())
     
-    users = {'admin': 'aaa', 'guest': 'bbb'}
+    users = {'admin': 'aaa', 'guest': 'bbb', 'pi':'raspberry'}
     sshFactory.portal.registerChecker(
         checkers.InMemoryUsernamePasswordDatabaseDontUse(**users))
     
