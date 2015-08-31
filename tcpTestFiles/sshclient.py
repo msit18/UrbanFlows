@@ -1,3 +1,5 @@
+#Current working ssh client file
+
 from twisted.conch.ssh import transport, connection, userauth, channel, common
 from twisted.internet import defer, protocol, reactor
 import sys, getpass
@@ -66,8 +68,8 @@ class ClientCommandFactory(protocol.ClientFactory):
             self.username, self.password, self.command)
         return protocol
 
-server = '18.111.55.111' #hostname that this file connects to
-command = 'python takepic.py'
+server = '18.111.34.22' #hostname that this file connects to
+command = 'python /home/pi/UrbanFlows/slavePi2/takepic.py'
 #username = raw_input("Username: ")
 username = 'pi'
 password = 'raspberry'

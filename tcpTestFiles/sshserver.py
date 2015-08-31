@@ -1,3 +1,5 @@
+#Current working ssh server file
+
 from twisted.conch import avatar, recvline
 from twisted.conch.interfaces import IConchUser, ISession
 from twisted.conch.ssh import factory, keys, session
@@ -13,6 +15,7 @@ class SSHDemoProtocol(recvline.HistoricRecvLine):
     def connectionMade(self):
         recvline.HistoricRecvLine.connectionMade(self)
         self.terminal.write("Welcome to my test SSH server.")
+        print "Printed message: welcome to my test SSH server"
         self.terminal.nextLine()
         self.do_help()
         self.showPrompt()
@@ -96,11 +99,11 @@ class SSHDemoRealm(object):
             raise NotImplementedError("No supported interfaces found.")
 
 def getRSAKeys():
-    with open('id_rsa') as privateBlobFile:
+    with open('/home/michelle/.ssh/id_rsa') as privateBlobFile:
         privateBlob = privateBlobFile.read()
         privateKey = keys.Key.fromString(data=privateBlob)
     
-    with open('id_rsa.pub') as publicBlobFile:
+    with open('/home/michelle/.ssh/id_rsa.pub') as publicBlobFile:
         publicBlob = publicBlobFile.read()
         publicKey = keys.Key.fromString(data=publicBlob)
 

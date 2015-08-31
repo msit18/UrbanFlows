@@ -12,7 +12,8 @@ class SSHDemoProtocol(recvline.HistoricRecvLine):
 
     def connectionMade(self):
         recvline.HistoricRecvLine.connectionMade(self)
-        self.terminal.write("Welcome to my test SSH server.")
+        self.terminal.write("Welcome to my test SSH server.")        
+        print "Printed message: welcome to my test SSH server"
         self.terminal.nextLine()
         self.do_help()
         self.showPrompt()
