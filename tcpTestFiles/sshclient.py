@@ -49,7 +49,8 @@ class CommandChannel(channel.SSHChannel):
             self._gotResponse)
 
     def _gotResponse(self, _):
-        self.conn.sendEOF(self)
+        print "running _gotResponse"
+        #self.conn.sendEOF(self)
 
     def dataReceived(self, data):
         print data
@@ -68,12 +69,13 @@ class ClientCommandFactory(protocol.ClientFactory):
             self.username, self.password, self.command)
         return protocol
 
-server = '18.111.34.22' #hostname that this file connects to
-command = 'python /home/pi/UrbanFlows/slavePi2/takepic.py'
+server = '18.111.53.136' #hostname that this file connects to
+#command = 'python /home/pi/UrbanFlows/slavePi2/takepic.py'
+command = 'whoami'
 #username = raw_input("Username: ")
 username = 'pi'
 password = 'raspberry'
 #password = getpass.getpass("Password: ")
 factory = ClientCommandFactory(username, password, command)
-reactor.connectTCP(server, 22, factory)
+reactor.connectTCP(server, 2222, factory)
 reactor.run()
