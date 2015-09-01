@@ -1,10 +1,11 @@
 from twisted.conch import avatar, recvline
 from twisted.conch.interfaces import IConchUser, ISession
-from twisted.conch.ssh import factory, keys, session
+from twisted.conch.ssh import factory, keys, session, channel, common
 from twisted.conch.insults import insults
 from twisted.cred import portal, checkers
 from twisted.internet import reactor
 from zope.interface import implements
+import os
 
 class SSHDemoProtocol(recvline.HistoricRecvLine):
     def __init__(self, user):
@@ -97,7 +98,7 @@ class SSHDemoAvatar(avatar.ConchUser):
     def execCommand(self, protocol, cmd):
 	print "running execCommand"
 	print cmd
-	self.write("thanks for the data")
+	os.system("scp /home/pi/success.jpg pi")
 # 	raise NotImplementedError()
 
     def closed(self):
