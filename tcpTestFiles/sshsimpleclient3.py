@@ -9,7 +9,7 @@ from twisted.python import log
 import struct, sys, getpass, os
 
 USER = 'pi'  # replace this with a valid username
-HOST = '18.111.55.111' # and a valid host
+HOST = '18.111.53.136' # and a valid host
 PASSPHRASE = 'raspberry'
 
 class SimpleTransport(transport.SSHClientTransport):
@@ -27,12 +27,12 @@ class SimpleTransport(transport.SSHClientTransport):
 class SimpleUserAuth(userauth.SSHUserAuthClient):
     def getPassword(self):
         print "running SimpleUserAuth getPassword"
-        #return defer.succeed(getpass.getpass("%s@%s's password: " % (USER, HOST)))
-        return defer.succeed(PASSPHRASE)
+        return defer.succeed(getpass.getpass("%s@%s's password: " % (USER, HOST)))
+        #return defer.succeed(PASSPHRASE)
             
     def getPublicKey(self):
         print "running SimpleUserAuth getPublicKey"
-        path = os.path.expanduser('~/.ssh/known_hosts') 
+        path = os.path.expanduser('/home/michelle/.ssh/known_hosts') 
         # this works with rsa too
         # just change the name here and in getPrivateKey
         if not os.path.exists(path) or self.lastPublicKey:
@@ -138,5 +138,5 @@ class CatChannel(channel.SSHChannel):
         # self.loseConnection()
         # reactor.stop()
 
-protocol.ClientCreator(reactor, SimpleTransport).connectTCP(HOST, 22)
+protocol.ClientCreator(reactor, SimpleTransport).connectTCP(HOST, 2222)
 reactor.run()
