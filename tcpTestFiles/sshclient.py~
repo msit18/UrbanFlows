@@ -78,5 +78,5 @@ username = 'pi'
 password = 'raspberry'
 #password = getpass.getpass("Password: ")
 factory = ClientCommandFactory(username, password, command)
-reactor.connectTCP(server, 2222, factory)
+reactor.connectTCP(server, 22, factory)
 reactor.run()

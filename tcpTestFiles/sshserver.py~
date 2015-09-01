@@ -97,7 +97,6 @@ class SSHDemoAvatar(avatar.ConchUser):
     def execCommand(self, protocol, cmd):
 	print "running execCommand"
 	print cmd
-	self.write("thanks for the data")
 # 	raise NotImplementedError()
 
     def closed(self):
