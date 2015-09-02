@@ -14,7 +14,7 @@ class SSHDemoAvatar(avatar.ConchUser):
         avatar.ConchUser.__init__(self)
         self.username = username
         self.channelLookup.update({'session': session.SSHSession})
-        numConnections += 1
+#        numConnections += 1
 
     # def openShell(self, protocol):
     #     print "running openShell"
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     sshFactory.publicKeys = {'ssh-rsa': pubKey}
     sshFactory.privateKeys = {'ssh-rsa': privKey}
 
-    global numConnections
-    numConnections = 0
+#    global numConnections
+#    numConnections = 0
     reactor.listenTCP(2222, sshFactory)
     reactor.run()
