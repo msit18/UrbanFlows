@@ -66,7 +66,7 @@ if __name__ == "__main__":
     sshFactory.publicKeys = {'ssh-rsa': pubKey}
     sshFactory.privateKeys = {'ssh-rsa': privKey}
 
-#    global numConnections
-#    numConnections = 0
+    global numConnections
+    numConnections = 0
     reactor.listenTCP(2222, sshFactory)
     reactor.run()
