@@ -2,7 +2,9 @@
 
 from twisted.conch.ssh import transport, connection, userauth, channel, common
 from twisted.internet import defer, protocol, reactor
+from twisted.python import log
 import sys, getpass
+log.startLogging(sys.stderr)
 
 class ClientCommandTransport(transport.SSHClientTransport):
     def __init__(self, username, password, command):
@@ -71,6 +73,7 @@ class ClientCommandFactory(protocol.ClientFactory):
         return protocol
 
 server = '18.111.53.136' #hostname that this file connects to
+#server = '10.0.0.2'
 command = 'python /home/pi/UrbanFlows/slavePi2/takepic.py'
 #command = 'whoami'
 #username = raw_input("Username: ")
