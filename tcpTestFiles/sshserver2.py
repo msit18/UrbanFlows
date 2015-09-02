@@ -14,7 +14,6 @@ class SSHDemoAvatar(avatar.ConchUser):
         avatar.ConchUser.__init__(self)
         self.username = username
         self.channelLookup.update({'session': session.SSHSession})
-#        numConnections += 1
 
     # def openShell(self, protocol):
     #     print "running openShell"
@@ -23,12 +22,17 @@ class SSHDemoAvatar(avatar.ConchUser):
     #     protocol.makeConnection(session.wrapProtocol(serverProtocol))
 
     def execCommand(self, protocol, cmd):
+	global numConnections
+	numConnections = numConnections + 1
+	print numConnections
         print "running execCommand"
         print cmd
-        os.system(cmd)
-        #os.system("scp /home/pi/success.jpg pi")
+#        os.system(cmd)
 
     def closed(self):
+	global numConnections
+	numConnections -= 1
+	print numConnections
         print "running closed"
         pass
 
