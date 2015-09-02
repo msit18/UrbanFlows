@@ -1,0 +1,143 @@
+from twisted.conch import avatar, recvline
+from twisted.conch.interfaces import IConchUser, ISession
+from twisted.conch.ssh import factory, keys, session, channel, common
+from twisted.conch.insults import insults
+from twisted.cred import portal, checkers
+from twisted.internet import reactor
+from zope.interface import implements
+import os
+
+# class SSHDemoProtocol(recvline.HistoricRecvLine):
+#     def __init__(self, user):
+#         self.user = user
+
+#     def connectionMade(self):
+#         print "running connectionMade"
+#         recvline.HistoricRecvLine.connectionMade(self)
+#         self.terminal.write("Welcome to my test SSH server.")        
+#         print "Printed message: welcome to my test SSH server"
+#         self.terminal.nextLine()
+#         self.do_help()
+#         self.showPrompt()
+
+#     def showPrompt(self):
+#         print "running showPrompt"
+#         self.terminal.write("$ ")
+
+#     def getCommandFunc(self, cmd):
+#         print "running getCommandFunc"
+#         return getattr(self, 'do_' + cmd, None)
+
+#     def lineReceived(self, line):
+#         print "running lineReceived"
+#         line = line.strip()
+#         print line
+#         if line:
+#             cmdAndArgs = line.split()
+#             cmd = cmdAndArgs[0]
+#             args = cmdAndArgs[1:]
+#             func = self.getCommandFunc(cmd)
+#             if func:
+#                 try:
+#                     func(*args)
+#                 except Exception, e:
+#                     self.terminal.write("Error: %s" % e)
+#                     self.terminal.nextLine()
+#             else:
+#                 self.terminal.write("No such command.")
+#                 self.terminal.nextLine()
+#         self.showPrompt()
+
+#     def do_help(self):
+#         print "running do_help"
+#         publicMethods = filter(
+#             lambda funcname: funcname.startswith('do_'), dir(self))
+#         commands = [cmd.replace('do_', '', 1) for cmd in publicMethods]
+#         self.terminal.write("Commands: " + " ".join(commands))
+#         self.terminal.nextLine()
+
+#     def do_echo(self, *args):
+#         print "running do_echo"
+#         self.terminal.write(" ".join(args))
+#         self.terminal.nextLine()
+
+#     def do_whoami(self):
+#         print "running do_whoami"
+#         self.terminal.write(self.user.username)
+#         self.terminal.write("hiPi")
+#         self.terminal.nextLine()
+
+#     def do_quit(self):
+#         print "running do_quit"
+#         self.terminal.write("Thanks for playing!")
+#         self.terminal.nextLine()
+#         self.terminal.loseConnection()
+
+#     def do_clear(self):
+#         print "running do_clear"
+#         self.terminal.reset()
+
+class SSHDemoAvatar(avatar.ConchUser):
+    implements(ISession)
+
+    def __init__(self, username):
+        avatar.ConchUser.__init__(self)
+        self.username = username
+        self.channelLookup.update({'session': session.SSHSession})
+
+    def openShell(self, protocol):
+        print "running openShell"
+        serverProtocol = insults.ServerProtocol(SSHDemoProtocol, self)
+        serverProtocol.makeConnection(protocol)
+        protocol.makeConnection(session.wrapProtocol(serverProtocol))
+
+    # def getPty(self, terminal, windowSize, attrs):
+    #     print "running getPty"
+    #     return None
+
+    def execCommand(self, protocol, cmd):
+        print "running execCommand"
+        print cmd
+        os.system("scp /home/pi/success.jpg pi")
+        # 	raise NotImplementedError()
+
+    def closed(self):
+        print "running closed"
+        pass
+
+class SSHDemoRealm(object):
+    implements(portal.IRealm)
+
+    def requestAvatar(self, avatarId, mind, *interfaces):
+        print "running requestAvatar"
+        if IConchUser in interfaces:
+            return interfaces[0], SSHDemoAvatar(avatarId), lambda: None
+        else:
+            raise NotImplementedError("No supported interfaces found.")
+
+def getRSAKeys():
+    with open('/home/pi/.ssh/id_rsa') as privateBlobFile:
+        privateBlob = privateBlobFile.read()
+        privateKey = keys.Key.fromString(data=privateBlob)
+
+    with open('/home/pi/.ssh/id_rsa.pub') as publicBlobFile:
+        publicBlob = publicBlobFile.read()
+        publicKey = keys.Key.fromString(data=publicBlob)
+
+    return publicKey, privateKey
+
+if __name__ == "__main__":
+    print "waiting"
+    sshFactory = factory.SSHFactory()
+    sshFactory.portal = portal.Portal(SSHDemoRealm())
+
+    users = {'admin': 'aaa', 'guest': 'bbb', 'pi':'raspberry'}
+    sshFactory.portal.registerChecker(
+        checkers.InMemoryUsernamePasswordDatabaseDontUse(**users))
+
+    pubKey, privKey = getRSAKeys()
+    sshFactory.publicKeys = {'ssh-rsa': pubKey}
+    sshFactory.privateKeys = {'ssh-rsa': privKey}
+
+    reactor.listenTCP(2222, sshFactory)
+    reactor.run()
