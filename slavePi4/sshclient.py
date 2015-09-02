@@ -74,7 +74,8 @@ class ClientCommandFactory(protocol.ClientFactory):
 
 server = '18.111.53.136' #hostname that this file connects to
 #server = '10.0.0.2'
-command = 'python /home/pi/UrbanFlows/slavePi2/takepic.py'
+command = 'python /home/pi/UrbanFlows/slavePi2/makeGarbageFile.py'
+#command = 'python /home/pi/UrbanFlows/slavePi2/takepic.py'
 #command = 'whoami'
 #username = raw_input("Username: ")
 username = 'pi'
