@@ -72,8 +72,8 @@ class ClientCommandFactory(protocol.ClientFactory):
         return protocol
 
 server = '18.111.36.91' #hostname that this file connects to
-command = 'python /home/pi/UrbanFlows/slavePi2/takepic.py'
-#command = 'whoami'
+#command = 'python /home/pi/UrbanFlows/slavePi2/takepic.py'
+command = 'whoami'
 username = 'pi'
 password = 'raspberry'
 factory = ClientCommandFactory(username, password, command)
