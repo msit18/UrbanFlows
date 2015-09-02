@@ -14,6 +14,7 @@ class SSHDemoAvatar(avatar.ConchUser):
         avatar.ConchUser.__init__(self)
         self.username = username
         self.channelLookup.update({'session': session.SSHSession})
+        numConnections += 1
 
     # def openShell(self, protocol):
     #     print "running openShell"
@@ -37,7 +38,6 @@ class SSHDemoRealm(object):
     def requestAvatar(self, avatarId, mind, *interfaces):
         print "running requestAvatar"
         if IConchUser in interfaces:
-            numConnections += 1
             return interfaces[0], SSHDemoAvatar(avatarId), lambda: None
         else:
             raise NotImplementedError("No supported interfaces found.")
