@@ -35,6 +35,7 @@ class SSHDemoRealm(object):
     implements(portal.IRealm)
 
     def requestAvatar(self, avatarId, mind, *interfaces):
+        numConnections += 1
         print "running requestAvatar"
         if IConchUser in interfaces:
             return interfaces[0], SSHDemoAvatar(avatarId), lambda: None
@@ -65,5 +66,7 @@ if __name__ == "__main__":
     sshFactory.publicKeys = {'ssh-rsa': pubKey}
     sshFactory.privateKeys = {'ssh-rsa': privKey}
 
+    global numConnections
+    numConnections = 0
     reactor.listenTCP(2222, sshFactory)
     reactor.run()
