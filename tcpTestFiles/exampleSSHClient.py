@@ -1,10 +1,6 @@
-#Current working ssh client file
-
 from twisted.conch.ssh import transport, connection, userauth, channel, common
 from twisted.internet import defer, protocol, reactor
-from twisted.python import log
 import sys, getpass
-#log.startLogging(sys.stderr)
 
 class ClientCommandTransport(transport.SSHClientTransport):
     def __init__(self, username, password, command):
@@ -19,7 +15,8 @@ class ClientCommandTransport(transport.SSHClientTransport):
 
     def connectionSecure(self):
         self.requestService(
-            PasswordAuth(self.username, self.password, ClientConnection(self.command) ) )
+            PasswordAuth(self.username, self.password,
+                         ClientConnection(self.command)))
 
 class PasswordAuth(userauth.SSHUserAuthClient):
     def __init__(self, user, password, connection):
@@ -50,11 +47,9 @@ class CommandChannel(channel.SSHChannel):
             self._gotResponse)
 
     def _gotResponse(self, _):
-        print "running _gotResponse"
-        #self.conn.sendEOF(self)
+        self.conn.sendEOF(self)
 
     def dataReceived(self, data):
-        print "received: {0}".format(data)
         print data
 
     def closed(self):
@@ -71,13 +66,10 @@ class ClientCommandFactory(protocol.ClientFactory):
             self.username, self.password, self.command)
         return protocol
 
-server = '18.111.36.91' #hostname that this file connects to
+server = '18.111.36.91'
 command = 'python /home/pi/UrbanFlows/slavePi2/takepic.py'
-#command = 'whoami'
 username = 'pi'
 password = 'raspberry'
 factory = ClientCommandFactory(username, password, command)
-#Use port 22 for direct commands.  Use 2222 if there's a server waiting on the other side
-#reactor.connectTCP(server, 22, factory)
 reactor.connectTCP(server, 2222, factory)
 reactor.run()
