@@ -35,9 +35,9 @@ class SSHDemoRealm(object):
     implements(portal.IRealm)
 
     def requestAvatar(self, avatarId, mind, *interfaces):
-        numConnections += 1
         print "running requestAvatar"
         if IConchUser in interfaces:
+            numConnections += 1
             return interfaces[0], SSHDemoAvatar(avatarId), lambda: None
         else:
             raise NotImplementedError("No supported interfaces found.")
