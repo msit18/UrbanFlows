@@ -45,9 +45,10 @@ class CommandChannel(channel.SSHChannel):
         self.command = command
 
     def channelOpen(self, data):
-        self.conn.sendRequest(
-            self, 'exec', common.NS(self.command), wantReply=True).addCallback(
-            self._gotResponse)
+        pass
+        # self.conn.sendRequest(
+        #     self, 'exec', common.NS(self.command), wantReply=True).addCallback(
+        #     self._gotResponse)
 
     def _gotResponse(self, _):
         print "running _gotResponse"

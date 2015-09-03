@@ -47,9 +47,15 @@ class SimpleSession(SSHSession):
 class SimpleRealm(object):
     def requestAvatar(self, avatarId, mind, *interfaces):
 #        user = ConchUser()
-	user = 'pi'
-        user.channelLookup['session'] = SimpleSession
-        return IConchUser, user, nothing
+	    # user = 'pi'
+     #    user.channelLookup['session'] = SimpleSession
+     #    return IConchUser, user, nothing
+        if IConchUser in interfaces:
+            return interfaces[0], SSHDemoAvatar(avatarId), lambda: None
+        else:
+            raise NotImplementedError("No supported interfaces found.")
+
+
 
 print "waiting"
 factory = SSHFactory()
