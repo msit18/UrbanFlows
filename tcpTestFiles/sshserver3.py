@@ -1,5 +1,5 @@
 from twisted.internet.protocol import Protocol
-from twisted.cred.portal import Portal
+from twisted.cred.portal import Portal, IRealm
 from twisted.cred.checkers import FilePasswordDB, InMemoryUsernamePasswordDatabaseDontUse
 from twisted.conch.ssh.factory import SSHFactory
 from twisted.internet import reactor
@@ -8,14 +8,18 @@ from twisted.conch.interfaces import IConchUser
 from twisted.conch.avatar import ConchUser
 from twisted.conch.ssh.session import (
     SSHSession, SSHSessionProcessProtocol, wrapProtocol)
+from zope.interface import implements
 
-with open('/home/pi/.ssh/id_rsa') as privateBlobFile:
-    privateBlob = privateBlobFile.read()
-    privateKey = Key.fromString(data=privateBlob)
+def getRSAKeys():
+	with open('/home/pi/.ssh/id_rsa') as privateBlobFile:
+		privateBlob = privateBlobFile.read()
+		privateKey = Key.fromString(data=privateBlob)
 
-with open('/home/pi/.ssh/id_rsa.pub') as publicBlobFile:
-    publicBlob = publicBlobFile.read()
-    publicKey = Key.fromString(data=publicBlob)
+	with open('/home/pi/.ssh/id_rsa.pub') as publicBlobFile:
+		publicBlob = publicBlobFile.read()
+		publicKey = Key.fromString(data=publicBlob)
+
+	return publicKey, privateKey
 
 class EchoProtocol(Protocol):
     def connectionMade(self):
@@ -45,6 +49,8 @@ class SimpleSession(SSHSession):
         return True
 
 class SimpleRealm(object):
+    implements(IRealm)
+
     def requestAvatar(self, avatarId, mind, *interfaces):
 #        user = ConchUser()
 	    # user = 'pi'
@@ -59,6 +65,7 @@ class SimpleRealm(object):
 
 print "waiting"
 factory = SSHFactory()
+publicKey, privateKey = getRSAKeys()
 factory.privateKeys = {'ssh-rsa': privateKey}
 factory.publicKeys = {'ssh-rsa': publicKey}
 factory.portal = Portal(SimpleRealm())
