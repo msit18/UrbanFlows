@@ -1,5 +1,5 @@
 from twisted.internet.protocol import Protocol
-from twisted.cred.portal import Portal#, IRealm
+from twisted.cred.portal import Portal
 from twisted.cred.checkers import FilePasswordDB, InMemoryUsernamePasswordDatabaseDontUse
 from twisted.conch.ssh.factory import SSHFactory
 from twisted.internet import reactor
@@ -8,7 +8,6 @@ from twisted.conch.interfaces import IConchUser
 from twisted.conch.avatar import ConchUser
 from twisted.conch.ssh.session import (
     SSHSession, SSHSessionProcessProtocol, wrapProtocol)
-#from zope.interface import implements
 
 class EchoProtocol(Protocol):
     def connectionMade(self):
@@ -20,8 +19,8 @@ class EchoProtocol(Protocol):
     def connectionLost(self, reason):
         print 'Connection lost', reason
 
-def nothing():
-    pass
+# def nothing():
+#     pass
 
 class SimpleSession(SSHSession):
     name = 'session'
@@ -38,19 +37,13 @@ class SimpleSession(SSHSession):
         return True
 
 class SimpleRealm(object):
-#    implements(IRealm)
-
     def requestAvatar(self, avatarId, mind, *interfaces):
 	print "running requestAvatar"
-#        user = ConchUser()
-	    # user = 'pi'
-     #    user.channelLookup['session'] = SimpleSession
-     #    return IConchUser, user, nothing
         if IConchUser in interfaces:
             print "if statement"
             user = ConchUser()
             user.channelLookup['session'] = SimpleSession
-            return IConchUser, user, nothing
+            return IConchUser, user#, nothing
         else:
             raise NotImplementedError("No supported interfaces found.")
 
