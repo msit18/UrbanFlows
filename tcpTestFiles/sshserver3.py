@@ -11,6 +11,7 @@ from twisted.conch.ssh.session import (
 from zope.interface import implements
 
 def getRSAKeys():
+	print "running getRSAKeys"
 	with open('/home/pi/.ssh/id_rsa') as privateBlobFile:
 		privateBlob = privateBlobFile.read()
 		privateKey = Key.fromString(data=privateBlob)
@@ -52,12 +53,17 @@ class SimpleRealm(object):
     implements(IRealm)
 
     def requestAvatar(self, avatarId, mind, *interfaces):
+	print "running requestAvatar"
 #        user = ConchUser()
 	    # user = 'pi'
      #    user.channelLookup['session'] = SimpleSession
      #    return IConchUser, user, nothing
         if IConchUser in interfaces:
-            return interfaces[0], SSHDemoAvatar(avatarId), lambda: None
+            print "if statement"
+#            return interfaces[0], SSHDemoAvatar(avatarId), lambda: None
+            user = ConchUser()
+            user.channelLookup['session'] = SimpleSession
+            return IConchUser, user, nothing
         else:
             raise NotImplementedError("No supported interfaces found.")
 
