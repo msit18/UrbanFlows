@@ -1,6 +1,6 @@
 from twisted.internet.protocol import Protocol
 from twisted.cred.portal import Portal
-from twisted.cred.checkers import FilePasswordDB
+from twisted.cred.checkers import FilePasswordDB, InMemoryUsernamePasswordDatabaseDontUse
 from twisted.conch.ssh.factory import SSHFactory
 from twisted.internet import reactor
 from twisted.conch.ssh.keys import Key
@@ -9,11 +9,11 @@ from twisted.conch.avatar import ConchUser
 from twisted.conch.ssh.session import (
     SSHSession, SSHSessionProcessProtocol, wrapProtocol)
 
-with open('id_rsa') as privateBlobFile:
+with open('/home/pi/.ssh/id_rsa') as privateBlobFile:
     privateBlob = privateBlobFile.read()
     privateKey = Key.fromString(data=privateBlob)
 
-with open('id_rsa.pub') as publicBlobFile:
+with open('/home/pi/.ssh/id_rsa.pub') as publicBlobFile:
     publicBlob = publicBlobFile.read()
     publicKey = Key.fromString(data=publicBlob)
 
@@ -46,7 +46,8 @@ class SimpleSession(SSHSession):
 
 class SimpleRealm(object):
     def requestAvatar(self, avatarId, mind, *interfaces):
-        user = ConchUser()
+#        user = ConchUser()
+	user = 'pi'
         user.channelLookup['session'] = SimpleSession
         return IConchUser, user, nothing
 
@@ -55,7 +56,9 @@ factory = SSHFactory()
 factory.privateKeys = {'ssh-rsa': privateKey}
 factory.publicKeys = {'ssh-rsa': publicKey}
 factory.portal = Portal(SimpleRealm())
-factory.portal.registerChecker(FilePasswordDB("ssh-passwords"))
+#factory.portal.registerChecker(FilePasswordDB("ssh-passwords"))
+users = {'pi':'raspberry'}
+factory.portal.registerChecker(InMemoryUsernamePasswordDatabaseDontUse(**users) )
 
 reactor.listenTCP(2222, factory)
 reactor.run()

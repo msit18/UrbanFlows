@@ -98,7 +98,7 @@ class SSHDemoAvatar(avatar.ConchUser):
     def execCommand(self, protocol, cmd):
 	print "running execCommand"
 	print cmd
-	os.system("scp /home/pi/success.jpg pi")
+#	os.system("scp /home/pi/success.jpg pi")
 # 	raise NotImplementedError()
 
     def closed(self):
