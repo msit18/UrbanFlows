@@ -4,7 +4,7 @@ from twisted.conch.ssh import transport, connection, userauth, channel, common
 from twisted.internet import defer, protocol, reactor
 from twisted.python import log
 import sys, getpass
-#log.startLogging(sys.stderr)
+log.startLogging(sys.stderr)
 
 class ClientCommandTransport(transport.SSHClientTransport):
     def __init__(self, username, password, command):
