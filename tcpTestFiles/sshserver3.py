@@ -19,8 +19,8 @@ class EchoProtocol(Protocol):
     def connectionLost(self, reason):
         print 'Connection lost', reason
 
-# def nothing():
-#     pass
+def nothing():
+	pass
 
 class SimpleSession(SSHSession):
     name = 'session'
@@ -43,7 +43,7 @@ class SimpleRealm(object):
             print "if statement"
             user = ConchUser()
             user.channelLookup['session'] = SimpleSession
-            return IConchUser, user#, nothing
+            return IConchUser, user, nothing
         else:
             raise NotImplementedError("No supported interfaces found.")
 
