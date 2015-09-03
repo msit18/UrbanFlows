@@ -65,13 +65,14 @@ class SimpleRealm(object):
 
 print "waiting"
 factory = SSHFactory()
-publicKey, privateKey = getRSAKeys()
-factory.privateKeys = {'ssh-rsa': privateKey}
-factory.publicKeys = {'ssh-rsa': publicKey}
 factory.portal = Portal(SimpleRealm())
 #factory.portal.registerChecker(FilePasswordDB("ssh-passwords"))
 users = {'pi':'raspberry'}
 factory.portal.registerChecker(InMemoryUsernamePasswordDatabaseDontUse(**users) )
+
+publicKey, privateKey = getRSAKeys()
+factory.privateKeys = {'ssh-rsa': privateKey}
+factory.publicKeys = {'ssh-rsa': publicKey}
 
 reactor.listenTCP(2222, factory)
 reactor.run()
