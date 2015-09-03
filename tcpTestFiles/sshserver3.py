@@ -1,5 +1,5 @@
 from twisted.internet.protocol import Protocol
-from twisted.cred.portal import Portal, IRealm
+from twisted.cred.portal import Portal#, IRealm
 from twisted.cred.checkers import FilePasswordDB, InMemoryUsernamePasswordDatabaseDontUse
 from twisted.conch.ssh.factory import SSHFactory
 from twisted.internet import reactor
@@ -8,19 +8,7 @@ from twisted.conch.interfaces import IConchUser
 from twisted.conch.avatar import ConchUser
 from twisted.conch.ssh.session import (
     SSHSession, SSHSessionProcessProtocol, wrapProtocol)
-from zope.interface import implements
-
-def getRSAKeys():
-	print "running getRSAKeys"
-	with open('/home/pi/.ssh/id_rsa') as privateBlobFile:
-		privateBlob = privateBlobFile.read()
-		privateKey = Key.fromString(data=privateBlob)
-
-	with open('/home/pi/.ssh/id_rsa.pub') as publicBlobFile:
-		publicBlob = publicBlobFile.read()
-		publicKey = Key.fromString(data=publicBlob)
-
-	return publicKey, privateKey
+#from zope.interface import implements
 
 class EchoProtocol(Protocol):
     def connectionMade(self):
@@ -50,7 +38,7 @@ class SimpleSession(SSHSession):
         return True
 
 class SimpleRealm(object):
-    implements(IRealm)
+#    implements(IRealm)
 
     def requestAvatar(self, avatarId, mind, *interfaces):
 	print "running requestAvatar"
@@ -60,25 +48,34 @@ class SimpleRealm(object):
      #    return IConchUser, user, nothing
         if IConchUser in interfaces:
             print "if statement"
-#            return interfaces[0], SSHDemoAvatar(avatarId), lambda: None
             user = ConchUser()
             user.channelLookup['session'] = SimpleSession
             return IConchUser, user, nothing
         else:
             raise NotImplementedError("No supported interfaces found.")
 
+def getRSAKeys():
+    print "running getRSAKeys"
+    with open('/home/pi/.ssh/id_rsa') as privateBlobFile:
+        privateBlob = privateBlobFile.read()
+        privateKey = Key.fromString(data=privateBlob)
 
+    with open('/home/pi/.ssh/id_rsa.pub') as publicBlobFile:
+        publicBlob = publicBlobFile.read()
+        publicKey = Key.fromString(data=publicBlob)
 
-print "waiting"
-factory = SSHFactory()
-factory.portal = Portal(SimpleRealm())
-#factory.portal.registerChecker(FilePasswordDB("ssh-passwords"))
-users = {'pi':'raspberry'}
-factory.portal.registerChecker(InMemoryUsernamePasswordDatabaseDontUse(**users) )
+    return publicKey, privateKey
 
-publicKey, privateKey = getRSAKeys()
-factory.privateKeys = {'ssh-rsa': privateKey}
-factory.publicKeys = {'ssh-rsa': publicKey}
+if __name__ == "__main__":
+    print "waiting"
+    factory = SSHFactory()
+    factory.portal = Portal(SimpleRealm())
+    users = {'pi':'raspberry'}
+    factory.portal.registerChecker(InMemoryUsernamePasswordDatabaseDontUse(**users) )
 
-reactor.listenTCP(2222, factory)
-reactor.run()
+    publicKey, privateKey = getRSAKeys()
+    factory.privateKeys = {'ssh-rsa': privateKey}
+    factory.publicKeys = {'ssh-rsa': publicKey}
+
+    reactor.listenTCP(2222, factory)
+    reactor.run()
