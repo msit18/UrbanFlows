@@ -1,3 +1,7 @@
+#Current working ssh server file
+
+#Borrowed from online source. Heavy edits from Michelle Sit
+
 from twisted.internet.protocol import Protocol
 from twisted.cred.portal import Portal
 from twisted.cred.checkers import FilePasswordDB, InMemoryUsernamePasswordDatabaseDontUse
@@ -11,6 +15,7 @@ from twisted.conch.ssh.session import (
 
 class EchoProtocol(Protocol):
     def connectionMade(self):
+        
         self.transport.write("Echo protocol connected\r\n")
 
     def dataReceived(self, bytes):
