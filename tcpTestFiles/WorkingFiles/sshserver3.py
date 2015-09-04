@@ -1,9 +1,7 @@
-#Current working ssh server file
-
-#Borrowed from online source. Heavy edits from Michelle Sit
+#Working ssh server file.  Used with sshclient2.py
 
 from twisted.internet.protocol import Protocol
-from twisted.cred.portal import Portal
+from twisted.cred.portal import Portal, IRealm
 from twisted.cred.checkers import FilePasswordDB, InMemoryUsernamePasswordDatabaseDontUse
 from twisted.conch.ssh.factory import SSHFactory
 from twisted.internet import reactor
@@ -12,16 +10,19 @@ from twisted.conch.interfaces import IConchUser
 from twisted.conch.avatar import ConchUser
 from twisted.conch.ssh.session import (
     SSHSession, SSHSessionProcessProtocol, wrapProtocol)
+from zope.interface import implements
 
 class EchoProtocol(Protocol):
+
     def connectionMade(self):
-        
+	print "running connectionMade"
         self.transport.write("Echo protocol connected\r\n")
 
     def dataReceived(self, bytes):
         self.transport.write("echo: " + repr(bytes) + "\r\n")
 
     def connectionLost(self, reason):
+	print "running connectionLost"
         print 'Connection lost', reason
 
 def nothing():
@@ -34,6 +35,7 @@ class SimpleSession(SSHSession):
         return True
 
     def request_shell(self, data):
+	print "running request_shell"
         protocol = EchoProtocol()
         transport = SSHSessionProcessProtocol(self)
         protocol.makeConnection(transport)
@@ -42,15 +44,17 @@ class SimpleSession(SSHSession):
         return True
 
 class SimpleRealm(object):
+    implements(IRealm)
+
     def requestAvatar(self, avatarId, mind, *interfaces):
-	print "running requestAvatar"
+        print "running requestAvatar"
         if IConchUser in interfaces:
-            print "if statement"
-            user = ConchUser()
-            user.channelLookup['session'] = SimpleSession
-            return IConchUser, user, nothing
+             print "if statement"
+             user = ConchUser()
+             user.channelLookup['session'] = SimpleSession
+             return IConchUser, user, nothing
         else:
-            raise NotImplementedError("No supported interfaces found.")
+             raise NotImplementedError("No supported interfaces found.")
 
 def getRSAKeys():
     print "running getRSAKeys"
