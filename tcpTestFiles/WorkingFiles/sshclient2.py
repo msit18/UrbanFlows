@@ -6,6 +6,17 @@ from twisted.python import log
 import sys, getpass
 log.startLogging(sys.stderr)
 
+class ClientCommandFactory(protocol.ClientFactory):
+    def __init__(self, username, password, command):
+        self.username = username
+        self.password = password
+        self.command = command
+
+    def buildProtocol(self, addr):
+        protocol = ClientCommandTransport(
+            self.username, self.password, self.command)
+        return protocol
+
 class ClientCommandTransport(transport.SSHClientTransport):
     def __init__(self, username, password, command):
         self.username = username
@@ -18,6 +29,7 @@ class ClientCommandTransport(transport.SSHClientTransport):
         return defer.succeed(True)
 
     def connectionSecure(self):
+        print "running connectionSecure"
         self.requestService(
             PasswordAuth(self.username, self.password, ClientConnection(self.command) ) )
 
@@ -35,6 +47,7 @@ class ClientConnection(connection.SSHConnection):
         self.command = cmd
 
     def serviceStarted(self):
+        print "running serviceStarted"
         self.openChannel(CommandChannel(self.command, conn=self))
 
 class CommandChannel(channel.SSHChannel):
@@ -45,10 +58,11 @@ class CommandChannel(channel.SSHChannel):
         self.command = command
 
     def channelOpen(self, data):
+        print "running channelOpen for client"
         pass
-        self.conn.sendRequest(
-            self, 'exec', common.NS(self.command), wantReply=True).addCallback(
-            self._gotResponse)
+        # self.conn.sendRequest(
+        #     self, 'exec', common.NS(self.command), wantReply=True).addCallback(
+        #     self._gotResponse)
 
     def _gotResponse(self, _):
         print "running _gotResponse"
@@ -61,16 +75,6 @@ class CommandChannel(channel.SSHChannel):
     def closed(self):
         reactor.stop()
 
-class ClientCommandFactory(protocol.ClientFactory):
-    def __init__(self, username, password, command):
-        self.username = username
-        self.password = password
-        self.command = command
-
-    def buildProtocol(self, addr):
-        protocol = ClientCommandTransport(
-            self.username, self.password, self.command)
-        return protocol
 
 server = '18.111.37.15' #hostname that this file connects to
 #command = 'python /home/pi/UrbanFlows/slavePi2/takepic.py'
