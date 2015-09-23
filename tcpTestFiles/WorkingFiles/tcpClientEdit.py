@@ -29,6 +29,9 @@ class myProtocol(protocol.Protocol):
 		self.state = "runFirst"
 
 	def connectionMade(self):
+		self.sendIP()
+
+	def sendIP(self):
 		ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
 		piTime = subprocess.check_output("date '+%T'", shell=True).strip()
 		msg = "piGroup1 {0} {1}".format(ip_address, piTime)

@@ -44,7 +44,7 @@ class shutdownS5():
 				time.sleep(1)
 				cad.lcd.clear()
 				print ("os reboot masterPi")
-#				# os.system("sudo reboot")
+				os.system("sudo reboot")
 			else:
 				shutdownS5.homeScreen()
 		elif v1.exitAns == "Shutdown all":
@@ -57,9 +57,9 @@ class shutdownS5():
 				time.sleep(1)
 				cad.lcd.clear()
 				print ("os shutdown all")
-#				# os.system("sshpass -p 'raspberry' ssh pi@10.0.0.2 -o StrictHostKeyChecking=no sudo halt & sshpass -p 'raspberry' ssh pi@10.0.0.3 -o StrictHostKeyChecking=no sudo halt & \
-#				# sshpass -p 'raspberry' ssh pi@10.0.0.4 -o StrictHostKeyChecking=no sudo halt & sshpass -p 'raspberry' ssh pi@10.0.0.5 -o StrictHostKeyChecking=no sudo halt")
-#				# os.system("sudo shutdown -h now")
+				os.system("sshpass -p 'raspberry' ssh pi@10.0.0.2 -o StrictHostKeyChecking=no sudo halt & sshpass -p 'raspberry' ssh pi@10.0.0.3 -o StrictHostKeyChecking=no sudo halt & \
+				sshpass -p 'raspberry' ssh pi@10.0.0.4 -o StrictHostKeyChecking=no sudo halt & sshpass -p 'raspberry' ssh pi@10.0.0.5 -o StrictHostKeyChecking=no sudo halt")
+				os.system("sudo shutdown -h now")
 			else:
 				shutdownS5.homeScreen()
 		elif v1.exitAns == "Reboot all":
@@ -72,9 +72,9 @@ class shutdownS5():
 				time.sleep(1)
 				cad.lcd.clear()
 				print ("Os rebooted")
-#				# os.system("sshpass -p 'raspberry' ssh pi@10.0.0.2 -o StrictHostKeyChecking=no sudo reboot & sshpass -p 'raspberry' ssh pi@10.0.0.3 -o StrictHostKeyChecking=no sudo reboot & \
-#				# 	   sshpass -p 'raspberry' ssh pi@10.0.0.4 -o StrictHostKeyChecking=no sudo reboot & sshpass -p 'raspberry' ssh pi@10.0.0.5 -o StrictHostKeyChecking=no sudo reboot")
-#				# os.system("sudo reboot")
+				os.system("sshpass -p 'raspberry' ssh pi@10.0.0.2 -o StrictHostKeyChecking=no sudo reboot & sshpass -p 'raspberry' ssh pi@10.0.0.3 -o StrictHostKeyChecking=no sudo reboot & \
+					   sshpass -p 'raspberry' ssh pi@10.0.0.4 -o StrictHostKeyChecking=no sudo reboot & sshpass -p 'raspberry' ssh pi@10.0.0.5 -o StrictHostKeyChecking=no sudo reboot")
+				os.system("sudo reboot")
 			else:
 				shutdownS5.homeScreen()
 		elif v1.exitAns == "Num file in fldr":
@@ -92,7 +92,6 @@ class shutdownS5():
 			shutdownS5.homeScreen()
 		else:
 			shutdownS5.homeScreen()
-
 
 	def homeScreen():
 		print ("resolutionS2 S2 function")

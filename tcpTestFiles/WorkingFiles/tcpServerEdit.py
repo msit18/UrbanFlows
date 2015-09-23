@@ -9,6 +9,7 @@ import time
 #sets up the Protocol class
 class DataFactory(Factory):
 	numConnections = 0
+	dictFormat = {}
 
 	def __init__(self, data=None):
 		self.data = data
@@ -18,6 +19,7 @@ class DataFactory(Factory):
 		return DataProtocol(self)
 
 class DataProtocol (protocol.Protocol):
+	dictFormat = {}
 	def __init__(self,factory):
 		self.factory = factory
 
@@ -29,30 +31,34 @@ class DataProtocol (protocol.Protocol):
 #Then switches to accepting error messages
 	def dataReceived(self, data):
 		print "Server received data: {0}".format(data)
-		storage = [data for data in data.split() if data.strip()]
-		print storage
-		piInfo = [storage[1], storage[2]]
-		listOfAll = [piInfo]
-		dictFormat = {storage[0]: listOfAll}
-		print dictFormat
-		print dictFormat.keys()
-		listOfAll.append(['10.189.49.150', '19:01:10'])
-		print dictFormat
-		for x in listOfAll:
-			print x[1]
+		dataSplit = [data for data in data.split() if data.strip()]
+		print dataSplit[0]
+		print dataSplit[0] in self.factory.dictFormat
+		if dataSplit[0] == "msg":
+			pass #run cmd
+		elif (dataSplit[0] in self.factory.dictFormat) == False:
+			piInfo = [dataSplit[1], dataSplit[2]]
+			listOfAll = [piInfo]
+			self.factory.dictFormat = {dataSplit[0]: listOfAll}
+			print "dictFormat:"
+			print self.factory.dictFormat
+			print "keys of dictoFormat"
+			print self.factory.dictFormat.keys()
+			listOfAll.append(['10.189.49.150', '19:01:10'])
+			print self.factory.dictFormat
+			for x in listOfAll:
+				print x[1]
+		elif (dataSplit[0] in self.factory.dictFormat) == True:
+			print "it's true! I have this IP in my keys already"
+		else:
+			print "didn't find anything.  Sorry"
 		self.transport.write("Thanks I got your data")
 	#	self.updateData(data)
 
-	def _acceptIP(self, data):
-		print "running acceptIP.  Received: {0}".format(data)
-		self.transport.write("Thanks I got your IP address")
-
-	def _acceptMSG(self, data):
-		print "running acceptMSG.  Received: {0}".format(data)
-		self.transport.write("Thanks I got your message")
-
 	def connectionLost(self, reason):
 		self.factory.numConnections -= 1
+		print "connection closed"
+		print self.factory.dictFormat
 		print "Connection lost. Number of active connections: {0}".format(self.factory.numConnections)
 
 

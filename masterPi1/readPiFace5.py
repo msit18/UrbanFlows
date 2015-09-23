@@ -58,15 +58,18 @@ class callAll():
 		p1.videoTimeEng = 0
 		p1.resolutionW = 0
 		p1.resolutionH = 0
+		#Used to set camera fps
 		p1.numFrames = 0
 		p1.timeInterval = 0
-		p1.inputFR = 0
+		p1.inputFR = 0 #Used to designate framerate (fps) for video.  Used to set internal camera framerate (different for fps for camera)
+
+
 		p1.inputFPS = "{0}fps".format(p1.inputFR)
 
 		p1.inputRun = ""
 		p1.currentMode = "MODE"
 		p1.cmdStr = ""
-		p1.fileName = ""
+#		p1.fileName = ""
 		p1.exitAns = ""
 		p1.emergencyAns = ""
 		p1.check = ["0"]
@@ -171,6 +174,8 @@ class callAll():
 		cad.lcd.clear()
 		#User feedback
 		p1.inputFR = p1.FRanswers[answer_index]
+		p1.setCamFramesAndTime()
+		p1.manualFRSelect()
 		cad.lcd.write("FRate selected: \n{0}".format(p1.inputFR))
 		time.sleep(1)
 		p1.homeScreen()
@@ -199,7 +204,7 @@ class callAll():
 		#Set string to video mode
 		elif p1.inputRun == "VID":
 			p1.currentMode = p1.inputRun
-			p1.fileName = "videoMode1.py"
+#			p1.fileName = "videoMode1.py"
 			cad.lcd.clear()
 			cad.lcd.write("Selected video\nCheck res")
 			time.sleep(1)
@@ -207,7 +212,7 @@ class callAll():
 		#Set string to manual mode
 		elif p1.inputRun == "CAM":
 			p1.currentMode = p1.inputRun
-			p1.fileName = "manualPic2.py"
+#			p1.fileName = "manualPic2.py"
 			cad.lcd.clear()
 			cad.lcd.write("Selected pictures\nCheck res")
 			time.sleep(1)
@@ -318,6 +323,7 @@ class callAll():
 		elif p1.currentMode == "CAM":
 			if p1.resolutionH == "1080":
 				p1.FRanswers = ["1", "2", "3", "5", "8", "Custom"]
+				p1.frameRate = 90
 			elif p1.resolutionH == "1944":
 				p1.FRanswers = ["1", "2", "3", "5", "Custom"]
 			elif p1.resolutionH == "730":
@@ -326,8 +332,8 @@ class callAll():
 				p1.FRanswers = ["10", "20"]
 			else:
 				p1.FRanswers = ["0"]
-			p1.manualFRSelect()
-			p1.setCamFramesAndTime()
+#			p1.manualFRSelect()
+#			p1.setCamFramesAndTime()
 		else:
 			p1.FRanswers = ["0"]
 
@@ -355,7 +361,7 @@ class callAll():
 		p1.timeInterval = 1
 		if p1.inputFR == "1":
 			p1.numFrames = 1
-		if p1.inputFR == "2" and p1.resoluionH != "1944":
+		if p1.inputFR == "2" and p1.resolutionH != "1944":
 			p1.numFrames = 2
 
 		if p1.resolutionH == "1080":
@@ -396,29 +402,50 @@ class callAll():
 	#0 indicates false, 1 indicates true statement
 	def testFR(self):
 		p1.determineFR()
-		if p1.FRanswers.count(p1.inputFR) == 0:
-			cad.lcd.clear()
-			cad.lcd.write("Wrong frameRate\nTry again")
-			time.sleep(1)
-			p1.homeScreen()
-		elif p1.FRanswers.count(p1.inputFR) > 0:
+		if p1.inputFR == "Custom":
 			pass
+		else:
+			if p1.FRanswers.count(p1.inputFR) == 0:
+				cad.lcd.clear()
+				cad.lcd.write("Wrong frameRate\nTry again")
+				time.sleep(1)
+				p1.homeScreen()
+			elif p1.FRanswers.count(p1.inputFR) > 0:
+				pass
 
 #TODO: NOT TESTED YET
 #TESTRES AND TESTFR ARE EXECUTING TWICE
 	#Checks that current mode and resolution are appropriate
 	def testRes(self):
+		print ("Running testRes")
 		if p1.currentMode == "VID" and p1.resolutionH == "1944":
 			cad.lcd.clear()
 			cad.lcd.write("Wrong res\nTry again")
 			time.sleep(1)
 			p1.homeScreen()
 		else:
-			p1.cmdStr = "sshpass -p 'raspberry' ssh pi@10.0.0.2 -o StrictHostKeyChecking=no python /home/pi/{0} {1} {2} {3} {4} {5} & \
-				     sshpass -p 'raspberry' ssh pi@10.0.0.3 -o StrictHostKeyChecking=no python /home/pi/{0} {1} {2} {3} {4} {5} & \
-				     sshpass -p 'raspberry' ssh pi@10.0.0.4 -o StrictHostKeyChecking=no python /home/pi/{0} {1} {2} {3} {4} {5} & \
-				     sshpass -p 'raspberry' ssh pi@10.0.0.5 -o StrictHostKeyChecking=no python /home/pi/{0} {1} {2} {3} {4} {5}\
-			".format(p1.fileName, p1.totalTime, p1.resolutionW, p1.resolutionH, p1.inputFR, p1.videoTime)
+			p1.runCMD()
+
+	#Sends commands to the slavePies with two different modes for camera or video.  For camera mode, sets the frameRate (different from framerate specified in this code)
+	#depending on the resolution selected
+	def runCMD(self):
+		if p1.currentMode == "VID":
+			p1.cmdStr = "sshpass -p 'raspberry' ssh pi@10.0.0.2 -o StrictHostKeyChecking=no python /home/pi/videoMode1.py {0} {1} {2} {3} {4} & \
+				     sshpass -p 'raspberry' ssh pi@10.0.0.3 -o StrictHostKeyChecking=no python /home/pi/videoMode1.py {0} {1} {2} {3} {4} & \
+				     sshpass -p 'raspberry' ssh pi@10.0.0.4 -o StrictHostKeyChecking=no python /home/pi/videoMode1.py {0} {1} {2} {3} {4} & \
+				     sshpass -p 'raspberry' ssh pi@10.0.0.5 -o StrictHostKeyChecking=no python /home/pi/videoMode1.py {0} {1} {2} {3} {4}\
+			".format(p1.videoTime, p1.resolutionW, p1.resolutionH, p1.totalTime, p1.inputFR)
+		elif p1.currentMode == "CAM":
+			if p1.resolutionH == "730" or p1.resolutionH == "1944":
+				p1.inputFR = 50
+			elif p1.resolutionH == "1080" or p1.resolutionH == "480":
+				p1.inputFR = 90
+			p1.cmdStr = "sshpass -p 'raspberry' ssh pi@10.0.0.2 -o StrictHostKeyChecking=no python /home/pi/manualPic2.py {0} {1} {2} {3} {4} {5} & \
+				     sshpass -p 'raspberry' ssh pi@10.0.0.3 -o StrictHostKeyChecking=no python /home/pi/manualPic2.py {0} {1} {2} {3} {4} {5} & \
+				     sshpass -p 'raspberry' ssh pi@10.0.0.4 -o StrictHostKeyChecking=no python /home/pi/manualPic2.py {0} {1} {2} {3} {4} {5} & \
+				     sshpass -p 'raspberry' ssh pi@10.0.0.5 -o StrictHostKeyChecking=no python /home/pi/manualPic2.py {0} {1} {2} {3} {4} {5}\
+			".format(p1.totalTime, p1.resolutionW, p1.resolutionH, p1.numFrames, p1.timeInterval, p1.inputFR)
+
 
 	def main(self):
 		global cad, p1, listener

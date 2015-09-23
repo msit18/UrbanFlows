@@ -73,46 +73,55 @@ class setFpsS4():
 		if v1.inputFPS == "Custom":
 			pass
 		else:
-			if v1.inputFPS == 1:
+			print ("inputFPS is :" + str(v1.inputFPS))
+			if v1.inputFPS == "1":
 				v1.numFrames = 1
-			if v1.inputFPS == 2 and v1.resolutionH != 1944:
+				print ("Selected numFrames = 1")
+			elif v1.inputFPS == "2" and v1.resolutionH != "1944":
+				print ("v1.inputFPS ==2")
 				v1.numFrames = 2
 
-			if v1.resolutionH == 1080:
-				if v1.inputFPS == 3:
+			if v1.resolutionH == "1080":
+				print ("if resH == 1080")
+				if v1.inputFPS == "3":
 					v1.numFrames = 4
-				elif v1.inputFPS == 5:
+				elif v1.inputFPS == "5":
 					v1.numFrames = 8
-				elif v1.inputFPS == 8:
+				elif v1.inputFPS == "8":
 					v1.numFrames = 50
 					v1.timeInterval = 2
 
-			elif v1.resolutionH == 1944:
-				if v1.inputFPS == 2:
+			elif v1.resolutionH == "1944":
+				print ("Hi self! 5MP")
+				if v1.inputFPS == "2":
+					print ("Ive reached inside the loop")
+					print (v1.inputFPS)
 					v1.numFrames = 3
-				elif v1.inputFPS == 3:
+				elif v1.inputFPS == "3":
 					v1.numFrames = 7
-				elif v1.inputFPS == 5:
+				elif v1.inputFPS == "5":
 					v1.numFrames = 25
 
-			elif v1.resolutionH == 730:
-				if v1.inputFPS == 5:
+			elif v1.resolutionH == "730":
+				print ("if resH == 730")
+				if v1.inputFPS == "5":
 					v1.numFrames = 5
-				elif v1.inputFPS == 15:
+				elif v1.inputFPS == "15":
 					v1.numFrames = 30
-				elif v1.inputFPS == 18:
+				elif v1.inputFPS == "18":
 					v1.numFrames = 40
 					v1.timeInterval = 2
 
-			elif v1.resolutionH == 480:
-				if v1.inputFPS == 10:
+			elif v1.resolutionH == "480":
+				print ("if resH == 480")
+				if v1.inputFPS == "10":
 					v1.numFrames = 10
-				elif v1.inputFPS == 20:
+				elif v1.inputFPS == "20":
 					v1.numFrames = 20
+			else:
+				print ("I'm not in any of the loops")
 			print ("numFrames selected: " + str(v1.numFrames) )
 			print ("timeInterval: " + str(v1.timeInterval))
-	#		NEED TO UPDATE THE INPUT ON THE HOMESCREEN
-	#		v1.inputFPS = "{0}fps".format(v1.inputFR)
 
 	#If 'Custom' is selected as the fps, asks user questions to get fps
 	def manualFpsSelect():
