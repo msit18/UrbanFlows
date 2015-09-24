@@ -6,6 +6,10 @@
 
 #Also triggerd by wifiRestart.sh to provide feedback on its processes
 
+#Works with piFaceMain.  Will be replaced by tcp-http processes in the server iteration.
+
+#To run: python flash.py [error message]
+
 import pifacecad
 import os
 import time

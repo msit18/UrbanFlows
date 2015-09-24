@@ -1,5 +1,8 @@
 #Written by Michelle Sit
 
+#Works with piFaceMain.py in 5Pi architecture
+#Sets resolution
+
 import pifacecad 
 from pifacecad.tools.question import LCDQuestion
 import string

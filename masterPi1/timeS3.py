@@ -1,5 +1,8 @@
 #Written by Michelle Sit
 
+#Works with piFaceMain.py for the 5Pi architecture
+#Sets time
+
 import pifacecad 
 from pifacecad.tools.question import LCDQuestion
 import time

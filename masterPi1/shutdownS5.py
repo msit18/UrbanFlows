@@ -1,5 +1,9 @@
 #Written by Michelle Sit
 
+#Used with piFaceMain.py in the 5Pi architecture
+
+#Controls shutdown and restart cmds for the pies
+
 import pifacecad 
 from pifacecad.tools.question import LCDQuestion
 import os

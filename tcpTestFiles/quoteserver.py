@@ -1,3 +1,6 @@
+#Example code
+#Runs a TCP server
+
 from twisted.internet.protocol import Factory
 from twisted.internet import reactor, protocol
 import time

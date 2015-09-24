@@ -1,3 +1,6 @@
+#Example code from Twisted Dev website
+#Edits by Michelle Sit
+
 from twisted.internet.protocol import Protocol
 from twisted.cred.portal import Portal
 from twisted.cred.checkers import FilePasswordDB

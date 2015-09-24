@@ -1,3 +1,6 @@
+#Example code
+#Runs TCP client
+
 from twisted.internet import reactor, protocol
 import time
 

@@ -1,3 +1,8 @@
+#Michelle Sit playing around with example code.  Attempting to see if you can
+#connect multiple clients to a server in one code (You can't)
+
+#Used as a basis for other tcp files
+
 from twisted.internet import reactor, protocol
 import subprocess
 import time

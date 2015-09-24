@@ -1,5 +1,8 @@
 #Written by Michelle Sit
 
+#Works with piFaceMain.py
+#Sets camera or video mode, resets variables, and sends commands to slavePies after checking if parameters are permissable
+
 import pifacecad 
 from pifacecad.tools.question import LCDQuestion
 import time

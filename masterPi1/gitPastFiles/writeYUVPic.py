@@ -1,3 +1,7 @@
+#Written by Michelle Sit
+
+#Writes a YUV image
+
 import time
 import picamera
 import picamera.array

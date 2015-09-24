@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#readPiFace5.py - Derived from readPiFace4.py and used for field testing
+#readPiFace5.py - Derived from readPiFace4.py.  An old file.  No longer used.
 #Written by Michelle Sit
 
 #Reads the values from the piFace and sends them to manualPic.py to trigger

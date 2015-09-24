@@ -1,3 +1,7 @@
+#Example code
+#Michelle started to make edits to test GET and POST methods for HTTP
+#HTTP client code
+
 from pprint import pformat
 
 from twisted.internet import reactor

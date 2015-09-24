@@ -1,4 +1,6 @@
-#Current working ssh client file
+#Written by Michelle Sit
+
+#Old ssh client file
 
 from twisted.conch.ssh import transport, connection, userauth, channel, common
 from twisted.internet import defer, protocol, reactor

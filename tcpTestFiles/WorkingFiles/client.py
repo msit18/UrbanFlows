@@ -1,4 +1,8 @@
-import sys
+#Written by Vlatko Klabucar.
+
+#TODO: needs to be debugged
+
+mport sys
 
 from twisted.internet import reactor
 from twisted.web.client import Agent

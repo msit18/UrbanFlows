@@ -1,5 +1,5 @@
-#Used as an example to show how to use variables across files and how to use functions within functions and across files.
-#Example files are resolutionS2.py, piFaceMain.py, and variables.py
+#Runs the piFace program with the 5Pi architecture.  Used in field testing
+#Calls the appropriate files to execute the piFace buttons
 
 #To use, type: python3 piFaceMain.py
 #Written by Michelle Sit

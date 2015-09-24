@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#Written by Michelle Sit
+#Takes video, sends it to the MasterPi, and sends a finished msg to flash.py
+
 DATE=$(date "+%Y_%m_%d_%H_%M_%2S_%3N")
 echo;
 

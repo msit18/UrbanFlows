@@ -1,5 +1,9 @@
 #Written by Michelle Sit
 
+#Used with piFaceMain.py in the 5Pi architecture 
+
+#Sets fps for camera and video (see below for more details)
+
 import pifacecad 
 from pifacecad.tools.question import LCDQuestion
 import os

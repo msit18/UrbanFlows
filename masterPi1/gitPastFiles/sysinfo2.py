@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+
+#Example code from piFaceCAD github
+
+#Has some useful cmds for getting IP address of the pi
+
 import sys
 import subprocess
 from time import sleep

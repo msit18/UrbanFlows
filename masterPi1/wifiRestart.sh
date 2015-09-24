@@ -1,5 +1,9 @@
 #!/bin/bash
-#Test it several times and figure out how to deal with the stalling problem
+#TODO: Test it several times and figure out how to deal with the stalling problem.  Does not work
+#Attempts to connect to wifi twice.  If it fails, sends a message to flash.py to notify user
+
+#Written by Michelle Sit
+
 COUNT=0
 
 while [ $COUNT -lt 4 ] ; do
