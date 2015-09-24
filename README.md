@@ -7,38 +7,47 @@ commands that trigger the end of the processes
 #MasterPi files
 
 Programs that control the piFace:   
-*   camVidStartS1.py - Responsible for S1 functions (Cam/Vid/Clear Options)   
-*   resolutionS2.py - Responsible for S2 functions (Resolution)   
-*   timeS3.py - Responsible for S3 functions (time)   
-*   setFpsS4.py - Responsible for S4 functions (setting frames/sec and custom)   
+*   camVidStartS1.py - Sets camera or video mode, resets variables, and sends commands to slavePies after checking if parameters are permissable (S1)   
+*   resolutionS2.py - Sets resolution (S2)   
+*   timeS3.py - Sets time (S3)   
+*   setFpsS4.py - Sets frames/sec and custom fps    
 *   shutdownS5.py - Responsible for S5 functions (shutting down/restarting)   
 *   piFaceMain.py - Calls appropriate S1-5 files   
-*   variables.py - Holds all variables for S1-5   
-*   (missing) flash.py - Flashes the piFace and shows an error msg if there's something wrong or if it finishes
+*   variables.py - Stores variables for the piFaceMain program.  Shared across several files.  
+*   flash.py - Flashes the piFace and shows an error msg if there's something wrong or if it finishes   
 
-Bash scripts:
-*   clrPics.sh - removes all .jpg files from all the slavePies   
-*   removePics.sh - removes all .jpg and .h264 (video) files from the current Pi   
-*   wifiRestart.sh - restarts wifi for that Pi.  After 3 tries, triggers flash.py to restart all Pies   
+Other programs:   
+*   clrPics.sh - Triggers removePics on all slavePies.  Removes all jpg files from the home/specified folder   
+*   removePics.sh - Removes all .jpg and .h264 (video) files from the current Pi   
+*   wifiRestart.sh - Restarts wifi for that Pi.  After 3 tries, triggers flash.py to restart all Pies   
+*   restartWifi.sh - Restarts wifi if wifi is down and Pi is connected by ethernet   
 
-#SlavePi2 files
+#Common files in all SlavePi folders:   
+The common files here are almost identical across slavePi2-4.  slavePi5 has these files but with an additional
+section of code that sends parameters to flash.py on the MasterPi   
 
-Programs related to writing YUV images:   
+Programs related to piFace:   
+*   manualPic4.py - Takes 6 parameters.  Produces a text file with fps updates when running   
+*   videoMode2.py - Takes 5 parameters.   
+
+Other programs:   
+*   preview.py - Shows camera image for a specified time.  Doesn't store the images.   
+*   removePics.sh - Removes all .jpg and .h264 (video) files from the current Pi   
+*   restartWifi.sh - Restarts wifi if wifi is down and Pi is connected by ethernet   
+
+#Programs specific to each Raspi:   
+
+SlavePi2 Files:   
 *   openjpeg-2.0.1 folder - program folder.  Used when I was installing PIL (Python Imaging Library)   
-*   makeGarbageFile.py - Testing file for writing images
+*   sshserver.py - Old iteration.  Used for testing sshserver   
+*   sshsimpleclient.py - Old iteration.  Used for testing ssh client   
+*   takePic.py - Takes a picture.  Used for testing if a command has been executed.   
 
-Programs related to piFace:
-*   manualPic3.py - Past iteration of manualPic4.py
-*   manualPic4.py - Takes 5 parameters when executing file.  Produces a text file with fps updates when running
-*   videoMode2.py - Takes 4 parameters when executing file.
+SlavePi3 Files:   
+*   takeVideo.sh - Takes video, sends it to the MasterPi, and sends a finished msg to flash.py   
 
-Bash scripts:
-*   removePics.sh - removes all .jpg and .h264 (video) files from the current Pi
+SlavePi4 Files:    
+*   sshclient.py - Old ssh client file   
 
-Programs used for testing ssh:
-*   sshserver.py - Old iteration.  Used for testing sshserver
-*   sshsimpleclient.py - Old iteration.  Used for testing ssh client
-
-Useful programs for testing cameras:
-*   preview.py - turns on camera for 90 seconds.  Does not take pictures
-*   takePic.py - Takes a picture.  Used for testing if a command has been executed.
+SlavePi5 Files:   
+*   takeVideo.sh - Takes video, sends it to the MasterPi, and sends a finished msg to flash.py  
