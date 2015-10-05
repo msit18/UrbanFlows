@@ -34,7 +34,7 @@ class DataProtocol (protocol.Protocol):
 		dataSplit = [data for data in data.split() if data.strip()]
 		#dataSplit[0] = piGroup1
 		#dataSplit[1] = IP address
-		print dataSplit[0] in self.factory.dictFormta
+		print dataSplit[0] in self.factory.dictFormat
 		if dataSplit[0] == "msg":
 			pass #run cmd
 		elif dataSplit[0] == "time":
