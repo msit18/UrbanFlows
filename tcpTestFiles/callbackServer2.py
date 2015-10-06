@@ -17,7 +17,6 @@ class DataFactory(Factory):
 		self.data = data
 
 	def buildProtocol(self, addr):
-		print "running buildProtocol"
 		return DataProtocol(self, d)
 
 class DataProtocol (protocol.Protocol):
@@ -42,10 +41,8 @@ class DataProtocol (protocol.Protocol):
 		self.d.addCallback(self.gotIP)
 		self.d.addErrback(self.failedIP)
 		self.d.callback(data)
-		print "fin"
 
 	def gotIP(self, data):
-		print "got data"
 		dataSplit = [data for data in data.split() if data.strip()]
 		#dataSplit[0] = piGroup1
 		#dataSplit[1] = IP address
@@ -55,7 +52,7 @@ class DataProtocol (protocol.Protocol):
 			print "I didn't have this cluster key"
 			dictFormat[dataSplit[0]] = [dataSplit[1]]
 			print dictFormat
-			reactor.callLater(0.1, self.writeToClient, "Added your IP")
+			reactor.callLater(0.1, self.writeToClient, "ls")
 			print "finished with adding cluster and IP"
 		elif (dataSplit[0] in dictFormat) == True:
 			#appends new IP to the end of the key's list
@@ -63,13 +60,11 @@ class DataProtocol (protocol.Protocol):
 #			print dictFormat[dataSplit[0]] #prints out the key values
 			dictFormat[dataSplit[0]].append(dataSplit[1])
 			print dictFormat
-			reactor.callLater(0.1, self.writeToClient, "Added your IP")
+			reactor.callLater(0.1, self.writeToClient, "ls")
 			print "finished with adding new IP to a known cluster"
 		else:
-			print "didn't find anything.  Sorry"
 			self.d.errback(ValueError("Couldn't process your IP request"))
-		reactor.callLater (0.2, self.writeToClient, "IP received")
-		reactor.callInThread(self.checkConnections, 'piGroup1')
+		reactor.callInThread(self.checkConnections, dataSplit[0])
 
 	def writeToClient(self, msg):
 		self.transport.write(msg)
@@ -79,33 +74,29 @@ class DataProtocol (protocol.Protocol):
 		sys.stderr.write(str(failure))
 
 	#Called in seperate threads	
-	def checkConnections(self, thing2):
+	def checkConnections(self, dataKey):
 		print "This is checkConnections method.  Hello."
-		print thing2
-		print len(dictFormat[thing2])
-		numValues = len(dictFormat[thing2])
-		while numValues < 3:
-			numValues = len(dictFormat[thing2])
+		print dataKey
+		print len(dictFormat[dataKey])
+		numValues = len(dictFormat[dataKey])
+		while numValues < 0:
+			numValues = len(dictFormat[dataKey])
 		else:
-			self.d.addCallback(self.thirdMethod)
-		 	self.d.addErrback(self.failedThirdMethod)
-		print "finnn"
+			self.d.addCallback(self.sendCmds)
+		 	self.d.addErrback(self.failedSendCmds)
 
 	def failedCheckConnections(self, failure):
 		print "FAILURE: failedCheckConnections"
 		sys.stderr.write(str(failure))
-		print "end of failedCheckConnections"
 
-	#Send commands to the Pies
-	def thirdMethod(self, data):
-		print "thirdmethod"
-		reactor.callLater(0.3, self.writeToClient, "This is from thirdMethod from the Server")
+	def sendCmds(self, data):
+		print "sendCmds"
+		#reactor.callLater(0.3, self.writeToClient, "ls")
 
 #TODO: Put in a timeout to check if the msgs were received
-	def failedThirdMethod(self, failure):
-		print "FAILURE: failedThirdMethod"
+	def failedSendCmds(self, failure):
+		print "FAILURE: failedSendCmds"
 		sys.stderr.write(str(failure))
-		print "end of failedThirdMethod"
 
 if __name__ == '__main__':
 	d = defer.Deferred()

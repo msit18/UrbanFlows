@@ -6,9 +6,11 @@ import cgi
 
 class UploadImage(Resource):
     def render_GET(self, request):
+    	print "getting"
         return '<html><body><p>To upload an image just send me a POST request.</p><p> P.S. don\'t forget the image :)</p></body></html>'
 
     def render_POST(self, request):
+    	print "posting"
         file = open("uploaded-image.jpg","wb")
         file.write(request.content.read())
         return '<html><body>Image uploaded :) </body></html>'
