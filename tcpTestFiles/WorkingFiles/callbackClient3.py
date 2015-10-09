@@ -1,6 +1,8 @@
 #Working TCP client that runs with callbackServer3
 #Works to test callbacks
 
+#TODO: Integration with manualPic and videoMode
+
 #Written by Michelle Sit
 #Many thanks to Vlatko Klabucar for helping me with the HTTP part!
 
@@ -42,6 +44,7 @@ class myProtocol(protocol.Protocol):
 		msg = "ip piGroup1 {0}".format(ip_address)
 		self.transport.write(msg)
 
+#TODO: SEND IMG NAME FROM ACTUAL FOLDER BETWEEN DEF
 	def dataReceived(self, data):
 		print "data Received from Server: {0}".format(data)
 		msgFromServer = [data for data in data.split()]
@@ -65,12 +68,6 @@ class myProtocol(protocol.Protocol):
 		    Headers({'User-Agent': ['Twisted Web Client Example'],
 		    		'Content-Type': ['text/x-greeting']}),
 		    body)
-
-	def writeToServer(self, msg):
-		self.transport.write(msg)
-
-	def cbShutdown(self, ignored):
-	    reactor.stop()
 
 if __name__ == '__main__':
 	#reactor.connectTCP('18.111.45.131', 8888, DataClientFactory(data), timeout=200)

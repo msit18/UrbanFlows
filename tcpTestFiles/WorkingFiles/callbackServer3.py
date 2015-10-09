@@ -1,6 +1,10 @@
 #Working callback server.  Used with callbackClient3.py to send data and messages
 
 #TODO: NEED TO FIX LOST CONNECTIONS THING (CHECK CURENT IP AND HOW TO REMOVE FROM DICTFORMAT)
+#TODO: CLEAN UP INTO CLASSES
+#TODO: TEST WITH RASPIES
+#TODO: ERROR HANDLING
+#TODO: FINISH PROCESS HANDLING
 
 #Written by Michelle Sit
 #Many thanks to Vlatko Klabucar for helping me with the HTTP part!
