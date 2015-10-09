@@ -48,7 +48,7 @@ class myProtocol(protocol.Protocol):
 		print msgFromServer[0]
 		print msgFromServer[1]
 		if msgFromServer[1] == "sendPicName":
-			self.transport.write("Hi success.jpg filler")
+			self.transport.write("Hi success3.jpg filler")
 			self.sendImg()
 		else:
 			print "Didn't write hi success.jpg to server"
@@ -58,7 +58,7 @@ class myProtocol(protocol.Protocol):
 
 	def sendImg(self):
 		agent = Agent(reactor)
-		body = FileBodyProducer(open("./cute_otter.jpg", 'rb'))
+		body = FileBodyProducer(open("./cute_cockatiel.jpg", 'rb'))
 		postImg = agent.request(
 		    'POST',
 		    "http://localhost:8880/upload-image",

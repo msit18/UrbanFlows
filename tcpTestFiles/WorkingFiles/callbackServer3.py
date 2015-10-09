@@ -1,9 +1,9 @@
 #Working callback server.  Used with callbackClient3.py to send data and messages
 
-#TODO: NEED TO FIX CALLBACK TIMES BECAUSE THEY MIGHT CALL AT THE SAME TIME
 #TODO: NEED TO FIX LOST CONNECTIONS THING (CHECK CURENT IP AND HOW TO REMOVE FROM DICTFORMAT)
 
 #Written by Michelle Sit
+#Many thanks to Vlatko Klabucar for helping me with the HTTP part!
 
 from twisted.internet.protocol import Factory
 from twisted.internet import reactor, protocol, defer
@@ -43,35 +43,41 @@ class DataProtocol (protocol.Protocol):
 
 	def dataReceived(self, data):
 		print "Server received data: {0}".format(data)
-		self.d.addCallback(self.gotIP)
-		self.d.addErrback(self.failedIP)
-		self.d.callback(data)
+		msgFromClient = [data for data in data.split()]
+		print msgFromClient
+		if msgFromClient[0] == "ip":
+			print "FOUND AN IP"
+			self.d.addCallback(self.gotIP, msgFromClient[2])
+			self.d.addErrback(self.failedIP)
+			self.d.callback(msgFromClient[1])
+		elif msgFromClient[0] == "Hi":
+			print "FOUND A HI"
+			reactor.callInThread(a.setImgName, msgFromClient[1])
 
-	def gotIP(self, data):
-		dataSplit = [data for data in data.split() if data.strip()]
-		#dataSplit[0] = piGroup1
-		#dataSplit[1] = IP address
-		print dataSplit[0] in dictFormat
-		if (dataSplit[0] in dictFormat) == False:
+	def gotIP(self, piGroup, ipAddr):
+		print "RUNNING GOTIP"
+		print piGroup
+		print ipAddr
+		if (piGroup in dictFormat) == False:
 			#adds key and a list containing IP address
 			print "I didn't have this cluster key"
-			dictFormat[dataSplit[0]] = [dataSplit[1]]
+			dictFormat[piGroup] = [ipAddr]
 			print dictFormat
-			reactor.callLater(0.1, self.writeToClient, "ls")
 			print "finished with adding cluster and IP"
-		elif (dataSplit[0] in dictFormat) == True:
+		elif (piGroup in dictFormat) == True:
 			#appends new IP to the end of the key's list
 			print "it's true! I have this cluster in my keys"
-#			print dictFormat[dataSplit[0]] #prints out the key values
-			dictFormat[dataSplit[0]].append(dataSplit[1])
+			#print dictFormat[piGroup] #prints out the key values
+			dictFormat[piGroup].append(ipAddr)
 			print dictFormat
-			reactor.callLater(0.1, self.writeToClient, "ls")
 			print "finished with adding new IP to a known cluster"
 		else:
+			print "Got something that wasn't an IP"
 			self.d.errback(ValueError("Couldn't process your IP request"))
-		reactor.callInThread(self.checkConnections, dataSplit[0])
+		reactor.callInThread(self.checkConnections, piGroup)
 
 	def writeToClient(self, msg):
+		print "write message to client"
 		self.transport.write(msg)
 
 	def failedIP(self, failure):
@@ -84,9 +90,10 @@ class DataProtocol (protocol.Protocol):
 		print dataKey
 		print len(dictFormat[dataKey])
 		numValues = len(dictFormat[dataKey])
-		while numValues < 0:
+		while numValues < 2:
 			numValues = len(dictFormat[dataKey])
 		else:
+			print "SENDING CMDS"
 			self.d.addCallback(self.sendCmds)
 		 	self.d.addErrback(self.failedSendCmds)
 
@@ -96,7 +103,7 @@ class DataProtocol (protocol.Protocol):
 
 	def sendCmds(self, data):
 		print "sendCmds"
-		#reactor.callLater(0.3, self.writeToClient, "ls")
+		reactor.callLater(0.1, self.writeToClient, "Okay sendPicName")
 
 #TODO: Put in a timeout to check if the msgs were received
 	def failedSendCmds(self, failure):
@@ -105,21 +112,30 @@ class DataProtocol (protocol.Protocol):
 
 #Used for HTTP network.  Receives images and saves them to the server
 class UploadImage(Resource):
-    def render_GET(self, request):
-    	print "getting"
-        return '<html><body><p>This is the server for the MIT SENSEable City Urban Flows Project.'\
-        '  It receives images and saves them to the server.</p></body></html>'
 
-    def render_POST(self, request):
-    	print "posting"
-        file = open("uploaded-image.jpg","wb")
-        file.write(request.content.read())
-        return '<html><body>Image uploaded :) </body></html>'
+	def setImgName(self, value):
+		global imgName
+		imgName = value
+		print "This img name will be {0}".format(imgName)
+
+	def render_GET(self, request):
+		print "getting"
+		return '<html><body><p>This is the server for the MIT SENSEable City Urban Flows Project.'\
+		'  It receives images and saves them to the server.</p></body></html>'
+
+	def render_POST(self, request):
+		print "Posting: {0}".format(imgName)
+		# file = open("uploaded-image.jpg","wb")
+		file = open(imgName, "wb")
+		file.write(request.content.read())
+		return '<html><body>Image uploaded :) </body></html>'
+		file.close()
 
 if __name__ == '__main__':
 	#HTTP network
+	a = UploadImage()
 	root = Resource()
-	root.putChild("upload-image", UploadImage())
+	root.putChild("upload-image", a)
 	factory = Site(root)
 	reactor.listenTCP(8880, factory, 200, 'localhost')
 
