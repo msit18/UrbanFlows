@@ -1,13 +1,14 @@
 #Working callback server.  Used with callbackClient3.py to send data and messages
 
-#TODO: NEED TO FIX LOST CONNECTIONS THING (CHECK CURENT IP AND HOW TO REMOVE FROM DICTFORMAT)
-#TODO: CLEAN UP INTO CLASSES
+#TODO: NEED TO FIX LOST CONNECTIONS THING
+#TODO: NEED TO INCORPORATE THE TEAM LEADER PI KEEPING TRACK OF CONNECTIONS
 #TODO: TEST WITH RASPIES
 #TODO: ERROR HANDLING
 #TODO: FINISH PROCESS HANDLING
 
 #Written by Michelle Sit
-#Many thanks to Vlatko Klabucar for helping me with the HTTP part!
+#Many thanks to Vlatko Klabucar for helping me with the HTTP part!  Also many thanks to Nahom Marie
+#for helping me with the architecture of this system!
 
 from twisted.internet.protocol import Factory
 from twisted.internet import reactor, protocol, defer
@@ -57,6 +58,9 @@ class DataProtocol (protocol.Protocol):
 		elif msgFromClient[0] == "Hi":
 			print "FOUND A HI"
 			reactor.callInThread(a.setImgName, msgFromClient[1])
+		elif msgFromClient[0] == 'imgName':
+			print msgFromClient[1]
+			a.setImgName(msgFromClient[1])
 
 	def gotIP(self, piGroup, ipAddr):
 		print "RUNNING GOTIP"
@@ -94,7 +98,7 @@ class DataProtocol (protocol.Protocol):
 		print dataKey
 		print len(dictFormat[dataKey])
 		numValues = len(dictFormat[dataKey])
-		while numValues < 2:
+		while numValues < 0:
 			numValues = len(dictFormat[dataKey])
 		else:
 			print "SENDING CMDS"
@@ -110,7 +114,7 @@ class DataProtocol (protocol.Protocol):
 		reactor.callLater(0.1, self.writeToClient, "Okay sendPicName")
 
 #TODO: Put in a timeout to check if the msgs were received
-	def failedSendCmds(self, failure):
+	def failedSendCmds(self,failure):
 		print "FAILURE: failedSendCmds"
 		sys.stderr.write(str(failure))
 
@@ -118,10 +122,11 @@ class DataProtocol (protocol.Protocol):
 class UploadImage(Resource):
 
 	def setImgName(self, value):
-		global imgName
+		print "SETIMGNAME RUNNING"
+		#global imgName
 		imgName = value
-		print "This img name will be {0}".format(imgName)
-
+		print "This img name will be {0}".format(imgName
+)
 	def render_GET(self, request):
 		print "getting"
 		return '<html><body><p>This is the server for the MIT SENSEable City Urban Flows Project.'\
@@ -136,8 +141,11 @@ class UploadImage(Resource):
 		file.close()
 
 if __name__ == '__main__':
+	global imgName
+	imgName = ""
+
 	#HTTP network
-	a = UploadImage()
+	a = UploadImage(imgName)
 	root = Resource()
 	root.putChild("upload-image", a)
 	factory = Site(root)
