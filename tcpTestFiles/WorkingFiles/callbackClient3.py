@@ -41,6 +41,7 @@ class DataClientFactory(protocol.ClientFactory):
 class myProtocol(protocol.Protocol):
 	def __init__(self, factory):
 		self.factory = factory
+		self._count = 1
 
 	def connectionMade(self):
 		ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
@@ -54,33 +55,39 @@ class myProtocol(protocol.Protocol):
 		print msgFromServer[0]
 		print msgFromServer[1]
 		if msgFromServer[1] == "sendPicName":
+			print "GOT A SENDPICNAME"
 			#insert cmd to start manualPic5
 			#self.transport.write("Hi success.jpg filler")
 			#self.sendImg()
 			self.runMETHOD()
+		elif msgFromServer[1] == "imgToken":
+			print "GOT A IMGTOKEN"
+			print self._count
 		else:
 			print "Didn't write hi success.jpg to server"
 
-#Collects pictures from the folder and posts to HTTP
-# class queuePictures(threading.Thread):
-# 	def __init__(self, queue, f):
-# 		threading.Thread.__init__(self)
-# 		self.queue = queue
-# 		self.f = f
-
 #Need to rewrite logic for sending pictures and removing them
 	def runMETHOD (self):
-		fileList = glob.glob('/home/michelle/Desktop/*.jpg')
+		print "RUNNING RUNMETHOD"
+		imgToken = self._count
+		print imgToken
+		fileList = glob.glob('/home/michelle/gitFolder/UrbanFlows/tcpTestFiles/*.jpg')
 		print fileList
-		print len(fileList)
+		#This while loop doesn't work because it's waiting for the loop to end before it
+		#sends out the message.  It's holding onto the message
 		while len(fileList) > 0:
-			global name
-			name = fileList.pop()
-			print name
-			self.imgSendProcess(name)
-			#reactor.callLater(1, self.transport.write, "imgName {0}".format(name))
-			#self.transport.write("imgName {0}".format(name))
-			#self.sendImg(name)
+			if imgToken == 1:
+				global name
+				name = fileList.pop()
+				print "name: {0}".format(name)
+				reactor.callLater(1, self.transport.write, " imgName {0}".format(name))
+#				self.transport.write(" imgname {0}".format(name))
+				self._count = 0
+				imgToken = self._count
+				print "end of imgtoken 1 part"
+				break
+			else: 
+				imgToken = self._count
 
 # 		list = ""
 # 		while True:
@@ -104,9 +111,10 @@ class myProtocol(protocol.Protocol):
 # 				break
 
 	def imgSendProcess(self, name):
-		print name
-		self.transport.write(name)
-		self.sendImg(name)
+		print "Running imgSendProcess"
+		self.transport.write(" imgName {0}".format(name))
+		print "sent name"
+		#self.sendImg(name)
 		#os.system('rm {0}'.format(name))
 
 # #HTTP network portion

@@ -58,9 +58,12 @@ class DataProtocol (protocol.Protocol):
 		elif msgFromClient[0] == "Hi":
 			print "FOUND A HI"
 			reactor.callInThread(a.setImgName, msgFromClient[1])
-		elif msgFromClient[0] == 'imgName':
+		elif msgFromClient[0] == ' imgName':
+			print "FOUND AN IMGNAME"
 			print msgFromClient[1]
 			a.setImgName(msgFromClient[1])
+		else:
+			"I don't know what this is: {0}".format(data)
 
 	def gotIP(self, piGroup, ipAddr):
 		print "RUNNING GOTIP"
@@ -85,7 +88,7 @@ class DataProtocol (protocol.Protocol):
 		reactor.callInThread(self.checkConnections, piGroup)
 
 	def writeToClient(self, msg):
-		print "write message to client"
+		print "write message to client: {0}".format(msg)
 		self.transport.write(msg)
 
 	def failedIP(self, failure):
@@ -120,13 +123,16 @@ class DataProtocol (protocol.Protocol):
 
 #Used for HTTP network.  Receives images and saves them to the server
 class UploadImage(Resource):
+	# def __init__(self):
+	# 	self._lock = defer.DeferredLock()
 
 	def setImgName(self, value):
 		print "SETIMGNAME RUNNING"
-		#global imgName
+		global imgName
 		imgName = value
-		print "This img name will be {0}".format(imgName
-)
+		print "This img name will be {0}".format(imgName)
+		self.transport.write("imgToken 1")
+
 	def render_GET(self, request):
 		print "getting"
 		return '<html><body><p>This is the server for the MIT SENSEable City Urban Flows Project.'\
@@ -135,17 +141,16 @@ class UploadImage(Resource):
 	def render_POST(self, request):
 		print "Posting: {0}".format(imgName)
 		# file = open("uploaded-image.jpg","wb")
-		file = open(imgName, "wb")
-		file.write(request.content.read())
+		# file = open(imgName, "wb")
+		# file.write(request.content.read())
 		return '<html><body>Image uploaded :) </body></html>'
-		file.close()
 
 if __name__ == '__main__':
-	global imgName
-	imgName = ""
+	# global imgName
+	# imgName = ""
 
 	#HTTP network
-	a = UploadImage(imgName)
+	a = UploadImage()
 	root = Resource()
 	root.putChild("upload-image", a)
 	factory = Site(root)

@@ -2,7 +2,7 @@
 
 #Written by Michelle Sit
 
-#Edited from manualPic3.py to take arguments from readPiFace.py.  Takes pictures on
+#Edited from manualPic4.py to take arguments from readPiFace.py.  Takes pictures on
 #one thread and on another thread moves/removes them to the MasterPi.  Picture resolution,
 #fps, and time is controlled by the inputs from the MasterPi piface
 #Sends errors to flash.py on the MasterPi
@@ -65,8 +65,15 @@ class takePictures(threading.Thread):
 			fpsArray = []
 			timeAvg = []
 
+			#This outerloop checks to make sure the whole taking pictures time frame doesn't
+			#go over the specified time limit (timeNow < timeEnd)
+			#(timeNow < timePlusTwentyMins) also checks to make sure the process doesn't end
+			#before the end of the last camera cycle (I think?)
 			while timeNow < timePlusTwentyMins and timeNow < timeEnd:
+				#takes the current time at the beginning of each loop to check in statements
 				timeNow = time.time()
+				#This process outprints statements every 20 mins (currently set to something
+				#faster for testing purposes)
 				if timeNow >= timePlusTwentyMins:
 					endTwenty = time.time()
 					twentyTime = endTwenty-timeStart
@@ -76,6 +83,15 @@ class takePictures(threading.Thread):
 					 str(twentyTime), str(twentyFPS) )
 					timePlusTwentyMins = time.time()+600
 				else:
+					#This loop ensures that pictures are taken within the time frame
+					#To make sure the processes are running at xfps, the camera cannot take pictures
+					#before the start of the next appropriate time (ex - 3 frames per 5 seconds.  Cannot
+					#take 3 frames whenever the process finishes.  It has to wait until 5 seconds have
+					#passed)
+					#For the multiplexer, this is an important factor that I can explain next time
+					#we meet.  tl;dr: the four cameras have to take simultaneous pictures so the loop
+					#needs to take that into consideration.
+					#Also if you want to math this out somehow, that would also be awesome
 					while timeNow > timePlusInt:
 						timePlusInt = timeNow + timeInterval
 						start=time.time()
