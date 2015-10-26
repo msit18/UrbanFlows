@@ -27,6 +27,25 @@ import os
 import string
 import sys
 import numpy as np
+import RPi.GPIO as gp
+
+#Setup for the pi camera, taken from the 'ivport_capture_sequence_A.py' file
+gp.setwarnings(False)
+gp.setmode(gp.BOARD)
+
+gp.setup(7, gp.OUT)
+gp.setup(11, gp.OUT)
+gp.setup(12, gp.OUT)
+
+gp.output(7, False)
+gp.output(11, False)
+gp.output(12, True)
+
+#More for testing purposes for now; number of pictures to be taken. 
+frames = 90
+
+#Begins the camera on picamera 1
+cam = 1
 
 #Takes pictures based inputted fps options (while loops control total run time and how many 
 #pictures are taken in the specified time frame (fps).
@@ -37,6 +56,46 @@ class takePictures(threading.Thread):
 		threading.Thread.__init__(self)
 		self.queue = queue
 		self.f = f
+		
+	#Switches cameras. Taken from 'ivport_capture_sequence_A.py'
+	#ACTUAL PORTS FOR THE PI CAMERAS TBD 
+	def cam_change():
+		global cam
+		gp.setmode(gp.BOARD)
+		if cam == 1:
+	        	# CAM 1 for A Jumper Setting
+	        	gp.output(7, False)
+	        	gp.output(11, False)
+	        	gp.output(12, True)
+	        elif cam == 2:
+	        	# CAM 2 for A Jumper Setting
+	        	gp.output(7, True)
+	        	gp.output(11, False)
+	        	gp.output(12, True)
+	    	elif cam == 3:
+	    		# CAM 3 for A Jumper Setting
+	        	gp.output(7, False)
+	        	gp.output(11, True)
+	        	gp.output(12, False)
+	    	elif cam == 4:
+	        	# CAM 4 for A Jumper Setting
+	        	gp.output(7, True)
+	        	gp.output(11, True)
+	        	gp.output(12, False)
+	    cam += 1
+	    if cam > 4:
+	    	cam = 1
+
+	#Changes cameras and names the written files; SHOULD BE MORE SUBSTANTIVELY NAMED. 
+	def filenames():
+    		frame = 0
+		while frame < frames:
+			time.sleep(0.007    # SD Card Bandwidth Correction Delay,
+			cam_change()        # Switching Camera
+        		time.sleep(0.007)   # SD Card Bandwidth Correction Delay
+        		yield 'image%02d.jpg' % frame
+        		frame += 1 
+        
 
 	def run (self):
 		try:
@@ -94,16 +153,32 @@ class takePictures(threading.Thread):
 					while timeNow > timePlusInt:
 						timePlusInt = timeNow + timeInterval
 						start=time.time()
+						#5 pi architecture capturing sequence 
+						# with picamera.PiCamera() as camera:
+						# 	camera.resolution = (resW, resH)
+						# 	camera.framerate = frameRate
+						# 	camera.capture_sequence([
+						# 		datetime.datetime.now().strftime ('%d-%m-%Y-%H_%M_%S_%f') + '_TT'\
+						# 		 + str(sys.argv[1]) + '_RES' + str(resH) + '_PIC' + str(numPics) +\
+						# 		  '_TI' + str(timeInterval) + '_FR' + str(frameRate) + '.jpg'
+						# 		for i in range(numPics)
+						# 		], use_video_port=True)
+						# finish = time.time()
+						
+						# Multiplexer architecture capturing sequence
 						with picamera.PiCamera() as camera:
-							camera.resolution = (resW, resH)
-							camera.framerate = frameRate
-							camera.capture_sequence([
-								datetime.datetime.now().strftime ('%d-%m-%Y-%H_%M_%S_%f') + '_TT'\
-								 + str(sys.argv[1]) + '_RES' + str(resH) + '_PIC' + str(numPics) +\
-								  '_TI' + str(timeInterval) + '_FR' + str(frameRate) + '.jpg'
-								for i in range(numPics)
-								], use_video_port=True)
-						finish = time.time()
+						    camera.resolution = (640, 480)
+						    camera.framerate = 90
+						    camera.start_preview()
+
+						    # Optional Camera LED OFF
+						    #gp.setmode(gp.BCM)
+						    #camera.led = False
+
+						    time.sleep(2)    # Camera Initialize
+						    start = time.time()
+						    camera.capture_sequence(filenames(), use_video_port=True)
+						    finish = time.time()
 						#Analyzing time and frames
 						fpsTime = (finish-start)
 						fps = numPics/fpsTime
