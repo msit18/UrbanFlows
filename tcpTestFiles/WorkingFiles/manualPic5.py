@@ -65,7 +65,7 @@ class takePictures(threading.Thread):
 		if cam == 1:
 	        	# CAM 1 for A Jumper Setting
 	        	#first output number was first 7
-	        	gp.output(6, False)
+	        	gp.output(7, False)
 	        	gp.output(11, False)
 	        	gp.output(12, True)
 	        elif cam == 2:
