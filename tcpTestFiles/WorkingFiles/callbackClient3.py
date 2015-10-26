@@ -40,9 +40,9 @@ class DataClientFactory(protocol.ClientFactory):
 class myProtocol(protocol.Protocol):
 	def __init__(self, factory):
 		self.factory = factory
-		self._count = False
 		self.fileList = []
 		self.name = ""
+		self.tag = True
 
 	def connectionMade(self):
 		ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
@@ -59,12 +59,12 @@ class myProtocol(protocol.Protocol):
 			print "GOT A STARTTAKINGPICTURES"
 			#INSERT COMMAND TO START TAKING PICTURES
 			#(below) STARTS GATHERING PICTURES TO SEND OVER
-			#self._count = True
 			self.getList()
 		elif msgFromServer[1] == "gotNameSendImg":
 			print "RECEIVED GOTNAMESENDIMG"
-			#print "SELFCOUNT {0}".format(self._count)
 			self.sendImg()
+		elif msgFromServer[1] == "End":
+			self.tag = False
 		else:
 			print "Didn't write hi success.jpg to server"
 
@@ -81,7 +81,6 @@ class myProtocol(protocol.Protocol):
 		self.name = self.fileList.pop(0)
 		print "Sending name over: {0}".format(self.name)
 		reactor.callLater(1, self.transport.write, " imgName {0}".format(self.name))
-		#self._count = False
 
 # #HTTP network portion
 # class sendHTTPImage():
@@ -89,16 +88,18 @@ class myProtocol(protocol.Protocol):
 		print "RUNNING SENDIMG"
 		print self.name
 		agent = Agent(reactor)
-		body = FileBodyProducer(open("{0}".format(self.name), 'rb'))
+		body = FileBodyProducer(open("/home/michelle/gitFolder/UrbanFlows/tcpTestFiles/WorkingFiles/{0}".format(self.name), 'rb'))
 		postImg = agent.request(
 		    'POST',
 		    "http://localhost:8880/upload-image",
 		    Headers({'User-Agent': ['Twisted Web Client Example'],
 		    		'Content-Type': ['text/x-greeting']}),
 		    body)
-		#self._count = True
 		os.system('rm {0}'.format(self.name))
-		self.getList()
+		if self.tag == True:
+			self.getList()
+		else:
+			pass
 
 if __name__ == '__main__':
 	#reactor.connectTCP('18.111.45.131', 8888, DataClientFactory(data), timeout=200)
