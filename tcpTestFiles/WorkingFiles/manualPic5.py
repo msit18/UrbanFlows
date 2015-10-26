@@ -82,9 +82,9 @@ class takePictures(threading.Thread):
 	        	gp.output(7, True)
 	        	gp.output(11, True)
 	        	gp.output(12, False)
-	    cam += 1
-	    if cam > 4:
-	    	cam = 1
+	        cam += 1
+	        if cam > 4:
+	        	cam = 1
 
 	#Changes cameras and names the written files; SHOULD BE MORE SUBSTANTIVELY NAMED. 
 	def filenames():
