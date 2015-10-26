@@ -75,17 +75,20 @@ class myProtocol(protocol.Protocol):
 		print fileList
 		#This while loop doesn't work because it's waiting for the loop to end before it
 		#sends out the message.  It's holding onto the message
-		while len(fileList) > 0:
+		#Thoughts: see if I can change this to a if loop so that it can exit
+		#See if I can run this process as a callBack and it calls back every time
+		#See if I can pop the top item off the list without having to reverse the whole thing
+		#See if I can do something to fix this
+		if len(fileList) > 0:
 			if imgToken == 1:
 				global name
-				name = fileList.pop()
+				name = fileList.pop(0)
 				print "name: {0}".format(name)
 				reactor.callLater(1, self.transport.write, " imgName {0}".format(name))
 #				self.transport.write(" imgname {0}".format(name))
 				self._count = 0
 				imgToken = self._count
 				print "end of imgtoken 1 part"
-				break
 			else: 
 				imgToken = self._count
 

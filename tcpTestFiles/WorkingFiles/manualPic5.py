@@ -91,7 +91,6 @@ class takePictures(threading.Thread):
 					#For the multiplexer, this is an important factor that I can explain next time
 					#we meet.  tl;dr: the four cameras have to take simultaneous pictures so the loop
 					#needs to take that into consideration.
-					#Also if you want to math this out somehow, that would also be awesome
 					while timeNow > timePlusInt:
 						timePlusInt = timeNow + timeInterval
 						start=time.time()

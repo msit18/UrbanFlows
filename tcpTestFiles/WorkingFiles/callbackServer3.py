@@ -58,7 +58,7 @@ class DataProtocol (protocol.Protocol):
 		elif msgFromClient[0] == "Hi":
 			print "FOUND A HI"
 			reactor.callInThread(a.setImgName, msgFromClient[1])
-		elif msgFromClient[0] == ' imgName':
+		elif msgFromClient[0] == 'imgName':
 			print "FOUND AN IMGNAME"
 			print msgFromClient[1]
 			a.setImgName(msgFromClient[1])
@@ -123,15 +123,14 @@ class DataProtocol (protocol.Protocol):
 
 #Used for HTTP network.  Receives images and saves them to the server
 class UploadImage(Resource):
-	# def __init__(self):
-	# 	self._lock = defer.DeferredLock()
 
 	def setImgName(self, value):
 		print "SETIMGNAME RUNNING"
 		global imgName
 		imgName = value
 		print "This img name will be {0}".format(imgName)
-		self.transport.write("imgToken 1")
+		c.writeToClient("imgToken 1")
+		#b.transport.write("imgToken 1")
 
 	def render_GET(self, request):
 		print "getting"
@@ -158,7 +157,9 @@ if __name__ == '__main__':
 
 	#TCP network
 	d = defer.Deferred()
-	reactor.listenTCP(8888, DataFactory(), 200, 'localhost')
+	b = DataFactory()
+	c = DataProtocol(DataFactory, d)
+	reactor.listenTCP(8888, b, 200, 'localhost')
 	reactor.run()
 
 	#reactor.listenTCP(8888, DataFactory(), 200, '18.111.45.131')
