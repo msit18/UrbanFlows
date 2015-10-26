@@ -7,7 +7,7 @@
 #for helping me with the architecture of this system!
 
 #TCP
-from twisted.internet import reactor, protocol
+from twisted.internet import reactor, protocol, defer, threads
 import subprocess
 #HTTP
 from twisted.web.client import Agent
@@ -20,6 +20,7 @@ import os
 import glob
 import time
 #import manualPic_capturePhotos
+from doSomeRandom import doSomeRandom
 
 #TCP network portion
 class DataClientFactory(protocol.ClientFactory):
@@ -43,6 +44,7 @@ class myProtocol(protocol.Protocol):
 		self.fileList = []
 		self.name = ""
 		self.tag = True
+		self.e = defer.Deferred()
 
 	def connectionMade(self):
 		ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
@@ -57,7 +59,11 @@ class myProtocol(protocol.Protocol):
 		if msgFromServer[1] == "startTakingPictures":
 			#STARTS IMAGE TAKING PROCESS
 			print "GOT A STARTTAKINGPICTURES"
-			#INSERT COMMAND TO START TAKING PICTURES
+			#TAKING PICTURES IN SEPARATE THREAD. Has errback handling here
+			#added callback to notify when finished
+			result = threads.deferToThread(y.capturePictures)
+			result.addCallback(y.printResult)
+			result.addErrback(self.failedMethod)
 			#(below) STARTS GATHERING PICTURES TO SEND OVER
 			self.getList()
 		elif msgFromServer[1] == "gotNameSendImg":
@@ -67,6 +73,10 @@ class myProtocol(protocol.Protocol):
 			self.tag = False
 		else:
 			print "Didn't write hi success.jpg to server"
+
+	def failedMethod(self,failure):
+		print "FAILURE: failedMethod"
+		sys.stderr.write(str(failure))
 
 	def getList(self):
 		if len(self.fileList) <= 0:
@@ -82,8 +92,6 @@ class myProtocol(protocol.Protocol):
 		print "Sending name over: {0}".format(self.name)
 		reactor.callLater(1, self.transport.write, " imgName {0}".format(self.name))
 
-# #HTTP network portion
-# class sendHTTPImage():
 	def sendImg(self):
 		print "RUNNING SENDIMG"
 		print self.name
@@ -111,10 +119,14 @@ if __name__ == '__main__':
 	#t2 = queuePictures(queue, f)
 	
 	#TCP network.  Connects on port 8888
-	data = "first data"
-	reactor.connectTCP('localhost', 8888, DataClientFactory(data), timeout=200)
+	#data = "first data"
+	e = defer.Deferred()
+	reactor.connectTCP('localhost', 8888, DataClientFactory(e), timeout=200)
+
+
+	#x = fakeTakePictures()
+	y = doSomeRandom()
 
 	#HTTP network.  Connects on port 8880
-	# c = sendHTTPImage()
 
 	reactor.run()
