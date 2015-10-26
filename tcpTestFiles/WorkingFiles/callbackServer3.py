@@ -36,6 +36,7 @@ class DataProtocol (protocol.Protocol):
 	def __init__(self, factory, d):
 		self.factory = factory
 		self.d = defer.Deferred()
+		self.confirm = False
 
 	def connectionMade(self):
 		self.factory.numConnections += 1
@@ -43,11 +44,11 @@ class DataProtocol (protocol.Protocol):
 
 	def connectionLost(self, reason):
 		self.factory.numConnections -= 1
-		print dictFormat
+		#print dictFormat
 		print "Connection lost. Number of active connections: {0}".format(self.factory.numConnections)
 
 	def dataReceived(self, data):
-		print "Server received data: {0}".format(data)
+		print "DATARECEIVED. Server received data: {0}".format(data)
 		msgFromClient = [data for data in data.split()]
 		print msgFromClient
 		if msgFromClient[0] == "ip":
@@ -61,14 +62,14 @@ class DataProtocol (protocol.Protocol):
 		elif msgFromClient[0] == 'imgName':
 			print "FOUND AN IMGNAME"
 			print msgFromClient[1]
-			a.setImgName(msgFromClient[1])
+			self.setImgName(msgFromClient[1])
 		else:
 			"I don't know what this is: {0}".format(data)
 
 	def gotIP(self, piGroup, ipAddr):
 		print "RUNNING GOTIP"
-		print piGroup
-		print ipAddr
+		# print piGroup
+		# print ipAddr
 		if (piGroup in dictFormat) == False:
 			#adds key and a list containing IP address
 			print "I didn't have this cluster key"
@@ -88,7 +89,7 @@ class DataProtocol (protocol.Protocol):
 		reactor.callInThread(self.checkConnections, piGroup)
 
 	def writeToClient(self, msg):
-		print "write message to client: {0}".format(msg)
+		print "WRITETOCLIENT. write message to client: {0}".format(msg)
 		self.transport.write(msg)
 
 	def failedIP(self, failure):
@@ -97,56 +98,67 @@ class DataProtocol (protocol.Protocol):
 
 	#Called in seperate threads	
 	def checkConnections(self, dataKey):
-		print "This is checkConnections method.  Hello."
-		print dataKey
-		print len(dictFormat[dataKey])
+		print "CHECKCONNECTIONS.  Hello."
+		# print dataKey
+		# print len(dictFormat[dataKey])
 		numValues = len(dictFormat[dataKey])
 		while numValues < 0:
 			numValues = len(dictFormat[dataKey])
 		else:
 			print "SENDING CMDS"
-			self.d.addCallback(self.sendCmds)
+			self.d.addCallback(self.startTakingPictures)
 		 	self.d.addErrback(self.failedSendCmds)
 
 	def failedCheckConnections(self, failure):
 		print "FAILURE: failedCheckConnections"
 		sys.stderr.write(str(failure))
 
-	def sendCmds(self, data):
-		print "sendCmds"
-		reactor.callLater(0.1, self.writeToClient, "Okay sendPicName")
+	def startTakingPictures(self, data):
+		print "STARTTAKINGPICTURES"
+		reactor.callLater(0.1, self.writeToClient, "Okay startTakingPictures")
 
 #TODO: Put in a timeout to check if the msgs were received
 	def failedSendCmds(self,failure):
 		print "FAILURE: failedSendCmds"
 		sys.stderr.write(str(failure))
 
-#Used for HTTP network.  Receives images and saves them to the server
-class UploadImage(Resource):
-
 	def setImgName(self, value):
 		print "SETIMGNAME RUNNING"
 		global imgName
 		imgName = value
 		print "This img name will be {0}".format(imgName)
-		c.writeToClient("imgToken 1")
-		#b.transport.write("imgToken 1")
+		self.d.addCallback(a.check)
+		self.d.addErrback(self.failedSendCmds)
+		self.transport.write("Okay gotNameSendImg")
+		print "FIN setImgName"
+
+#Used for HTTP network.  Receives images and saves them to the server
+class UploadImage(Resource):
+
+	def check(self, second):
+		print "UPLOADIMAGE CHECK. This is the imageName: {0}".format(imgName)
 
 	def render_GET(self, request):
-		print "getting"
+		print "RENDER GETTING"
 		return '<html><body><p>This is the server for the MIT SENSEable City Urban Flows Project.'\
 		'  It receives images and saves them to the server.</p></body></html>'
 
 	def render_POST(self, request):
-		print "Posting: {0}".format(imgName)
+		print "RENDER Posting: {0}".format(imgName)
 		# file = open("uploaded-image.jpg","wb")
-		# file = open(imgName, "wb")
-		# file.write(request.content.read())
+		file = open(imgName, "wb")
+		file.write(request.content.read())
 		return '<html><body>Image uploaded :) </body></html>'
 
 if __name__ == '__main__':
 	# global imgName
 	# imgName = ""
+
+	#TCP network
+	d = defer.Deferred()
+	b = DataFactory()
+	c = DataProtocol(DataFactory, d)
+	reactor.listenTCP(8888, b, 200, 'localhost')
 
 	#HTTP network
 	a = UploadImage()
@@ -155,11 +167,6 @@ if __name__ == '__main__':
 	factory = Site(root)
 	reactor.listenTCP(8880, factory, 200, 'localhost')
 
-	#TCP network
-	d = defer.Deferred()
-	b = DataFactory()
-	c = DataProtocol(DataFactory, d)
-	reactor.listenTCP(8888, b, 200, 'localhost')
 	reactor.run()
 
 	#reactor.listenTCP(8888, DataFactory(), 200, '18.111.45.131')

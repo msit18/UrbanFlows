@@ -1,5 +1,4 @@
 #Working TCP client that runs with callbackServer3
-#Works to test callbacks
 
 #TODO: Integration with manualPic and videoMode
 
@@ -41,97 +40,65 @@ class DataClientFactory(protocol.ClientFactory):
 class myProtocol(protocol.Protocol):
 	def __init__(self, factory):
 		self.factory = factory
-		self._count = 1
+		self._count = False
+		self.fileList = []
+		self.name = ""
 
 	def connectionMade(self):
 		ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
 		msg = "ip piGroup1 {0}".format(ip_address)
 		self.transport.write(msg)
 
-#TODO: SEND IMG NAME FROM ACTUAL FOLDER BETWEEN DEF
 	def dataReceived(self, data):
 		print "data Received from Server: {0}".format(data)
 		msgFromServer = [data for data in data.split()]
-		print msgFromServer[0]
-		print msgFromServer[1]
-		if msgFromServer[1] == "sendPicName":
-			print "GOT A SENDPICNAME"
-			#insert cmd to start manualPic5
-			#self.transport.write("Hi success.jpg filler")
-			#self.sendImg()
-			self.runMETHOD()
-		elif msgFromServer[1] == "imgToken":
-			print "GOT A IMGTOKEN"
-			print self._count
+		# print msgFromServer[0]
+		# print msgFromServer[1]
+		if msgFromServer[1] == "startTakingPictures":
+			#STARTS IMAGE TAKING PROCESS
+			print "GOT A STARTTAKINGPICTURES"
+			#INSERT COMMAND TO START TAKING PICTURES
+			#(below) STARTS GATHERING PICTURES TO SEND OVER
+			#self._count = True
+			self.getList()
+		elif msgFromServer[1] == "gotNameSendImg":
+			print "RECEIVED GOTNAMESENDIMG"
+			#print "SELFCOUNT {0}".format(self._count)
+			self.sendImg()
 		else:
 			print "Didn't write hi success.jpg to server"
 
-#Need to rewrite logic for sending pictures and removing them
-	def runMETHOD (self):
-		print "RUNNING RUNMETHOD"
-		imgToken = self._count
-		print imgToken
-		fileList = glob.glob('/home/michelle/gitFolder/UrbanFlows/tcpTestFiles/*.jpg')
-		print fileList
-		#This while loop doesn't work because it's waiting for the loop to end before it
-		#sends out the message.  It's holding onto the message
-		#Thoughts: see if I can change this to a if loop so that it can exit
-		#See if I can run this process as a callBack and it calls back every time
-		#See if I can pop the top item off the list without having to reverse the whole thing
-		#See if I can do something to fix this
-		if len(fileList) > 0:
-			if imgToken == 1:
-				global name
-				name = fileList.pop(0)
-				print "name: {0}".format(name)
-				reactor.callLater(1, self.transport.write, " imgName {0}".format(name))
-#				self.transport.write(" imgname {0}".format(name))
-				self._count = 0
-				imgToken = self._count
-				print "end of imgtoken 1 part"
-			else: 
-				imgToken = self._count
+	def getList(self):
+		if len(self.fileList) <= 0:
+			self.fileList = glob.glob('*.jpg')
+			print self.fileList
+			self.sendName()
+		else:
+			self.sendName()
 
-# 		list = ""
-# 		while True:
-# 			runThread = self.queue.get()
-# 			if runThread is 'beginT2':
-# 				picsList = glob.glob('*.jpg')
-# 				while len(picsList) > 0:
-# 					list = ' '.join(picsList)
-# 					print (list)
-# 					# os.system("sshpass -p 'raspberry' scp -o StrictHostKeyChecking=no {0}"\
-# 					# " pi@10.0.0.1:/home/pi/pastImages/".format(list) )
-# 					os.system("rm {0}".format(list) )
-# 					picsList = []
-# 			elif runThread is 'T1closeT2':
-# 				print >>self.f, '10.2: T2 recieved close message'
-# #				self.f.close()
-# 				break
-# 			elif runThread is 'exit':
-# 				print >>self.f, "10.2 broken"
-# #				self.f.close()
-# 				break
-
-	def imgSendProcess(self, name):
-		print "Running imgSendProcess"
-		self.transport.write(" imgName {0}".format(name))
-		print "sent name"
-		#self.sendImg(name)
-		#os.system('rm {0}'.format(name))
+	def sendName(self):
+		print self.fileList
+		self.name = self.fileList.pop(0)
+		print "Sending name over: {0}".format(self.name)
+		reactor.callLater(1, self.transport.write, " imgName {0}".format(self.name))
+		#self._count = False
 
 # #HTTP network portion
 # class sendHTTPImage():
-	def sendImg(self, name):
-		print name
+	def sendImg(self):
+		print "RUNNING SENDIMG"
+		print self.name
 		agent = Agent(reactor)
-		body = FileBodyProducer(open("{0}".format(name), 'rb'))
+		body = FileBodyProducer(open("{0}".format(self.name), 'rb'))
 		postImg = agent.request(
 		    'POST',
 		    "http://localhost:8880/upload-image",
 		    Headers({'User-Agent': ['Twisted Web Client Example'],
 		    		'Content-Type': ['text/x-greeting']}),
 		    body)
+		#self._count = True
+		os.system('rm {0}'.format(self.name))
+		self.getList()
 
 if __name__ == '__main__':
 	#reactor.connectTCP('18.111.45.131', 8888, DataClientFactory(data), timeout=200)
