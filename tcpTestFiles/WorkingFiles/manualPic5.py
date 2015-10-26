@@ -90,7 +90,7 @@ class takePictures(threading.Thread):
 	def filenames():
     		frame = 0
 		while frame < frames:
-			time.sleep(0.007    # SD Card Bandwidth Correction Delay,
+			time.sleep(0.007)    # SD Card Bandwidth Correction Delay,
 			cam_change()        # Switching Camera
         		time.sleep(0.007)   # SD Card Bandwidth Correction Delay
         		yield 'image%02d.jpg' % frame
