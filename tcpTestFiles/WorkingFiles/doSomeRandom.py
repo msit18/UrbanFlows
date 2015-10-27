@@ -6,10 +6,7 @@ class doSomeRandom():
 		time.sleep(10)
 		print "finished capturePictures"
 		#print val
-		return "FINTOKEN"
-
-	def printResult(x, second):
-		print second
+		return "True"
 
 if __name__ == '__main__':
 	l = doSomeRandom()

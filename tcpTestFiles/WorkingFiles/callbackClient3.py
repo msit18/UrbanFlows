@@ -1,6 +1,4 @@
-#Working TCP client that runs with callbackServer3
-
-#TODO: Integration with manualPic and videoMode
+#Still being written: TCP client that runs with callbackServer3
 
 #Written by Michelle Sit
 #Many thanks to Vlatko Klabucar for helping me with the HTTP part!  Also many thanks to Nahom Marie
@@ -19,6 +17,7 @@ import Queue
 import os
 import glob
 import time
+import sys
 #import manualPic_capturePhotos
 from doSomeRandom import doSomeRandom
 
@@ -43,8 +42,8 @@ class myProtocol(protocol.Protocol):
 		self.factory = factory
 		self.fileList = []
 		self.name = ""
-		self.tag = True
-		self.e = defer.Deferred()
+		self.tag = False
+		self.state = "nothing"
 
 	def connectionMade(self):
 		ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
@@ -54,23 +53,19 @@ class myProtocol(protocol.Protocol):
 	def dataReceived(self, data):
 		print "data Received from Server: {0}".format(data)
 		msgFromServer = [data for data in data.split()]
-		# print msgFromServer[0]
-		# print msgFromServer[1]
 		if msgFromServer[1] == "startTakingPictures":
 			#STARTS IMAGE TAKING PROCESS
 			print "GOT A STARTTAKINGPICTURES"
 			#TAKING PICTURES IN SEPARATE THREAD. Has errback handling here
 			#added callback to notify when finished
 			result = threads.deferToThread(y.capturePictures)
-			result.addCallback(y.printResult)
+			result.addCallback(self.getFinStatus)
 			result.addErrback(self.failedMethod)
-			#(below) STARTS GATHERING PICTURES TO SEND OVER
+			#STARTS GATHERING PICTURES TO SEND OVER
 			self.getList()
 		elif msgFromServer[1] == "gotNameSendImg":
 			print "RECEIVED GOTNAMESENDIMG"
 			self.sendImg()
-		elif msgFromServer[1] == "End":
-			self.tag = False
 		else:
 			print "Didn't write hi success.jpg to server"
 
@@ -78,22 +73,57 @@ class myProtocol(protocol.Protocol):
 		print "FAILURE: failedMethod"
 		sys.stderr.write(str(failure))
 
+	def getFinStatus(self, second):
+		print "running GETFINSTATUS"
+		print second #end Token for capturePicture thread
+		self.tag = second
+
+	def getTagStatus(self):
+		print "running GETTAGSTATUS"
+		print "SELF TAG: {0}".format(self.tag)
+		return self.tag
+
 	def getList(self):
-		if len(self.fileList) <= 0:
-			self.fileList = glob.glob('*.jpg')
-			print self.fileList
+		self.stateMachine()
+		self.fileList = glob.glob('*.jpg')
+		self.tag = self.getTagStatus()
+		if len(self.fileList) > 0:
+			print "GLOB HAS PICTURES. SENDING NAME"
 			self.sendName()
-		else:
-			self.sendName()
+		else: #len has no pictures
+			#len has no pictures and self tag is false
+			while self.tag == False:
+					print "GLOB HAS NO PICTURES AND TAG IS FALSE. RUNNING CHECK"
+					self.fileList = glob.glob('*.jpg')
+					self.tag = self.getTagStatus()
+			#len has no pictures and self tag is true
+			else:
+				print "GLOB HAS NO PICTURES AND TAG IS TRUE. SLEEP"
+				self.fileList = glob.glob('*.jpg')
+				if len(self.fileList) > 0:
+					print "UP DATE FOUND PICTURES. SENDING NAME"
+					self.sendName()
+				elif len(self.fileList) <= 0:
+					print "UP DATE DIDN'T FIND ANYTHING. REACTOR STOP"
+					self.stateMachine()
+					self.finished()
+
+	def stateMachine(self):
+		print "self state: {0}".format(self.state)
 
 	def sendName(self):
 		print self.fileList
+		self.state = "name"
+		self.stateMachine()
 		self.name = self.fileList.pop(0)
 		print "Sending name over: {0}".format(self.name)
-		reactor.callLater(1, self.transport.write, " imgName {0}".format(self.name))
+		print "fileLen is: {0}".format(len(self.fileList))
+		reactor.callLater(0.1, self.transport.write, " imgName {0}".format(self.name))
 
 	def sendImg(self):
 		print "RUNNING SENDIMG"
+		self.state = "image"
+		self.stateMachine()
 		print self.name
 		agent = Agent(reactor)
 		body = FileBodyProducer(open("/home/michelle/gitFolder/UrbanFlows/tcpTestFiles/WorkingFiles/{0}".format(self.name), 'rb'))
@@ -104,29 +134,31 @@ class myProtocol(protocol.Protocol):
 		    		'Content-Type': ['text/x-greeting']}),
 		    body)
 		os.system('rm {0}'.format(self.name))
-		if self.tag == True:
-			self.getList()
+		self.state = "nothing"
+		print 'finished writing img'
+		self.getList()
+
+#Still closes process too early.  Need to figure out where it would be okay to stop
+	def finished(self):
+		print "FINISHED WRITING IMAGE"
+		if self.state == "nothing":
+			self.transport.write("finished")
 		else:
-			pass
+			self.finished()
 
 if __name__ == '__main__':
+	#HTTP network.  Connects on port 8880
+
 	#reactor.connectTCP('18.111.45.131', 8888, DataClientFactory(data), timeout=200)
 
 	#manualPic setup
-	queue = Queue.Queue()
 	f = open('manualPic5Output.txt', 'w')
 	# t1 = manualPic_capturePhotos.takePictures(queue, f)
-	#t2 = queuePictures(queue, f)
 	
 	#TCP network.  Connects on port 8888
-	#data = "first data"
-	e = defer.Deferred()
-	reactor.connectTCP('localhost', 8888, DataClientFactory(e), timeout=200)
+	data = "first data"
+	reactor.connectTCP('localhost', 8888, DataClientFactory(data), timeout=200)
 
-
-	#x = fakeTakePictures()
 	y = doSomeRandom()
-
-	#HTTP network.  Connects on port 8880
 
 	reactor.run()
