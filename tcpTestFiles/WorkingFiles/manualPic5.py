@@ -47,6 +47,63 @@ frames = 90
 #Begins the camera on picamera 1
 cam = 1
 
+#Switches cameras. Taken from 'ivport_capture_sequence_A.py'
+#ACTUAL PORTS FOR THE PI CAMERAS TBD 
+def cam_change():
+	global cam
+	gp.setmode(gp.BOARD)
+	if cam == 1:
+	        # CAM 1 for A Jumper Setting
+	        #first output number was first 7
+	        gp.output(7, False)
+	        gp.output(11, False)
+	        gp.output(12, True)
+	elif cam == 2:
+	        # CAM 2 for A Jumper Setting
+	        gp.output(7, True)
+	        gp.output(11, False)
+	        gp.output(12, True)
+	elif cam == 3:
+	    	# CAM 3 for A Jumper Setting
+	        gp.output(7, False)
+	        gp.output(11, True)
+	        gp.output(12, False)
+	elif cam == 4:
+	        # CAM 4 for A Jumper Setting
+	        gp.output(7, True)
+	        gp.output(11, True)
+	        gp.output(12, False)
+	cam += 1
+	if cam > 4:
+		cam = 1
+
+	#Changes cameras and names the written files; SHOULD BE MORE SUBSTANTIVELY NAMED. 
+def filenames():
+    	frame = 0
+	while frame < frames:
+		time.sleep(0.007)    # SD Card Bandwidth Correction Delay,
+		cam_change()        # Switching Camera
+        	time.sleep(0.007)   # SD Card Bandwidth Correction Delay
+        	yield 'image%02d.jpg' % frame
+        	frame += 1
+        	
+# Multiplexer architecture capturing sequence
+with picamera.PiCamera() as camera:
+	camera.resolution = (640, 480)
+	camera.framerate = 90
+	camera.start_preview()
+
+	# Optional Camera LED OFF
+	#gp.setmode(gp.BCM)
+	#camera.led = False
+
+	time.sleep(2)    # Camera Initialize
+	start = time.time()
+	camera.capture_sequence(filenames(), use_video_port=True)
+	finish = time.time()
+        
+
+
 #Takes pictures based inputted fps options (while loops control total run time and how many 
 #pictures are taken in the specified time frame (fps).
 
@@ -57,47 +114,7 @@ class takePictures(threading.Thread):
 		self.queue = queue
 		self.f = f
 		
-	#Switches cameras. Taken from 'ivport_capture_sequence_A.py'
-	#ACTUAL PORTS FOR THE PI CAMERAS TBD 
-	def cam_change():
-		global cam
-		gp.setmode(gp.BOARD)
-		if cam == 1:
-	        	# CAM 1 for A Jumper Setting
-	        	#first output number was first 7
-	        	gp.output(7, False)
-	        	gp.output(11, False)
-	        	gp.output(12, True)
-	        elif cam == 2:
-	        	# CAM 2 for A Jumper Setting
-	        	gp.output(7, True)
-	        	gp.output(11, False)
-	        	gp.output(12, True)
-	    	elif cam == 3:
-	    		# CAM 3 for A Jumper Setting
-	        	gp.output(7, False)
-	        	gp.output(11, True)
-	        	gp.output(12, False)
-	    	elif cam == 4:
-	        	# CAM 4 for A Jumper Setting
-	        	gp.output(7, True)
-	        	gp.output(11, True)
-	        	gp.output(12, False)
-	        cam += 1
-	        if cam > 4:
-	        	cam = 1
-
-	#Changes cameras and names the written files; SHOULD BE MORE SUBSTANTIVELY NAMED. 
-	def filenames():
-    		frame = 0
-		while frame < frames:
-			time.sleep(0.007)    # SD Card Bandwidth Correction Delay,
-			cam_change()        # Switching Camera
-        		time.sleep(0.007)   # SD Card Bandwidth Correction Delay
-        		yield 'image%02d.jpg' % frame
-        		frame += 1 
-        
-
+	
 	def run (self):
 		try:
 			resW = int(sys.argv[2])
