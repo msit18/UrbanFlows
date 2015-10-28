@@ -185,6 +185,7 @@ class takePictures(threading.Thread):
 								  '_TI' + str(timeInterval) + '_FR' + str(frameRate) + '.jpg'
 								for i in range(numPics)
 								], use_video_port=True)
+						print 'up to here works' 
 						finish = time.time()
 						#Analyzing time and frames
 						fpsTime = (finish-start)
