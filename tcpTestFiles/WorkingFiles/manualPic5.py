@@ -117,8 +117,7 @@ class takePictures(threading.Thread):
 		threading.Thread.__init__(self)
 		self.queue = queue
 		self.f = f
-		
-	
+
 	def run (self):
 		try:
 			resW = int(sys.argv[2])
@@ -175,7 +174,6 @@ class takePictures(threading.Thread):
 					while timeNow > timePlusInt:
 						timePlusInt = timeNow + timeInterval
 						start=time.time()
-						#5 pi architecture capturing sequence 
 						with picamera.PiCamera() as camera:
 							camera.resolution = (resW, resH)
 							camera.framerate = frameRate
@@ -248,10 +246,11 @@ class queuePictures(threading.Thread):
 #				self.f.close()
 				break
 
-#if __name__ == '__main__':
-#	queue = Queue.Queue()
-#	f = open('manualPic5Output.txt', 'w')
-#	t1 = takePictures(queue, f)
-#	t2 = queuePictures(queue, f)
-#	t1.start()
-#	t2.start()
+if __name__ == '__main__':
+	#queue = Queue.Queue()
+	#f = open('manualPic5Output.txt', 'w')
+	#t1 = takePictures(queue, f)
+	#t2 = queuePictures(queue, f)
+	#t1.start()
+	#t2.start()
+	pass
