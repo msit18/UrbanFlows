@@ -177,15 +177,15 @@ class takePictures(threading.Thread):
 						start=time.time()
 						#5 pi architecture capturing sequence 
 						with picamera.PiCamera() as camera:
-						 	camera.resolution = (resW, resH)
-						 	camera.framerate = frameRate
-						 	camera.capture_sequence([
-						 		datetime.datetime.now().strftime ('%d-%m-%Y-%H_%M_%S_%f') + '_TT'\
-						 		 + str(sys.argv[1]) + '_RES' + str(resH) + '_PIC' + str(numPics) +\
-						 		  '_TI' + str(timeInterval) + '_FR' + str(frameRate) + '.jpg'
-						 		for i in range(numPics)
-						 		], use_video_port=True)
-						finish=time.time()
+							camera.resolution = (resW, resH)
+							camera.framerate = frameRate
+							camera.capture_sequence([
+								datetime.datetime.now().strftime ('%d-%m-%Y-%H_%M_%S_%f') + '_TT'\
+								 + str(sys.argv[1]) + '_RES' + str(resH) + '_PIC' + str(numPics) +\
+								  '_TI' + str(timeInterval) + '_FR' + str(frameRate) + '.jpg'
+								for i in range(numPics)
+								], use_video_port=True)
+						finish = time.time()
 						#Analyzing time and frames
 						fpsTime = (finish-start)
 						fps = numPics/fpsTime
