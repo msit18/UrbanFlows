@@ -176,7 +176,7 @@ class takePictures(threading.Thread):
 						timePlusInt = timeNow + timeInterval
 						start=time.time()
 						#5 pi architecture capturing sequence 
-						 with picamera.PiCamera() as camera:
+						with picamera.PiCamera() as camera:
 						 	camera.resolution = (resW, resH)
 						 	camera.framerate = frameRate
 						 	camera.capture_sequence([
@@ -185,7 +185,7 @@ class takePictures(threading.Thread):
 						 		  '_TI' + str(timeInterval) + '_FR' + str(frameRate) + '.jpg'
 						 		for i in range(numPics)
 						 		], use_video_port=True)
-						 finish = time.time()
+						finish = time.time()
 						
 						# Multiplexer architecture capturing sequence
 						#with picamera.PiCamera() as camera:
