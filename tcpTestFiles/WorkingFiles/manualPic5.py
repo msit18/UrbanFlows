@@ -99,10 +99,10 @@ with picamera.PiCamera() as camera:
 	#camera.led = False
 
 	time.sleep(2)    # Camera Initialize
-	start = time.time()
+	startTime = time.time()
 	camera.capture_sequence(filenames(), use_video_port=True)
-	finish = time.time()
-	timeRan = finish - start
+	finishTime = time.time()
+	timeRan = finishTime - startTime
 	print 'Captured %d frames at total %.2ffps' % (frames, frames / timeRan)
 	print 'Finished running in %.02f seconds' % timeRan
         
@@ -185,7 +185,6 @@ class takePictures(threading.Thread):
 								  '_TI' + str(timeInterval) + '_FR' + str(frameRate) + '.jpg'
 								for i in range(numPics)
 								], use_video_port=True)
-						print 'up to here works' 
 						finish = time.time()
 						#Analyzing time and frames
 						fpsTime = (finish-start)
