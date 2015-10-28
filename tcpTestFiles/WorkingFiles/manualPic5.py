@@ -42,7 +42,7 @@ gp.output(11, False)
 gp.output(12, True)
 
 #More for testing purposes for now; number of pictures to be taken. 
-frames = 90
+frames = 30
 
 #Begins the camera on picamera 1
 cam = 1
@@ -91,7 +91,7 @@ def filenames():
 with picamera.PiCamera() as camera:
 	camera.resolution = (640, 480)
 	#How quickly pictures will be taken
-	camera.framerate = 25
+	camera.framerate = 30
 	camera.start_preview()
 
 	# Optional Camera LED OFF
@@ -103,6 +103,7 @@ with picamera.PiCamera() as camera:
 	camera.capture_sequence(filenames(), use_video_port=True)
 	finish = time.time()
 	timeRan = finish - start
+	print 'Captured %d frames at total %.2ffps' % (frames, frames / timeRan)
 	print 'Finished running in %.02f seconds' % timeRan
         
 
