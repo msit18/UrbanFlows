@@ -186,21 +186,6 @@ class takePictures(threading.Thread):
 						 		for i in range(numPics)
 						 		], use_video_port=True)
 						finish = time.time()
-						
-						# Multiplexer architecture capturing sequence
-						#with picamera.PiCamera() as camera:
-						 #   camera.resolution = (640, 480)
-						  #  camera.framerate = 90
-						   # camera.start_preview()
-
-						    # Optional Camera LED OFF
-						    #gp.setmode(gp.BCM)
-						    #camera.led = False
-
-						 #   time.sleep(2)    # Camera Initialize
-						  #  start = time.time()
-						   # camera.capture_sequence(filenames(), use_video_port=True)
-						    #finish = time.time()
 						#Analyzing time and frames
 						fpsTime = (finish-start)
 						fps = numPics/fpsTime
