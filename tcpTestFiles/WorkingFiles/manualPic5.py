@@ -176,31 +176,31 @@ class takePictures(threading.Thread):
 						timePlusInt = timeNow + timeInterval
 						start=time.time()
 						#5 pi architecture capturing sequence 
-						# with picamera.PiCamera() as camera:
-						# 	camera.resolution = (resW, resH)
-						# 	camera.framerate = frameRate
-						# 	camera.capture_sequence([
-						# 		datetime.datetime.now().strftime ('%d-%m-%Y-%H_%M_%S_%f') + '_TT'\
-						# 		 + str(sys.argv[1]) + '_RES' + str(resH) + '_PIC' + str(numPics) +\
-						# 		  '_TI' + str(timeInterval) + '_FR' + str(frameRate) + '.jpg'
-						# 		for i in range(numPics)
-						# 		], use_video_port=True)
-						# finish = time.time()
+						 with picamera.PiCamera() as camera:
+						 	camera.resolution = (resW, resH)
+						 	camera.framerate = frameRate
+						 	camera.capture_sequence([
+						 		datetime.datetime.now().strftime ('%d-%m-%Y-%H_%M_%S_%f') + '_TT'\
+						 		 + str(sys.argv[1]) + '_RES' + str(resH) + '_PIC' + str(numPics) +\
+						 		  '_TI' + str(timeInterval) + '_FR' + str(frameRate) + '.jpg'
+						 		for i in range(numPics)
+						 		], use_video_port=True)
+						 finish = time.time()
 						
 						# Multiplexer architecture capturing sequence
-						with picamera.PiCamera() as camera:
-						    camera.resolution = (640, 480)
-						    camera.framerate = 90
-						    camera.start_preview()
+						#with picamera.PiCamera() as camera:
+						 #   camera.resolution = (640, 480)
+						  #  camera.framerate = 90
+						   # camera.start_preview()
 
 						    # Optional Camera LED OFF
 						    #gp.setmode(gp.BCM)
 						    #camera.led = False
 
-						    time.sleep(2)    # Camera Initialize
-						    start = time.time()
-						    camera.capture_sequence(filenames(), use_video_port=True)
-						    finish = time.time()
+						 #   time.sleep(2)    # Camera Initialize
+						  #  start = time.time()
+						   # camera.capture_sequence(filenames(), use_video_port=True)
+						    #finish = time.time()
 						#Analyzing time and frames
 						fpsTime = (finish-start)
 						fps = numPics/fpsTime
@@ -263,10 +263,10 @@ class queuePictures(threading.Thread):
 #				self.f.close()
 				break
 
-if __name__ == '__main__':
-	queue = Queue.Queue()
-	f = open('manualPic5Output.txt', 'w')
-	t1 = takePictures(queue, f)
-	t2 = queuePictures(queue, f)
-	t1.start()
-	t2.start()
+#if __name__ == '__main__':
+#	queue = Queue.Queue()
+#	f = open('manualPic5Output.txt', 'w')
+#	t1 = takePictures(queue, f)
+#	t2 = queuePictures(queue, f)
+#	t1.start()
+#	t2.start()
