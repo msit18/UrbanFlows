@@ -101,7 +101,8 @@ with picamera.PiCamera() as camera:
 	start = time.time()
 	camera.capture_sequence(filenames(), use_video_port=True)
 	finish = time.time()
-	print 'Finished running in {0} seconds'\.format(str(finish - start)) 
+	timeRan = finish - start
+	print 'Finished running in %02d seconds' % timeRan
         
 
 
