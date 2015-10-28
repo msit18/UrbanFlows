@@ -42,7 +42,7 @@ gp.output(11, False)
 gp.output(12, True)
 
 #More for testing purposes for now; number of pictures to be taken. 
-frames = 30
+frames = 90
 
 #Begins the camera on picamera 1
 cam = 1
