@@ -82,7 +82,8 @@ def cam_change():
 	#Original model goes while frame < frames
 def filenames():
 	#Current number of pics taken
-    	global frame = 0
+    	global frame 
+    	frame = 0
     	start = time.time()
     	now = start
     	#How long to let the program run
