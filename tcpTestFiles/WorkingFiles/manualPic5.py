@@ -81,7 +81,7 @@ def cam_change():
 def filenames():
     	frame = 0
 	while frame < frames:
-		time.sleep(3)    # Used to correct delays; testing for time purposes
+		time.sleep(0.5)    # Used to correct delays; testing for time purposes
 		cam_change()        # Switching Camera
         	time.sleep(0.007)   
         	yield 'image%02d.jpg' % frame
