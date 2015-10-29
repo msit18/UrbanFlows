@@ -42,7 +42,7 @@ gp.output(11, False)
 gp.output(12, True)
 
 #More for testing purposes for now; number of pictures to be taken. 
-frames = 90
+frames = 4
 
 #Begins the camera on picamera 1
 cam = 1
@@ -77,13 +77,13 @@ def cam_change():
 	if cam > 4:
 		cam = 1
 
-	#Changes cameras and names the written files; SHOULD BE MORE SUBSTANTIVELY NAMED. 
+	#Changes cameras and names the written files; FILE NAMES SHOULD BE MORE SUBSTANTIVELY NAMED. 
 def filenames():
     	frame = 0
 	while frame < frames:
-		time.sleep(0.007)    # SD Card Bandwidth Correction Delay,
+		time.sleep(3)    # Used to correct delays; testing for time purposes
 		cam_change()        # Switching Camera
-        	time.sleep(0.007)   # SD Card Bandwidth Correction Delay
+        	time.sleep(0.007)   
         	yield 'image%02d.jpg' % frame
         	frame += 1
         	
