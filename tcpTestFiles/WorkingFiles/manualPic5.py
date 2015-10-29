@@ -93,6 +93,7 @@ def filenames():
 		cam_change()        # Switching Camera
         	time.sleep(0.007)   
         	yield 'image%02d.jpg' % frame
+        	frame += 1
         	now = time.time()
         	
 # Multiplexer architecture capturing sequence
