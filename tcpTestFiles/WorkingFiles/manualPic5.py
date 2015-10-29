@@ -42,7 +42,7 @@ gp.output(11, False)
 gp.output(12, True)
 
 #More for testing purposes for now; number of pictures to be taken. 
-frames = 30
+frames = 90
 
 #Begins the camera on picamera 1
 cam = 1
@@ -89,9 +89,9 @@ def filenames():
         	
 # Multiplexer architecture capturing sequence
 with picamera.PiCamera() as camera:
-	camera.resolution = (640, 480)
+	camera.resolution = (1280, 720)
 	#How quickly pictures will be taken
-	camera.framerate = 30
+	camera.framerate = 15
 	camera.start_preview()
 
 	# Optional Camera LED OFF
@@ -176,7 +176,7 @@ class takePictures(threading.Thread):
 						timePlusInt = timeNow + timeInterval
 						start=time.time()
 						#5 pi architecture capturing sequence 
-						 with picamera.PiCamera() as camera:
+						with picamera.PiCamera() as camera:
 						 	camera.resolution = (resW, resH)
 						 	camera.framerate = frameRate
 						 	camera.capture_sequence([
@@ -185,7 +185,7 @@ class takePictures(threading.Thread):
 						 		  '_TI' + str(timeInterval) + '_FR' + str(frameRate) + '.jpg'
 						 		for i in range(numPics)
 						 		], use_video_port=True)
-						 finish = time.time()
+						finish = time.time()
 						
 						# Multiplexer architecture capturing sequence
 						#with picamera.PiCamera() as camera:
