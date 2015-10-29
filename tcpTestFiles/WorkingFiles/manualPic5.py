@@ -81,9 +81,11 @@ def cam_change():
 	#Updated to test to make sure we can limit the running to a certain amount of time.
 	#Original model goes while frame < frames
 def filenames():
-    	frame = 0
+	#Current number of pics taken
+    	global frame = 0
     	start = time.time()
     	now = start
+    	#How long to let the program run
     	secondsToRun = 3
 	while now - start < secondsToRun:
 		time.sleep(0.007)    # Used to correct delays
@@ -108,7 +110,7 @@ with picamera.PiCamera() as camera:
 	camera.capture_sequence(filenames(), use_video_port=True)
 	finishTime = time.time()
 	timeRan = finishTime - startTime
-	print 'Captured %d frames at total %.2ffps' % (frames, frames / timeRan)
+	print 'Program captured %d images at %.2f fps' % (frame, frame / timeRan)
 	print 'Finished running in %.02f seconds' % timeRan
         
 
