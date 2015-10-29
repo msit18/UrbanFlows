@@ -41,8 +41,8 @@ gp.output(7, False)
 gp.output(11, False)
 gp.output(12, True)
 
-#More for testing purposes for now; number of pictures to be taken. 
-frames = 200
+#More for testing purposes for now; number of pictures to be taken. Stupid high value so that there's essentially no end to the loop. 
+frames = 200000000000000
 
 #Begins the camera on picamera 1
 cam = 1
@@ -87,7 +87,7 @@ def filenames():
     	start = time.time()
     	now = start
     	#How long to let the program run
-    	secondsToRun = 3
+    	secondsToRun = 300
 	while now - start < secondsToRun:
 		time.sleep(0.007)    # Used to correct delays
 		cam_change()        # Switching Camera
