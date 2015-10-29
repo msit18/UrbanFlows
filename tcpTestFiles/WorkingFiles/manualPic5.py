@@ -94,7 +94,7 @@ def filenames():
         	time.sleep(0.007)   
         	yield 'image%02d.jpg' % frame
         	frame += 1
-        	if (now - start) % 20 == 0 and (now - start) >= 20: 
+        	if frame % 20 == 0:
         		print 'Captured %d images so far, at %.02f fps' % (frame, frame / (now - start))
         	now = time.time()
     
