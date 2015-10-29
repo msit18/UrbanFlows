@@ -100,7 +100,7 @@ def filenames():
 with picamera.PiCamera() as camera:
 	camera.resolution = (640, 480)
 	#How quickly pictures will be taken
-	camera.framerate = 10
+	camera.framerate = 15
 	camera.start_preview()
 
 	# Optional Camera LED OFF
