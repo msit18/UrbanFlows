@@ -42,7 +42,7 @@ gp.output(11, False)
 gp.output(12, True)
 
 #More for testing purposes for now; number of pictures to be taken. 
-frames = 4
+frames = 200
 
 #Begins the camera on picamera 1
 cam = 1
@@ -78,20 +78,25 @@ def cam_change():
 		cam = 1
 
 	#Changes cameras and names the written files; FILE NAMES SHOULD BE MORE SUBSTANTIVELY NAMED. 
+	#Updated to test to make sure we can limit the running to a certain amount of time.
+	#Original model goes while frame < frames
 def filenames():
     	frame = 0
-	while frame < frames:
-		time.sleep(0.5)    # Used to correct delays; testing for time purposes
+    	start = time.time()
+    	now = start
+    	secondsToRun = 3
+	while now - start < secondsToRun:
+		time.sleep(0.007)    # Used to correct delays
 		cam_change()        # Switching Camera
         	time.sleep(0.007)   
         	yield 'image%02d.jpg' % frame
-        	frame += 1
+        	now = time.time()
         	
 # Multiplexer architecture capturing sequence
 with picamera.PiCamera() as camera:
 	camera.resolution = (640, 480)
 	#How quickly pictures will be taken
-	camera.framerate = 30
+	camera.framerate = 10
 	camera.start_preview()
 
 	# Optional Camera LED OFF
