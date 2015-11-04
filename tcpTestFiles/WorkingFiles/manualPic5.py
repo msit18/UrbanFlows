@@ -104,7 +104,7 @@ with picamera.PiCamera() as camera:
 	camera.resolution = (640, 480)
 	#How quickly pictures should be taken
 	camera.framerate = 30
-	#camera.start_preview()
+	camera.start_preview()
 
 	# Optional Camera LED OFF
 	#gp.setmode(gp.BCM)
