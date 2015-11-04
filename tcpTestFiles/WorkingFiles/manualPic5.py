@@ -101,10 +101,10 @@ def filenames():
         	
 # Multiplexer architecture capturing sequence
 with picamera.PiCamera() as camera:
-	camera.resolution = (2560, 1920)
+	camera.resolution = (640, 480)
 	#How quickly pictures should be taken
-	camera.framerate = 5
-	camera.start_preview()
+	camera.framerate = 30
+	#camera.start_preview()
 
 	# Optional Camera LED OFF
 	#gp.setmode(gp.BCM)
