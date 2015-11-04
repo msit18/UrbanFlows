@@ -86,7 +86,7 @@ def filenames():
     	start = time.time()
     	now = start
     	#How long to let the program run
-    	secondsToRun = 10
+    	secondsToRun = 15
 	while now - start < secondsToRun:
 		time.sleep(0.007)    # Used to correct delays
 		cam_change()        # Switching Camera
@@ -101,9 +101,9 @@ def filenames():
         	
 # Multiplexer architecture capturing sequence
 with picamera.PiCamera() as camera:
-	camera.resolution = (640, 480)
+	camera.resolution = (2560, 1920)
 	#How quickly pictures should be taken
-	camera.framerate = 30
+	camera.framerate = 5
 	camera.start_preview()
 
 	# Optional Camera LED OFF
