@@ -28,6 +28,7 @@ import string
 import sys
 import numpy as np
 import RPi.GPIO as gp
+import datetime
 
 #Setup for the pi camera, taken from the 'ivport_capture_sequence_A.py' file
 gp.setwarnings(False)
@@ -48,13 +49,11 @@ frames = 200000000000000
 cam = 1
 
 #Switches cameras. Taken from 'ivport_capture_sequence_A.py'
-#ACTUAL PORTS FOR THE PI CAMERAS TBD 
 def cam_change():
 	global cam
 	gp.setmode(gp.BOARD)
 	if cam == 1:
 	        # CAM 1 for A Jumper Setting
-	        #first output number was first 7
 	        gp.output(7, False)
 	        gp.output(11, False)
 	        gp.output(12, True)
@@ -82,17 +81,18 @@ def cam_change():
 	#Original model goes while frame < frames
 def filenames():
 	#Current number of pics taken
-    	global frame 
+    	global frame
     	frame = 0
     	start = time.time()
     	now = start
     	#How long to let the program run
-    	secondsToRun = 30
+    	secondsToRun = 10
 	while now - start < secondsToRun:
 		time.sleep(0.007)    # Used to correct delays
 		cam_change()        # Switching Camera
         	time.sleep(0.007)   
-        	yield 'image%02d.jpg' % frame
+        	timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+        	yield '%s.jpg' % timestamp
         	frame += 1
         	if frame % 20 == 0:
         		print 'Captured %d images so far, at %.02f fps' % (frame, frame / (now - start))
@@ -101,9 +101,9 @@ def filenames():
         	
 # Multiplexer architecture capturing sequence
 with picamera.PiCamera() as camera:
-	camera.resolution = (640, 480)
-	#How quickly pictures will be taken
-	camera.framerate = 16
+	camera.resolution = (2560, 1920)
+	#How quickly pictures should be taken
+	camera.framerate = 5
 	camera.start_preview()
 
 	# Optional Camera LED OFF
