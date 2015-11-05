@@ -86,7 +86,7 @@ def filenames():
     	start = time.time()
     	now = start
     	#How long to let the program run
-    	secondsToRun = 15
+    	secondsToRun = 30
 	while now - start < secondsToRun:
 		time.sleep(0.007)    # Used to correct delays
 		cam_change()        # Switching Camera
