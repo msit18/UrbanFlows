@@ -82,7 +82,9 @@ def cam_change():
 def filenames():
 	#Current number of pics taken
     	global frame
+    	global fpspc
     	frame = 0
+    	fpspc = []
     	start = time.time()
     	now = start
     	#How long to let the program run
@@ -92,6 +94,8 @@ def filenames():
 		cam_change()        # Switching Camera
         	time.sleep(0.007)   
         	timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%H:%M:%S:%f')
+        	#List to do analysis on frames per second per camera
+        	fpspc.append(datetime.datetime.fromtimestamp(time.time()).strftime('cam %d %H:%M:%S:%f') % cam)
         	#Image name saves camera number and timestamp 
         	yield 'cam %d %s.jpg' % (cam, timestamp)
         	frame += 1
@@ -99,7 +103,7 @@ def filenames():
         	if frame % 20 == 0:
         		print 'Captured %d images so far, at %.02f fps' % (frame, frame / (now - start))
         	now = time.time()
-    
+	
         	
 # Multiplexer architecture capturing sequence
 with picamera.PiCamera() as camera:
@@ -119,6 +123,7 @@ with picamera.PiCamera() as camera:
 	timeRan = finishTime - startTime
 	print 'Program captured %d images at %.2f fps' % (frame, frame / timeRan)
 	print 'Finished running in %.02f seconds' % timeRan
+	print fpspc
         
 
 
