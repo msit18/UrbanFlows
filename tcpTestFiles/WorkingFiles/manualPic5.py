@@ -95,7 +95,7 @@ def filenames():
         	time.sleep(0.007)   
         	timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%H:%M:%S:%f')
         	#List to do analysis on frames per second per camera
-        	fpspc.append('cam %d' % cam + datetime.datetime.fromtimestamp(time.time()).strftime('%H:%M:%S:%f'))
+        	fpspc.append('cam %d' % cam + ' ' + datetime.datetime.fromtimestamp(time.time()).strftime('%H:%M:%S:%f'))
         	#Image name saves camera number and timestamp 
         	yield 'cam %d %s.jpg' % (cam, timestamp)
         	frame += 1
@@ -123,6 +123,7 @@ with picamera.PiCamera() as camera:
 	timeRan = finishTime - startTime
 	print 'Program captured %d images at %.2f fps' % (frame, frame / timeRan)
 	print 'Finished running in %.02f seconds' % timeRan
+	fpspc.sort()
 	print fpspc
         
 
