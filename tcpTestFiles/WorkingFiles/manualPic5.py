@@ -95,7 +95,7 @@ def filenames():
         	time.sleep(0.007)   
         	timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%H:%M:%S:%f')
         	#List to do analysis on frames per second per camera
-        	fpspc.append(datetime.datetime.fromtimestamp(time.time()).strftime('cam %d %H:%M:%S:%f') % cam)
+        	fpspc.append('cam %d' % + camdatetime.datetime.fromtimestamp(time.time()).strftime('%H:%M:%S:%f'))
         	#Image name saves camera number and timestamp 
         	yield 'cam %d %s.jpg' % (cam, timestamp)
         	frame += 1
