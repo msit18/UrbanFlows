@@ -29,6 +29,7 @@ import sys
 import numpy as np
 import RPi.GPIO as gp
 import datetime
+import csv
 
 #Setup for the pi camera, taken from the 'ivport_capture_sequence_A.py' file
 gp.setwarnings(False)
@@ -94,8 +95,14 @@ def filenames():
 		cam_change()        # Switching Camera
         	time.sleep(0.007)   
         	timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%H:%M:%S:%f')
-        	#List to do analysis on frames per second per camera
+        	#Appends list with timestamps for parsing and analysis 
+        	#if frame == 0:
+        	#	pass
+        	#else:
         	fpspc.append('cam %d' % cam + ' ' + datetime.datetime.fromtimestamp(time.time()).strftime('%H:%M:%S:%f'))
+        	with open('fpspc.csv', 'wb') as myfile:
+    			wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+    			wr.writerow(fpspc)
         	#Image name saves camera number and timestamp 
         	yield 'cam %d %s.jpg' % (cam, timestamp)
         	frame += 1
@@ -103,7 +110,8 @@ def filenames():
         	if frame % 20 == 0:
         		print 'Captured %d images so far, at %.02f fps' % (frame, frame / (now - start))
         	now = time.time()
-	
+        	
+		
         	
 # Multiplexer architecture capturing sequence
 with picamera.PiCamera() as camera:
