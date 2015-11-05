@@ -93,7 +93,7 @@ def filenames():
         	time.sleep(0.007)   
         	timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%H:%M:%S:%f')
         	#Image name saves camera number and timestamp 
-        	yield 'cam %d : %s.jpg' % (cam, timestamp)
+        	yield 'cam %d %s.jpg' % (cam, timestamp)
         	frame += 1
         	#Prints a statment for every 20 pictures captured to update total FPS
         	if frame % 20 == 0:
