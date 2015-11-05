@@ -91,9 +91,10 @@ def filenames():
 		time.sleep(0.007)    # Used to correct delays
 		cam_change()        # Switching Camera
         	time.sleep(0.007)   
-        	timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+        	timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S:%f')
         	yield '%s.jpg' % timestamp
         	frame += 1
+        	#Prints a statment for every 20 pictures captured to update total FPS
         	if frame % 20 == 0:
         		print 'Captured %d images so far, at %.02f fps' % (frame, frame / (now - start))
         	now = time.time()
