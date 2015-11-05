@@ -100,9 +100,6 @@ def filenames():
         	#	pass
         	#else:
         	fpspc.append('cam %d' % cam + ' ' + datetime.datetime.fromtimestamp(time.time()).strftime('%H:%M:%S:%f'))
-        	with open('fpspc.csv', 'wb') as myfile:
-    			wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-    			wr.writerow(fpspc)
         	#Image name saves camera number and timestamp 
         	yield 'cam %d %s.jpg' % (cam, timestamp)
         	frame += 1
@@ -132,7 +129,9 @@ with picamera.PiCamera() as camera:
 	print 'Program captured %d images at %.2f fps' % (frame, frame / timeRan)
 	print 'Finished running in %.02f seconds' % timeRan
 	fpspc.sort()
-	print fpspc
+	with open('fpspc.csv', 'wb') as myfile:
+    			wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+    			wr.writerow(fpspc)
         
 
 
