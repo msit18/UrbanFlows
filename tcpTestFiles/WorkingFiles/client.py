@@ -1,4 +1,5 @@
 #Written by Vlatko Klabucar.  Fixed by Michelle Sit
+#Simple HTTP client. Sends a designated image
 
 import sys
 

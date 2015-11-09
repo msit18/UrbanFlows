@@ -11,10 +11,10 @@
 #for helping me with the architecture of this system!
 
 from twisted.internet.protocol import Factory
-from twisted.internet import reactor, protocol, defer
+from twisted.internet import reactor, protocol, defer, threads
 import time, sys
 
-from twisted.web.server import Site
+from twisted.web.server import Site, NOT_DONE_YET
 from twisted.web.resource import Resource
 
 import cgi
@@ -36,8 +36,6 @@ class DataProtocol (protocol.Protocol):
 	def __init__(self, factory, d):
 		self.factory = factory
 		self.d = defer.Deferred()
-		self.confirm = False
-		self.token = False
 
 	def connectionMade(self):
 		self.factory.numConnections += 1
@@ -60,10 +58,11 @@ class DataProtocol (protocol.Protocol):
 		elif msgFromClient[0] == 'imgName':
 			print "FOUND AN IMGNAME"
 			print msgFromClient[1]
+			f.finStatus = False
 			self.setImgName(msgFromClient[1])
 		elif msgFromClient[0] == 'finished':
 			print "client is finished"
-			self.transport.loseConnection()
+			endGame = threads.deferToThread(self.checkEnd)
 		else:
 			"I don't know what this is: {0}".format(data)
 
@@ -129,27 +128,24 @@ class DataProtocol (protocol.Protocol):
 		self.d.addCallback(a.check)
 		self.d.addErrback(self.failedSendCmds)
 		self.transport.write("Okay gotNameSendImg")
-	# 	self.d.addCallback(self.waitUntilPosted)
-	# 	self.d.addErrback(self.failedSendCmds)
 
-	# def finishedPosting(self):
-	# 	self.token = True
+	def checkEnd(self):
+		print "RUNNING CHECKEND"
+		value = f.getFinStatus()
+		print value
+		while value == False:
+			value = f.getFinStatus()
+		else:
+			print "end end end end end!"
+			self.transport.loseConnection()
+			return "done"
 
-	# def getPostStatus(self):
-	# 	self.confirm = self.token
-	# 	print "SELF.CONFIRM STATUS: {0}".format(self.confirm)
-	# 	return self.confirm
+class finState():
+	def __init__(self):
+		self.finStatus = False
 
-	# def waitUntilPosted(self, second):
-	# 	self.getPostStatus()
-	# 	while self.getPostStatus() == True:
-	# 		print "UPLOADED SUCCESSFULLY"
-	# 		self.transport.write("Okay uploaded")
-	# 	else:
-	# 		print "WAITING TO BE UPLOADED"
-	# 		self.waitUntilPosted()
-
-
+	def getFinStatus(self):
+		return self.finStatus
 
 #Used for HTTP network.  Receives images and saves them to the server
 class UploadImage(Resource):
@@ -164,18 +160,35 @@ class UploadImage(Resource):
 
 	def render_POST(self, request):
 		print "RENDER Posting: {0}".format(imgName)
-		file = open(imgName, "wb")
-		file.write(request.content.read())
-		#c.finishedPosting()
-		return '<html><body>Image uploaded :) </body></html>'
+		print f.getFinStatus()
+		with open(imgName, "wb") as file:
+			file.write(request.content.read())
+		v = request.notifyFinish()
+		v.addCallback(self.fin)
+		v.addErrback(self.errFin)
+		request.finish()
+		print "finished writing file"
+		return NOT_DONE_YET
+
+	def fin(self, notifyFinStat):
+		print "FIN"
+		#print notifyFinStat
+		print f.finStatus
+		f.finStatus = True
+		print f.getFinStatus()
+
+	def errFin (self, err):
+		print "ERR"
+		print err
 
 if __name__ == '__main__':
 
 	#TCP network
 	d = defer.Deferred()
 	b = DataFactory()
-	c = DataProtocol(DataFactory, d)
 	reactor.listenTCP(8888, b, 200, 'localhost')
+
+	f = finState()
 
 	#HTTP network
 	a = UploadImage()

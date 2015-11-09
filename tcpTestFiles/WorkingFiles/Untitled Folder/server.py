@@ -1,3 +1,6 @@
+#Written by Vlatko Klabucar
+#Simple HTTP Server. Posts a single image or provides GET information
+
 from twisted.web.server import Site
 from twisted.web.resource import Resource
 from twisted.internet import reactor

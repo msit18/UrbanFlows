@@ -62,10 +62,13 @@ class myProtocol(protocol.Protocol):
 			result.addCallback(self.getFinStatus)
 			result.addErrback(self.failedMethod)
 			#STARTS GATHERING PICTURES TO SEND OVER
-			self.getList()
+			self.getList("thing")
 		elif msgFromServer[1] == "gotNameSendImg":
 			print "RECEIVED GOTNAMESENDIMG"
-			self.sendImg()
+			e = self.sendImg()
+			e.addCallback(self.getList)
+			e.addErrback(self.failedMethod)
+			e.callback("thing")
 		else:
 			print "Didn't write hi success.jpg to server"
 
@@ -83,8 +86,7 @@ class myProtocol(protocol.Protocol):
 		print "SELF TAG: {0}".format(self.tag)
 		return self.tag
 
-	def getList(self):
-		self.stateMachine()
+	def getList(self, second):
 		self.fileList = glob.glob('*.jpg')
 		self.tag = self.getTagStatus()
 		if len(self.fileList) > 0:
@@ -105,16 +107,11 @@ class myProtocol(protocol.Protocol):
 					self.sendName()
 				elif len(self.fileList) <= 0:
 					print "UP DATE DIDN'T FIND ANYTHING. REACTOR STOP"
-					self.stateMachine()
+					print "FINISHED WRITING IMAGE"
 					self.finished()
-
-	def stateMachine(self):
-		print "self state: {0}".format(self.state)
 
 	def sendName(self):
 		print self.fileList
-		self.state = "name"
-		self.stateMachine()
 		self.name = self.fileList.pop(0)
 		print "Sending name over: {0}".format(self.name)
 		print "fileLen is: {0}".format(len(self.fileList))
@@ -122,8 +119,7 @@ class myProtocol(protocol.Protocol):
 
 	def sendImg(self):
 		print "RUNNING SENDIMG"
-		self.state = "image"
-		self.stateMachine()
+		e = defer.Deferred()
 		print self.name
 		agent = Agent(reactor)
 		body = FileBodyProducer(open("/home/michelle/gitFolder/UrbanFlows/tcpTestFiles/WorkingFiles/{0}".format(self.name), 'rb'))
@@ -134,17 +130,13 @@ class myProtocol(protocol.Protocol):
 		    		'Content-Type': ['text/x-greeting']}),
 		    body)
 		os.system('rm {0}'.format(self.name))
-		self.state = "nothing"
 		print 'finished writing img'
-		self.getList()
+		return e
 
 #Still closes process too early.  Need to figure out where it would be okay to stop
 	def finished(self):
 		print "FINISHED WRITING IMAGE"
-		if self.state == "nothing":
-			self.transport.write("finished")
-		else:
-			self.finished()
+		self.transport.write("finished")
 
 if __name__ == '__main__':
 	#HTTP network.  Connects on port 8880

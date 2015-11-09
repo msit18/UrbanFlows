@@ -3,7 +3,7 @@ import time
 class doSomeRandom():
 	def capturePictures(self):
 		print "Running capturePictures"
-		time.sleep(10)
+		time.sleep(7)
 		print "finished capturePictures"
 		#print val
 		return "True"
