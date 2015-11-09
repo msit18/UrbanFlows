@@ -42,7 +42,8 @@ gp.output(7, False)
 gp.output(11, False)
 gp.output(12, True)
 
-frames = 90
+#Used to be 90; changed to 10 for testing purposes 
+frames = 10
 
 cam = 1
 
