@@ -43,7 +43,7 @@ class myProtocol(protocol.Protocol):
 		self.fileList = []
 		self.name = ""
 		self.tag = False
-		self.state = "nothing"
+		self.clientParams = ""
 
 	def connectionMade(self):
 		ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
@@ -58,6 +58,15 @@ class myProtocol(protocol.Protocol):
 			print "GOT A STARTTAKINGPICTURES"
 			#TAKING PICTURES IN SEPARATE THREAD. Has errback handling here
 			#added callback to notify when finished
+			if msgFromServer[2] == "camera":
+				self.clientParams = "{0} {1} {2} {3} {4} {5} {6}".format(\
+				msgFromServer[2], msgFromServer[3], msgFromServer[4],\
+				msgFromServer[5], msgFromServer[6], msgFromServer[7], msgFromServer[8])
+			elif msgFromServer[2] == "video":
+				self.clientParams = "{0} {1} {2} {3} {4}".format(\
+				msgFromServer[2], msgFromServer[3], msgFromServer[4],\
+				msgFromServer[5], msgFromServer[6])
+			print self.clientParams
 			result = threads.deferToThread(y.capturePictures)
 			result.addCallback(self.getFinStatus)
 			result.addErrback(self.failedMethod)
@@ -108,7 +117,7 @@ class myProtocol(protocol.Protocol):
 				elif len(self.fileList) <= 0:
 					print "UP DATE DIDN'T FIND ANYTHING. REACTOR STOP"
 					print "FINISHED WRITING IMAGE"
-					self.finished()
+					self.transport.write("finished")
 
 	def sendName(self):
 		print self.fileList
@@ -132,11 +141,6 @@ class myProtocol(protocol.Protocol):
 		os.system('rm {0}'.format(self.name))
 		print 'finished writing img'
 		return e
-
-#Still closes process too early.  Need to figure out where it would be okay to stop
-	def finished(self):
-		print "FINISHED WRITING IMAGE"
-		self.transport.write("finished")
 
 if __name__ == '__main__':
 	#HTTP network.  Connects on port 8880
