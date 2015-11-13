@@ -20,9 +20,10 @@ import time
 import sys
 #import manualPic_capturePhotos
 from doSomeRandom import doSomeRandom
+from time import strftime
 
 #TCP network portion
-class DataClientFactory(protocol.ClientFactory):
+class DataClientFactory(protocol.ReconnectingClientFactory):
 	def __init__(self, data):
 		self.data = data
 
@@ -30,11 +31,12 @@ class DataClientFactory(protocol.ClientFactory):
 		return myProtocol(self)
 
 	def clientConnectionFailed(self, connector, reason):
-		print 'connection failed:', reason.getErrorMessage()
-		reactor.stop()
+		print >>f, 'Connection failed at {0}:'.format(strftime("%Y-%m-%d-%H:%M:%S")), reason.getErrorMessage()
+		ReconnectingClientFactory.clientConnectionFailed(self, connector, reason)
+		#reactor.stop()
 
 	def clientConnectionLost(self, connector, reason):
-		print 'connection lost:', reason.getErrorMessage()
+		print >>f, 'Connection lost at {0}:'.format(strftime("%Y-%m-%d-%H:%M:%S")), reason.getErrorMessage()
 		reactor.stop()
 
 class myProtocol(protocol.Protocol):
@@ -48,13 +50,13 @@ class myProtocol(protocol.Protocol):
 	def connectionMade(self):
 		ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
 		msg = "ip piGroup1 {0}".format(ip_address)
+		print >>f, msg
 		self.transport.write(msg)
 
 	def dataReceived(self, data):
-		print "data Received from Server: {0}".format(data)
+		print >>f, "Data received from Server: {0}".format(data)
 		msgFromServer = [data for data in data.split()]
 		if msgFromServer[1] == "startTakingPictures":
-			#STARTS IMAGE TAKING PROCESS
 			print "GOT A STARTTAKINGPICTURES"
 			#TAKING PICTURES IN SEPARATE THREAD. Has errback handling here
 			#added callback to notify when finished
@@ -66,7 +68,7 @@ class myProtocol(protocol.Protocol):
 				self.clientParams = "{0} {1} {2} {3} {4}".format(\
 				msgFromServer[2], msgFromServer[3], msgFromServer[4],\
 				msgFromServer[5], msgFromServer[6])
-			print self.clientParams
+			print >>f, self.clientParams
 			result = threads.deferToThread(y.capturePictures)
 			result.addCallback(self.getFinStatus)
 			result.addErrback(self.failedMethod)
@@ -81,14 +83,16 @@ class myProtocol(protocol.Protocol):
 		else:
 			print "Didn't write hi success.jpg to server"
 
-	def failedMethod(self,failure):
-		print "FAILURE: failedMethod"
-		sys.stderr.write(str(failure))
-
 	def getFinStatus(self, second):
 		print "running GETFINSTATUS"
 		print second #end Token for capturePicture thread
 		self.tag = second
+
+	def failedMethod(self,failure):
+		print >>f, "FAILURE: ERROR WITH PICTURE TAKING METHOD"
+		#TODO: FIGURE OUT HOW TO DISTINGUISH BETWEEN DIFFERENT PICAM ERRORS
+		self.transport.write("ERROR PICAMERA")
+		sys.stderr.write(str(failure))
 
 	def getTagStatus(self):
 		print "running GETTAGSTATUS"
@@ -101,12 +105,12 @@ class myProtocol(protocol.Protocol):
 		if len(self.fileList) > 0:
 			print "GLOB HAS PICTURES. SENDING NAME"
 			self.sendName()
-		else: #len has no pictures
+		else:
 			#len has no pictures and self tag is false
 			while self.tag == False:
-					print "GLOB HAS NO PICTURES AND TAG IS FALSE. RUNNING CHECK"
-					self.fileList = glob.glob('*.jpg')
-					self.tag = self.getTagStatus()
+				print "GLOB HAS NO PICTURES AND TAG IS FALSE. RUNNING CHECK"
+				self.fileList = glob.glob('*.jpg')
+				self.tag = self.getTagStatus() #TODO: Will this work for Raspi?
 			#len has no pictures and self tag is true
 			else:
 				print "GLOB HAS NO PICTURES AND TAG IS TRUE. SLEEP"
@@ -124,7 +128,7 @@ class myProtocol(protocol.Protocol):
 		self.name = self.fileList.pop(0)
 		print "Sending name over: {0}".format(self.name)
 		print "fileLen is: {0}".format(len(self.fileList))
-		reactor.callLater(0.1, self.transport.write, " imgName {0}".format(self.name))
+		reactor.callLater(0.1, self.transport.write, "imgName {0}".format(self.name))
 
 	def sendImg(self):
 		print "RUNNING SENDIMG"
@@ -143,18 +147,15 @@ class myProtocol(protocol.Protocol):
 		return e
 
 if __name__ == '__main__':
-	#HTTP network.  Connects on port 8880
-
-	#reactor.connectTCP('18.111.45.131', 8888, DataClientFactory(data), timeout=200)
-
-	#manualPic setup
-	f = open('manualPic5Output.txt', 'w')
+	f = open('ClientLog-{0}.txt'.format(strftime("%Y-%m-%d-%H:%M:%S")), 'w')
 	# t1 = manualPic_capturePhotos.takePictures(queue, f)
 	
 	#TCP network.  Connects on port 8888
-	data = "first data"
+	data = "start"
 	reactor.connectTCP('localhost', 8888, DataClientFactory(data), timeout=200)
 
 	y = doSomeRandom()
 
 	reactor.run()
+
+	#HTTP network.  Connects on port 8880

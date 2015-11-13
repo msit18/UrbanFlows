@@ -19,11 +19,8 @@
 #sys.argv[6] = framerate of picamera
 
 import time
-import threading
-import Queue
 import picamera
 import datetime
-import glob
 import os
 import string
 import sys
@@ -32,12 +29,8 @@ import numpy as np
 #Takes pictures based inputted fps options (while loops control total run time and how many 
 #pictures are taken in the specified time frame (fps).
 
-#Time is also updated on each run through)
-class takePictures(threading.Thread):
-	def __init__(self, queue, f):
-		threading.Thread.__init__(self)
-		self.queue = queue
-		self.f = f
+#Time is also updated on each run through
+class takePictures():
 
 	def run (self):
 		resW = int(sys.argv[2])
@@ -55,11 +48,11 @@ class takePictures(threading.Thread):
 
 		timePlusTwentyMins = timeNow+600
 
-		print >>self.f, "Capturing {0}p for a total time of {1} min ({2} secs) at {3} "\
+		print >>camLog, "Capturing {0}p for a total time of {1} min ({2} secs) at {3} "\
 		"frames per {4} second (({5} mins) at {6} framerate ".format(str(resH), \
 			str(totalTimeMin), str(totalTimeSec), str(numPics), str(timeInterval), \
 			str(float(timeInterval/60)), str(frameRate) )
-		print >>self.f, "TimePlusTwenty = {0}".format(str(timePlusTwentyMins) )
+		print >>camLog, "TimePlusTwenty = {0}".format(str(timePlusTwentyMins) )
 
 		numPicArray = []
 		fpsArray = []
@@ -71,7 +64,7 @@ class takePictures(threading.Thread):
 				endTwenty = time.time()
 				twentyTime = endTwenty-timeStart
 				twentyFPS = sum(numPicArray)/twentyTime
-				print >>self.f, "10.2 Twenty Min Update: Total number of pictures is {0},"\
+				print >>camLog, "10.2 Twenty Min Update: Total number of pictures is {0},"\
 				" total time elapsed is {1}, totalFPS is {2}".format(str(sum(numPicArray)),\
 				 str(twentyTime), str(twentyFPS) )
 				timePlusTwentyMins = time.time()+600
@@ -95,16 +88,20 @@ class takePictures(threading.Thread):
 					numPicArray.append(numPics)
 					fpsArray.append(fps)
 					timeAvg.append(fpsTime)
-					print >>self.f, 'Captured {0} frames at {1}fps in {2}secs'\
+					print >>camLog, 'Captured {0} frames at {1}fps in {2}secs'\
 					.format( str(sum(numPicArray)), str(numPics/(finish-start)), str(finish-start))
-					self.queue.put('beginT2')
 		endTime = time.time()
 		totalTime = endTime-timeStart
 		totalFPS = sum(numPicArray)/totalTime
-		print >>self.f, "10.2: Captured {0} total pictures.  Total time was {1}, total FPS is {2}"\
+		print >>camLog, "10.2: Captured {0} total pictures.  Total time was {1}, total FPS is {2}"\
 		.format(str(sum(numPicArray)), str(totalTime), str(totalFPS) )
 		camera.close()
-		self.queue.put('T1closeT2')
+
+if __name__ == '__main__':
+	t = takePictures()
+	camLog = open('CamLog-{0}.txt'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), 'w')
+
+	t.run()
 
 #Error handling can be handled in callbackClient class
 		# except (picamera.exc.PiCameraError, picamera.exc.PiCameraMMALError):

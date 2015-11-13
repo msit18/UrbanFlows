@@ -4,7 +4,6 @@
 #TODO: NEED TO INCORPORATE THE TEAM LEADER PI KEEPING TRACK OF CONNECTIONS
 #TODO: TEST WITH RASPIES
 #TODO: ERROR HANDLING
-#TODO: FINISH PROCESS HANDLING
 
 #Written by Michelle Sit
 #Many thanks to Vlatko Klabucar for helping me with the HTTP part!  Also many thanks to Nahom Marie
@@ -12,7 +11,8 @@
 
 from twisted.internet.protocol import Factory
 from twisted.internet import reactor, protocol, defer, threads
-import time, sys
+import sys, time
+#from time import strftime
 
 from twisted.web.server import Site, NOT_DONE_YET
 from twisted.web.resource import Resource
@@ -39,17 +39,15 @@ class DataProtocol (protocol.Protocol):
 
 	def connectionMade(self):
 		self.factory.numConnections += 1
-		print "Connection made. Number of active connections: {0}".format(self.factory.numConnections)
+		print >>log, "Connection made at {0}. Number of active connections: {1}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), self.factory.numConnections)
 
 	def connectionLost(self, reason):
 		self.factory.numConnections -= 1
-		#print dictFormat
-		print "Connection lost. Number of active connections: {0}".format(self.factory.numConnections)
+		print >>log, "Connection lost at {0}. Number of active connections: {1}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), self.factory.numConnections)
 
 	def dataReceived(self, data):
-		print "DATARECEIVED. Server received data: {0}".format(data)
+		print >>log, "DATARECEIVED. Server received data: {0}".format(data)
 		msgFromClient = [data for data in data.split()]
-		#print msgFromClient
 		if msgFromClient[0] == "ip":
 			print "FOUND AN IP"
 			self.d.addCallback(self.gotIP, msgFromClient[2])
@@ -57,59 +55,53 @@ class DataProtocol (protocol.Protocol):
 			self.d.callback(msgFromClient[1])
 		elif msgFromClient[0] == 'imgName':
 			print "FOUND AN IMGNAME"
-			print msgFromClient[1]
+			#print msgFromClient[1]
 			f.finStatus = False
 			self.setImgName(msgFromClient[1])
 		elif msgFromClient[0] == 'finished':
-			print "client is finished"
+			print >>log, "client is finished"
 			endGame = threads.deferToThread(self.checkEnd)
+		elif msgFromClient[0] == 'ERROR':
+			print >>log, "ERROR FROM PICAMERA at {0}".format(time.strftime("%Y-%m-%d-%H:%M:%S"))
+			#TODO: what to do if there is a camera error in one of them?
 		else:
-			"I don't know what this is: {0}".format(data)
+			print >>log, "Time: {0}. I don't know what this is: {1}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), data)
 
 	def gotIP(self, piGroup, ipAddr):
-		print "RUNNING GOTIP"
+		print >>log, "RUNNING GOTIP"
+		#adds key and a list containing IP address
 		if (piGroup in dictFormat) == False:
-			#adds key and a list containing IP address
-			print "I didn't have this cluster key"
+			print >>log, "I didn't have this cluster key"
 			dictFormat[piGroup] = [ipAddr]
-			print dictFormat
-			print "finished with adding cluster and IP"
+		#appends new IP to the end of the key's list
 		elif (piGroup in dictFormat) == True:
-			#appends new IP to the end of the key's list
-			print "it's true! I have this cluster in my keys"
-			#print dictFormat[piGroup] #prints out the key values
+			print >>log, "it's true! I have this cluster in my keys"
 			dictFormat[piGroup].append(ipAddr)
-			print dictFormat
-			print "finished with adding new IP to a known cluster"
 		else:
-			print "Got something that wasn't an IP"
-			self.d.errback(ValueError("Couldn't process your IP request"))
+			print >>log, "Got something that wasn't an IP. Adding to dict anyway"
+			dictFormat[piGroup] = [ipAddr]
+		print dictFormat
 		reactor.callInThread(self.checkConnections, piGroup)
-
-	def writeToClient(self, msg):
-		print "WRITETOCLIENT. write message to client: {0}".format(msg)
-		self.transport.write(msg)
 
 	def failedIP(self, failure):
 		print "FAILURE: NOTIP"
 		sys.stderr.write(str(failure))
 
-	#Called in seperate threads	
+	#Called in seperate threads. TEST WITH RASPIES
 	def checkConnections(self, dataKey):
-		print "CHECKCONNECTIONS.  Hello."
-		# print dataKey
-		# print len(dictFormat[dataKey])
+		print >>log, "RUNNING CHECKCONNECTIONS"
 		numValues = len(dictFormat[dataKey])
-		while numValues < 0:
+		while numValues < 0: #Set value to number of Raspies in each cluster
 			numValues = len(dictFormat[dataKey])
 		else:
 			print "SENDING CMDS"
 			self.d.addCallback(self.startTakingPictures)
 		 	self.d.addErrback(self.failedSendCmds)
-
-	def failedCheckConnections(self, failure):
-		print "FAILURE: failedCheckConnections"
-		sys.stderr.write(str(failure))
+	
+	#largely redundant method but provides a log of the message
+	def writeToClient(self, msg):
+		print >>log, "WRITETOCLIENT. Write message to client: {0}".format(msg)
+		self.transport.write(msg)
 
 	def startTakingPictures(self, data):
 		print "STARTTAKINGPICTURES"
@@ -266,6 +258,7 @@ class MasterVariables():
 			self.userInput()
 
 if __name__ == '__main__':
+	log = open('ServerLog-{0}.txt'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), 'w')
 	f = MasterVariables()
 	f.userInput()
 
@@ -283,4 +276,4 @@ if __name__ == '__main__':
 
 	reactor.run()
 
-	#reactor.listenTCP(8888, DataFactory(), 200, '18.111.45.131')
+#self.d.errback(ValueError("Couldn't process your IP request"))
