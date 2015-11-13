@@ -11,16 +11,14 @@ import subprocess
 from twisted.web.client import Agent
 from twisted.web.http_headers import Headers
 from twisted.web.client import FileBodyProducer
+
 #Threading for picture transfer
-import threading
-import Queue
+from manualPic_capturePhotos import takePictures
+#from doSomeRandom import doSomeRandom
 import os
 import glob
 import time
 import sys
-#import manualPic_capturePhotos
-from doSomeRandom import doSomeRandom
-from time import strftime
 
 #TCP network portion
 class DataClientFactory(protocol.ReconnectingClientFactory):
@@ -31,12 +29,12 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 		return myProtocol(self)
 
 	def clientConnectionFailed(self, connector, reason):
-		print >>f, 'Connection failed at {0}:'.format(strftime("%Y-%m-%d-%H:%M:%S")), reason.getErrorMessage()
+		print >>f, 'Connection failed at {0}:'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), reason.getErrorMessage()
 		ReconnectingClientFactory.clientConnectionFailed(self, connector, reason)
 		#reactor.stop()
 
 	def clientConnectionLost(self, connector, reason):
-		print >>f, 'Connection lost at {0}:'.format(strftime("%Y-%m-%d-%H:%M:%S")), reason.getErrorMessage()
+		print >>f, 'Connection lost at {0}:'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), reason.getErrorMessage()
 		reactor.stop()
 
 class myProtocol(protocol.Protocol):
@@ -69,7 +67,8 @@ class myProtocol(protocol.Protocol):
 				msgFromServer[2], msgFromServer[3], msgFromServer[4],\
 				msgFromServer[5], msgFromServer[6])
 			print >>f, self.clientParams
-			result = threads.deferToThread(y.capturePictures)
+			#result = threads.deferToThread(y.capturePictures)
+			result = threads.deferToThread(t1.run)
 			result.addCallback(self.getFinStatus)
 			result.addErrback(self.failedMethod)
 			#STARTS GATHERING PICTURES TO SEND OVER
@@ -147,15 +146,15 @@ class myProtocol(protocol.Protocol):
 		return e
 
 if __name__ == '__main__':
-	f = open('ClientLog-{0}.txt'.format(strftime("%Y-%m-%d-%H:%M:%S")), 'w')
-	# t1 = manualPic_capturePhotos.takePictures(queue, f)
+	f = open('ClientLog-{0}.txt'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), 'w')
+	t1 = takePictures()
 	
-	#TCP network.  Connects on port 8888
+	#TCP network. Connects on port 8888. HTTP network. Connects on port 8880
 	data = "start"
 	reactor.connectTCP('localhost', 8888, DataClientFactory(data), timeout=200)
 
-	y = doSomeRandom()
+	#y = doSomeRandom()
 
 	reactor.run()
 
-	#HTTP network.  Connects on port 8880
+	
