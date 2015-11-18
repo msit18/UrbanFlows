@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm *.jpg & rm *.h264;
+rm *.jpg;
 echo "removed pictures";
 
 done;

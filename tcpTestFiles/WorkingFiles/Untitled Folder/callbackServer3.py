@@ -176,14 +176,14 @@ if __name__ == '__main__':
 	#TCP network
 	d = defer.Deferred()
 	b = DataFactory()
-	reactor.listenTCP(8888, b, 200, 'localhost')
+	reactor.listenTCP(8888, b, 200, '18.111.103.156')
 
 	#HTTP network
 	a = UploadImage()
 	root = Resource()
 	root.putChild("upload-image", a)
 	factory = Site(root)
-	reactor.listenTCP(8880, factory, 200, 'localhost')
+	reactor.listenTCP(8880, factory, 200, '18.111.103.156')
 
 	reactor.run()
 
