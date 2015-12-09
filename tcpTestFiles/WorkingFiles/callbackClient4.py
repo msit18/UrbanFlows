@@ -79,12 +79,6 @@ class myProtocol(protocol.Protocol):
 			#STARTS GATHERING PICTURES TO SEND OVER
 			print "get list!"
 			self.getList("thing")
-		# elif msgFromServer[1] == "gotNameSendImg":
-		# 	print "RECEIVED GOTNAMESENDIMG"
-		# 	e = self.sendImg()
-		# 	e.addCallback(self.writeToServer)
-		# 	e.addErrback(self.failedMethod)
-		# 	e.callback("writingImg")
 		elif msgFromServer[1] == "sendNextName":
 			self.getList("thing")
 		else:
@@ -174,8 +168,6 @@ class myProtocol(protocol.Protocol):
 		print "Sending image over: {0}".format(self.name)
 		self.sendImg(self.name)
 		#print "fileLen is: {0}".format(len(self.fileList))
-		# self.transport.write("imgName {0}".format(self.name))
-		#reactor.callLater(0.1, self.writeToServer, "imgName {0}".format(self.name))
 
 	def writeToServer(self, msg):
 		print "WRITETOSERVER. Write message to server: {0}".format(msg)
