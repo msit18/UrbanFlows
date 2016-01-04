@@ -29,8 +29,8 @@ def requestGet(url):
     return d
 
 # Two requests to the same host:
-d = requestGet('http://18.189.98.166:8880/upload-image').addCallback(
-    lambda ign: requestGet("http://18.189.98.166:8880/upload-image"))
+d = requestGet('http://localhost:8880/upload-image').addCallback(
+    lambda ign: requestGet("http://localhost:8880/upload-image"))
 def cbShutdown(ignored):
     reactor.stop()
 d.addCallback(cbShutdown)

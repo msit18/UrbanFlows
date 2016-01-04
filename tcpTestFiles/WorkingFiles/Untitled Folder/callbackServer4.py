@@ -148,7 +148,7 @@ class UploadImage(Resource):
 
 	def render_POST(self, request):
 		name = request.getHeader('filename')
-    	print name
+		print name
 		print "RENDER Posting: {0}".format(name)
 		print f.getFinStatus()
 		with open(name, "wb") as file:
@@ -178,14 +178,14 @@ if __name__ == '__main__':
 	#TCP network
 	d = defer.Deferred()
 	b = DataFactory()
-	reactor.listenTCP(8888, b, 200, '18.111.103.156')
+	reactor.listenTCP(8888, b, 200, 'localhost')
 
 	#HTTP network
 	a = UploadImage()
 	root = Resource()
 	root.putChild("upload-image", a)
 	factory = Site(root)
-	reactor.listenTCP(8880, factory, 200, '18.111.103.156')
+	reactor.listenTCP(8880, factory, 200, 'localhost')
 
 	reactor.run()
 

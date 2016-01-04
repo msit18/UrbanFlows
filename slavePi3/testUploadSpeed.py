@@ -11,15 +11,18 @@ from twisted.web.http_headers import Headers
 from twisted.web.client import FileBodyProducer
 
 #Threading for picture transfer
-from manualPic_capturePhotos import takePictures
-from doSomeRandom import doSomeRandom
+#from manualPic_capturePhotos import takePictures
 import os
 import glob
 import time
 import sys
 
+from random import randrange
+from twisted.internet.defer import DeferredQueue
+from twisted.internet.task import deferLater, cooperate
+
 #Picture taking method
-import picamera
+#import picamera
 import datetime
 import string
 import numpy as np
@@ -51,15 +54,18 @@ class myProtocol(protocol.Protocol):
 		self.name = ""
 		self.tag = False
 		self.clientParams = ""
-		self.notDone = True
 		self.resW = 0
 		self.resH = 0
 		self.framerate = 0
 		self.numPics = 0
+		self.secondList = []
+		self.numPicsTaken = 0
+		self.numPicsSent = 0
 
 	def connectionMade(self):
-		ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
-		msg = "ip piGroup1 {0}".format(ip_address)
+		#ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
+		#msg = "ip piGroup1 {0}".format(ip_address)
+		msg = "ip piGroup1 temp"
 		print msg
 		self.transport.write(msg)
 
@@ -69,7 +75,6 @@ class myProtocol(protocol.Protocol):
 		if msgFromServer[1] == "startTakingPictures":
 			print "GOT A STARTTAKINGPICTURES"
 			#TAKING PICTURES IN SEPARATE THREAD. Has errback handling here
-			#added callback to notify when finished
 			if msgFromServer[2] == "camera":
 				print "this is a camera command"
 				self.clientParams = "{0} {1} {2} {3} {4} {5}".format(\
@@ -86,12 +91,9 @@ class myProtocol(protocol.Protocol):
 			# result.addErrback(self.failedMethod)
 			#STARTS GATHERING PICTURES TO SEND OVER
 			print "get list!"
-			self.getList()
-
-		elif msgFromServer[1] == "sendNextName":
-			self.getList()
+			self.piCamTakePictures()
 		else:
-			print "Didn't write  hi success.jpg to server"
+			print "Didn't write hi success.jpg to server"
 
 	def getFinStatus(self, second):
 		print "running GETFINSTATUS!!!!!!!!!!!!!!!!!!!"
@@ -108,10 +110,12 @@ class myProtocol(protocol.Protocol):
 #		print "SELF TAG: {0}".format(self.tag)
 		return self.tag
 
-	def getList(self):
-		self.fileList = glob.glob('*.jpg')
-		self.name = self.fileList.pop(0)
-		self.sendImg(self.name)
+
+#Continue
+	# def getList(self):
+	# 	self.fileList = glob.glob('*.jpg')
+	# 	self.secondList = self.fileList.pop(0)
+	# 	self.sendImg(self.name)
 
 		# start = time.time()
 		# print start
@@ -124,38 +128,13 @@ class myProtocol(protocol.Protocol):
 		# 	totaltime = end - start
 		# 	print "total time was {0}".format(totaltime)
 
-		#self.tag = self.getTagStatus()
-		#print self.tag
-		#self.fileList has pictures
-		# if self.fileList:
-		# 	print "GLOB HAS PICTURES. SENDING NAME"
-		# 	self.sendName()
-		# 	return
-		# elif self.tag == False:
-		# 	#len has no pictures and self tag is false
-		# 	print "GLOB HAS NO PICTURES AND TAG IS FALSE. RUNNING CHECK"
-		# 	time.sleep(1)
-		# 	self.getList()
-		# 	#len has no pictures and self tag is true
-		# elif self.tag == True and not self.fileList:
-		# 	print "GLOB HAS NO PICTURES AND TAG IS TRUE. SLEEP"
-		# 	self.fileList = glob.glob('*.jpg')
-		# 	if not self.fileList:
-		# 		print "UP DATE FOUND PICTURES. SENDING NAME"
-		# 		self.sendName()
-		# 		return
-		# 	else:
-		# 		print "UP DATE DIDN'T FIND ANYTHING. REACTOR STOP"
-		# 		print "FINISHED WRITING IMAGE"
-		# 		self.transport.write("finished")
-		# else:
-		# 	print 'derp'
-
-	def sendName(self):
-		#print self.fileList
-		self.name = self.fileList.pop(0)
-		print "Sending image over: {0}".format(self.name)
-		self.sendImg(self.name)
+	# def sendName(self):
+	# 	#print self.fileList
+	# 	print "RUNNING SENDNAME"
+	# 	self.fileList = glob.glob('*.jpg')
+	# 	self.name = self.fileList.pop(0)
+	# 	print "Sending image over: {0}".format(self.name)
+	# 	self.sendImg(self.name)
 
 	def writeToServer(self, msg):
 		print "WRITETOSERVER. Write message to server: {0}".format(msg)
@@ -163,36 +142,33 @@ class myProtocol(protocol.Protocol):
 
 	def sendImg(self, imgName):
 		print "RUNNING SENDIMG"
-		e = defer.Deferred()
 		print self.name
 		print imgName
 		agent = Agent(reactor)
-		body = FileBodyProducer(open("/home/pi/UrbanFlows/slavePi3/{0}".format(imgName), 'rb'))
+		body = FileBodyProducer(open("/home/michelle/gitFolder/UrbanFlows/slavePi3/{0}".format(imgName), 'rb'))
 		postImg = agent.request(
 		    'POST',
-		    "http://18.189.98.166:8880/upload-image",
+		    "http://localhost:8880/upload-image",
 		    Headers({'User-Agent': ['Twisted Web Client Example'],
 		    		'Content-Type': ['text/x-greeting'],
 		    		'fileName': ['{0}'.format(imgName)]}),
 		    body)
+		self.numPicsSent+=1
+		print self.numPicsSent
 		postImg.addCallback(self.cbRequest)
 		postImg.addErrback(self.failedMethod)
-		postImg.addCallback(self.getRidOf, imgName)
-		postImg.addErrback(self.failedMethod)
-		return e
 
-	def getRidOf(self, second, img):
-		os.system('rm {0}'.format(img))
+	def cbRequest(self, response):
+		print 'Response code:', response.code
+		if response.code == 200:
+			print "yes"
+			print self.numPicsSent
+		else:
+			print "no"
 
 
-	def cbRequest(response, second):
-		print 'Response code: {0}'.format(response.code)
-		finished = Deferred()
-		response.deliverBody(IgnoreBody(finished))
-		return finished
-
-#TODO: REPLACE WHILE LOOP WITH PRINTING UPDATES ON FILE TO A GRAPH APPROACH. HAVE THE
-#FPS UPDATED AT A CERTAIN TIME FRAME ON A GRAPH IF POSSIBLE.
+#WOULD BE FUN TODO: REPLACE WHILE LOOP WITH PRINTING UPDATES ON FILE TO A GRAPH APPROACH.
+#HAVE THE FPS UPDATED AT A CERTAIN TIME FRAME ON A GRAPH IF POSSIBLE.
 	def run (self, args):
 		try:
 			#Specifying arguments for picture parameters
@@ -236,8 +212,6 @@ class myProtocol(protocol.Protocol):
 						timePlusInt = timeNow + timeInterval
 						start=time.time()
 						self.piCamTakePictures()
-						# picDeferred.addCallback(self.secondRandom)
-						# picDeferred.addErrback(self.failedMethod)
 						finish = time.time()
 						#Analyzing time and frames
 						fpsTime = (finish-start)
@@ -252,7 +226,6 @@ class myProtocol(protocol.Protocol):
 			totalFPS = sum(numPicArray)/totalTime
 			#print "10.2: Captured {0} total pictures.  Total time was {1}, total FPS is {2}"\
 			#.format(str(sum(numPicArray)), str(totalTime), str(totalFPS) )
-			#camera.close()
 			print "CAMERA IS FINISHED. RETURN TRUE"
 			return "True"
 		except:
@@ -260,14 +233,9 @@ class myProtocol(protocol.Protocol):
 			print sys.exc_info()[0]
 			raise
 
-	def random(self):
-		print "sent image"
-
-	def secondRandom(self):
-		print "addCallback works from picDeferred"
-
 	def piCamTakePictures(self):
-		j = defer.Deferred()
+		print "PICAMTAKEPICTURES RUNNING"
+		h = defer.Deferred()
 		with picamera.PiCamera() as camera:
 			camera.resolution = (self.resW, self.resH)
 			camera.framerate = self.frameRate
@@ -278,17 +246,53 @@ class myProtocol(protocol.Protocol):
 				#   '_TI' + str(timeInterval) + '_FR' + str(frameRate) + '.jpg'
 				for i in range(self.numPics)
 				], use_video_port=True)
-			print v 
+			self.numPicsTaken+=1
+			h.addCallback(self.poolingProcess)
+			h.callback("FIRE")
+			print "END"
+
+	# def pretending(self):
+	# 	print "PRETENDING"
+	# 	h = defer.Deferred()
+	# 	#TAKES PICTURES HERE
+	# 	h.addCallback(self.poolingProcess)
+	# 	h.callback("FIRE")
+	# 	print "END"
+
+#Pooling process
+	def worker(self, jobs):
+	    while True:
+	        yield jobs.get().addCallback(self.sendImg)
+
+#TODO: NEED TO FIGURE OUT HOW TO LIMIT THE NUMBER OF MESSAGES SENT IN EACH ROUND
+#WHAT HAPPENS IF THE NUMBER IS TOO LARGE OR TOO LOW?
+#TODO: NEED TO FIGURE OUT HOW TO STOP THE PROCESS OR DETERMINE IF THERE ARE ANY
+#PICTURES LEFT
+#NumPicsSent doesn't work
+	def poolingProcess(self, second):
+		print "method"
+		print self.numPicsSent
+		print "rest of method"
+		self.fileList = glob.glob('*.jpg')
+
+#TODO: RUN TEST TO FIGURE OUT WHAT THE OPTIMAL NUMBER IS
+		for i in range(2):
+			cooperate(self.worker(jobs))
+
+		print len(self.fileList)
+		for i in range(len(self.fileList)):
+			print self.fileList[i]
+			jobs.put(self.fileList[i])
 
 if __name__ == '__main__':
 	#f = open('ClientLog-{0}.txt'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), 'w')
-	t1 = takePictures()
-	
-	#TCP network. Connects on port 8888. HTTP network. Connects on port 8880
-	data = "start"
-	reactor.connectTCP('18.189.98.166', 8888, DataClientFactory(data), timeout=200)
+#	t1 = takePictures()
 
-	y = doSomeRandom()
+	jobs = DeferredQueue()
+
+	#TCP network: Connects on port 8888. HTTP network: Connects on port 8880
+	data = "start"
+	reactor.connectTCP('localhost', 8888, DataClientFactory(data), timeout=200)
 
 	reactor.run()
 
