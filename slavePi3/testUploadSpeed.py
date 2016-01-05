@@ -22,7 +22,7 @@ from twisted.internet.defer import DeferredQueue
 from twisted.internet.task import deferLater, cooperate
 
 #Picture taking method
-#import picamera
+import picamera
 import datetime
 import string
 import numpy as np
@@ -61,6 +61,7 @@ class myProtocol(protocol.Protocol):
 		self.secondList = []
 		self.numPicsTaken = 0
 		self.numPicsSent = 0
+		self.sendStart = 0
 
 	def connectionMade(self):
 		#ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
@@ -91,7 +92,7 @@ class myProtocol(protocol.Protocol):
 			# result.addErrback(self.failedMethod)
 			#STARTS GATHERING PICTURES TO SEND OVER
 			print "get list!"
-			self.piCamTakePictures()
+			self.run(self.clientParams)
 		else:
 			print "Didn't write hi success.jpg to server"
 
@@ -139,33 +140,6 @@ class myProtocol(protocol.Protocol):
 	def writeToServer(self, msg):
 		print "WRITETOSERVER. Write message to server: {0}".format(msg)
 		self.transport.write(msg)
-
-	def sendImg(self, imgName):
-		print "RUNNING SENDIMG"
-		print self.name
-		print imgName
-		agent = Agent(reactor)
-		body = FileBodyProducer(open("/home/michelle/gitFolder/UrbanFlows/slavePi3/{0}".format(imgName), 'rb'))
-		postImg = agent.request(
-		    'POST',
-		    "http://localhost:8880/upload-image",
-		    Headers({'User-Agent': ['Twisted Web Client Example'],
-		    		'Content-Type': ['text/x-greeting'],
-		    		'fileName': ['{0}'.format(imgName)]}),
-		    body)
-		self.numPicsSent+=1
-		print self.numPicsSent
-		postImg.addCallback(self.cbRequest)
-		postImg.addErrback(self.failedMethod)
-
-	def cbRequest(self, response):
-		print 'Response code:', response.code
-		if response.code == 200:
-			print "yes"
-			print self.numPicsSent
-		else:
-			print "no"
-
 
 #WOULD BE FUN TODO: REPLACE WHILE LOOP WITH PRINTING UPDATES ON FILE TO A GRAPH APPROACH.
 #HAVE THE FPS UPDATED AT A CERTAIN TIME FRAME ON A GRAPH IF POSSIBLE.
@@ -219,8 +193,8 @@ class myProtocol(protocol.Protocol):
 						numPicArray.append(self.numPics)
 						fpsArray.append(fps)
 						timeAvg.append(fpsTime)
-						print 'Captured {0} frames at {1}fps in {2}secs'\
-						.format( str(sum(numPicArray)), str(self.numPics/(finish-start)), str(finish-start))
+						#print 'Captured {0} frames at {1}fps in {2}secs'\
+						#.format( str(sum(numPicArray)), str(self.numPics/(finish-start)), str(finish-start))
 			endTime = time.time()
 			totalTime = endTime-timeStart
 			totalFPS = sum(numPicArray)/totalTime
@@ -234,6 +208,7 @@ class myProtocol(protocol.Protocol):
 			raise
 
 	def piCamTakePictures(self):
+		startPics = time.time()
 		print "PICAMTAKEPICTURES RUNNING"
 		h = defer.Deferred()
 		with picamera.PiCamera() as camera:
@@ -247,42 +222,76 @@ class myProtocol(protocol.Protocol):
 				for i in range(self.numPics)
 				], use_video_port=True)
 			self.numPicsTaken+=1
-			h.addCallback(self.poolingProcess)
-			h.callback("FIRE")
-			print "END"
-
-	# def pretending(self):
-	# 	print "PRETENDING"
-	# 	h = defer.Deferred()
-	# 	#TAKES PICTURES HERE
-	# 	h.addCallback(self.poolingProcess)
-	# 	h.callback("FIRE")
-	# 	print "END"
+		self.poolingProcess("foo")
+		# h.addCallback(self.poolingProcess)
+		# h.callback("FIRE")
+		print "END"
+		endPics = time.time()
+		totalPicsTime = endPics - startPics
+		#print "!!!!!!totalPicsTime: ", totalPicsTime
 
 #Pooling process
 	def worker(self, jobs):
-	    while True:
-	        yield jobs.get().addCallback(self.sendImg)
+		while True:
+			yield jobs.get().addCallback(self.sendImg)
 
-#TODO: NEED TO FIGURE OUT HOW TO LIMIT THE NUMBER OF MESSAGES SENT IN EACH ROUND
-#WHAT HAPPENS IF THE NUMBER IS TOO LARGE OR TOO LOW?
+#TODO: DETERMINE WHAT THE OPTIMAL NUMBER OF PROCESSES TO RUN
+#TODO: FIGURE OUT HOW TO TAKE IMAGE + SEND IMAGE AT THE SAME TIME
 #TODO: NEED TO FIGURE OUT HOW TO STOP THE PROCESS OR DETERMINE IF THERE ARE ANY
 #PICTURES LEFT
 #NumPicsSent doesn't work
 	def poolingProcess(self, second):
+		startUpload = time.time()
 		print "method"
-		print self.numPicsSent
-		print "rest of method"
+		#print self.numPicsSent
+		#print "rest of method"
 		self.fileList = glob.glob('*.jpg')
 
-#TODO: RUN TEST TO FIGURE OUT WHAT THE OPTIMAL NUMBER IS
-		for i in range(2):
+		#print len(self.fileList)
+		for i in range(len(self.fileList)):
+			#print "self.fileList[i]: ",self.fileList[i]
+			jobs.put(self.fileList[i])
+
+		#TODO: RUN TEST TO FIGURE OUT WHAT THE OPTIMAL NUMBER IS
+		for j in range(2):
 			cooperate(self.worker(jobs))
 
-		print len(self.fileList)
-		for i in range(len(self.fileList)):
-			print self.fileList[i]
-			jobs.put(self.fileList[i])
+		endUpload = time.time()
+		UploadPt1Time = endUpload - startUpload
+		#print "!!!!!!UploadPt1Time: ", UploadPt1Time
+
+	def sendImg(self, imgName):
+		print "RUNNING SENDIMG"
+		print "imgName: ", imgName
+		self.sendStart = time.time()
+		agent = Agent(reactor)
+		body = FileBodyProducer(open("/home/pi/UrbanFlows/slavePi3/{0}".format(imgName), 'rb'))
+		postImg = agent.request(
+		    'POST',
+		    "http://18.189.105.211:8880/upload-image",
+		    Headers({'User-Agent': ['Twisted Web Client Example'],
+		    		'Content-Type': ['text/x-greeting'],
+		    		'fileName': ['{0}'.format(imgName)]}),
+		    body)
+		self.numPicsSent+=1
+		#print self.numPicsSent
+		sendEnd = time.time()
+		sendTotal = sendEnd - self.sendStart
+		#print "!!!!!!Send Time: ", sendTotal
+		postImg.addCallback(self.cbRequest)
+		postImg.addErrback(self.failedMethod)
+
+	def cbRequest(self, response):
+		cbRequestTime = time.time()
+		print 'Response code:', response.code
+		if response.code == 200:
+			#print "yes"
+			#print self.numPicsSent
+			CallbackTime = cbRequestTime - self.sendStart
+			#print "!!!!!!CallbackTime: ", CallbackTime
+		else:
+			print "no"
+
 
 if __name__ == '__main__':
 	#f = open('ClientLog-{0}.txt'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), 'w')
@@ -292,7 +301,7 @@ if __name__ == '__main__':
 
 	#TCP network: Connects on port 8888. HTTP network: Connects on port 8880
 	data = "start"
-	reactor.connectTCP('localhost', 8888, DataClientFactory(data), timeout=200)
+	reactor.connectTCP('18.189.105.211', 8888, DataClientFactory(data), timeout=200)
 
 	reactor.run()
 
