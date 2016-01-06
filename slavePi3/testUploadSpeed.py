@@ -87,12 +87,13 @@ class myProtocol(protocol.Protocol):
 				msgFromServer[2], msgFromServer[3], msgFromServer[4],\
 				msgFromServer[5], msgFromServer[6])
 			print self.clientParams
-			# result = threads.deferToThread(self.run, self.clientParams)
-			# result.addCallback(self.getFinStatus)
-			# result.addErrback(self.failedMethod)
+			result = threads.deferToThread(self.run, self.clientParams)
+			result.addCallback(self.getFinStatus)
+			result.addErrback(self.failedMethod)
 			#STARTS GATHERING PICTURES TO SEND OVER
 			print "get list!"
-			self.run(self.clientParams)
+			#self.run(self.clientParams)
+			self.getList()
 		else:
 			print "Didn't write hi success.jpg to server"
 
@@ -111,38 +112,13 @@ class myProtocol(protocol.Protocol):
 #		print "SELF TAG: {0}".format(self.tag)
 		return self.tag
 
-
-#Continue
-	# def getList(self):
-	# 	self.fileList = glob.glob('*.jpg')
-	# 	self.secondList = self.fileList.pop(0)
-	# 	self.sendImg(self.name)
-
-		# start = time.time()
-		# print start
-		# while len(self.fileList)>0:
-		# 	self.name = self.fileList.pop(0)
-		# 	self.sendImg(self.name)
-		# else:
-		# 	end = time.time()
-		# 	print end
-		# 	totaltime = end - start
-		# 	print "total time was {0}".format(totaltime)
-
-	# def sendName(self):
-	# 	#print self.fileList
-	# 	print "RUNNING SENDNAME"
-	# 	self.fileList = glob.glob('*.jpg')
-	# 	self.name = self.fileList.pop(0)
-	# 	print "Sending image over: {0}".format(self.name)
-	# 	self.sendImg(self.name)
-
 	def writeToServer(self, msg):
 		print "WRITETOSERVER. Write message to server: {0}".format(msg)
 		self.transport.write(msg)
 
 #WOULD BE FUN TODO: REPLACE WHILE LOOP WITH PRINTING UPDATES ON FILE TO A GRAPH APPROACH.
 #HAVE THE FPS UPDATED AT A CERTAIN TIME FRAME ON A GRAPH IF POSSIBLE.
+#FOR DECREASING AMOUNT OF DATA: REPLACE ARRAYS WITH SMARTER MATH SOLUTIONS (KEEP SUM RUNNING)
 	def run (self, args):
 		try:
 			#Specifying arguments for picture parameters
@@ -222,7 +198,7 @@ class myProtocol(protocol.Protocol):
 				for i in range(self.numPics)
 				], use_video_port=True)
 			self.numPicsTaken+=1
-		self.poolingProcess("foo")
+		#self.poolingProcess("foo")
 		# h.addCallback(self.poolingProcess)
 		# h.callback("FIRE")
 		print "END"
@@ -240,25 +216,50 @@ class myProtocol(protocol.Protocol):
 #TODO: NEED TO FIGURE OUT HOW TO STOP THE PROCESS OR DETERMINE IF THERE ARE ANY
 #PICTURES LEFT
 #NumPicsSent doesn't work
-	def poolingProcess(self, second):
-		startUpload = time.time()
-		print "method"
-		#print self.numPicsSent
-		#print "rest of method"
+	# def poolingProcess(self, second):
+	# 	startUpload = time.time()
+	# 	print "method"
+	# 	#print self.numPicsSent
+	# 	#print "rest of method"
+	# 	self.fileList = glob.glob('*.jpg')
+
+	# 	#print len(self.fileList)
+	# 	for i in range(len(self.fileList)):
+	# 		#print "self.fileList[i]: ",self.fileList[i]
+	# 		jobs.put(self.fileList.pop())
+
+	# 	#TODO: RUN TEST TO FIGURE OUT WHAT THE OPTIMAL NUMBER IS
+	# 	for j in range(2):
+	# 		cooperate(self.worker(jobs))
+
+	# 	endUpload = time.time()
+	# 	UploadPt1Time = endUpload - startUpload
+	# 	#print "!!!!!!UploadPt1Time: ", UploadPt1Time
+
+		#Continue
+	def getList(self):
 		self.fileList = glob.glob('*.jpg')
-
-		#print len(self.fileList)
-		for i in range(len(self.fileList)):
-			#print "self.fileList[i]: ",self.fileList[i]
-			jobs.put(self.fileList[i])
-
-		#TODO: RUN TEST TO FIGURE OUT WHAT THE OPTIMAL NUMBER IS
+		start = time.time()
+		print start
 		for j in range(2):
 			cooperate(self.worker(jobs))
+		while len(self.fileList)>0:
+			self.name = self.fileList.pop(0)
+			jobs.put(self.name)
+			#self.sendImg(self.name)
+		else:
+			end = time.time()
+			print end
+			totaltime = end - start
+			print "total time was {0}".format(totaltime)
 
-		endUpload = time.time()
-		UploadPt1Time = endUpload - startUpload
-		#print "!!!!!!UploadPt1Time: ", UploadPt1Time
+	# def sendName(self):
+	# 	#print self.fileList
+	# 	print "RUNNING SENDNAME"
+	# 	self.fileList = glob.glob('*.jpg')
+	# 	self.name = self.fileList.pop(0)
+	# 	print "Sending image over: {0}".format(self.name)
+	# 	self.sendImg(self.name)
 
 	def sendImg(self, imgName):
 		print "RUNNING SENDIMG"
