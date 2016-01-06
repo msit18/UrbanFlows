@@ -241,11 +241,11 @@ class myProtocol(protocol.Protocol):
 		self.fileList = glob.glob('*.jpg')
 		start = time.time()
 		print start
-		for j in range(2):
-			cooperate(self.worker(jobs))
 		while len(self.fileList)>0:
 			self.name = self.fileList.pop(0)
 			jobs.put(self.name)
+			for j in range(2):
+				cooperate(self.worker(jobs))
 			#self.sendImg(self.name)
 		else:
 			end = time.time()
