@@ -87,9 +87,9 @@ class myProtocol(protocol.Protocol):
 				msgFromServer[2], msgFromServer[3], msgFromServer[4],\
 				msgFromServer[5], msgFromServer[6])
 			print self.clientParams
-			result = threads.deferToThread(self.run, self.clientParams)
-			result.addCallback(self.getFinStatus)
-			result.addErrback(self.failedMethod)
+			# result = threads.deferToThread(self.run, self.clientParams)
+			# result.addCallback(self.getFinStatus)
+			# result.addErrback(self.failedMethod)
 			#STARTS GATHERING PICTURES TO SEND OVER
 			print "get list!"
 			#self.run(self.clientParams)
@@ -198,9 +198,9 @@ class myProtocol(protocol.Protocol):
 				for i in range(self.numPics)
 				], use_video_port=True)
 			self.numPicsTaken+=1
-		#self.poolingProcess("foo")
-		# h.addCallback(self.poolingProcess)
-		# h.callback("FIRE")
+		self.getList("foo")
+		h.addCallback(self.poolingProcess)
+		h.callback("FIRE")
 		print "END"
 		endPics = time.time()
 		totalPicsTime = endPics - startPics
@@ -237,7 +237,7 @@ class myProtocol(protocol.Protocol):
 	# 	#print "!!!!!!UploadPt1Time: ", UploadPt1Time
 
 		#Continue
-	def getList(self):
+	def getList(self, second):
 		self.fileList = glob.glob('*.jpg')
 		start = time.time()
 		print start
