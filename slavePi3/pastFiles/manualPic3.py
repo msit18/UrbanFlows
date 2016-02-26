@@ -63,11 +63,15 @@ class takePictures(threading.Thread):
 					with picamera.PiCamera() as camera:
 						camera.resolution = (resW, resH)
 						camera.framerate = frameRate
+						#file.write(str(x) + " ")
 						camera.capture_sequence([
-							datetime.datetime.now().strftime ('%d-%m-%Y-%H_%M_%S_%f') + '_TT' + str(sys.argv[1]) + '_RES' + str(resH) + '_PIC'\
-											 + str(numPics) + '_TI' + str(timeInterval) + '_FR' + str(frameRate) + '.jpg'
+							datetime.datetime.now().strftime('%M_%S_%f') + '.jpg'
+							#datetime.datetime.now().strftime ('%d-%m-%Y-%H_%M_%S_%f') + '_TT' + str(sys.argv[1]) + '_RES' + str(resH) + '_PIC'\
+							#				 + str(numPics) + '_TI' + str(timeInterval) + '_FR' + str(frameRate) + '.jpg'
 							for i in range(numPics)
 							], use_video_port=True)
+						x = datetime.datetime.now().strftime('%M_%S_%f')
+						file.write(str(x) + " ")
 					finish = time.time()
 					#Analyzing time and frames
  					fpsTime = (finish-start)
@@ -77,6 +81,7 @@ class takePictures(threading.Thread):
 					timeAvg.append(fpsTime)
 #					print 'Captured {0} frames at {1}fps in {2}secs'.format( str(numPics), str(numPics/(finish-start)), str(finish-start))
 					self.queue.put('beginT2')
+			file.close()
 			endTime = time.time()
 			totalTime = endTime-timeStart
 			totalFPS = sum(numPicArray)/totalTime
@@ -108,13 +113,14 @@ class queuePictures(threading.Thread):
 		while True:
 			runThread = self.queue.get()
 			if runThread is 'beginT2':
-				picsList = glob.glob('*.jpg')
-				while len(picsList) > 0:
-					list = ' '.join(picsList)
-					print (list)
-					os.system("sshpass -p 'raspberry' scp -o StrictHostKeyChecking=no {0} pi@10.0.0.1:/home/pi/pastImages/".format(list) )
-					os.system("rm {0}".format(list) )
-					picsList = []
+				pass
+#				picsList = glob.glob('*.jpg')
+#				while len(picsList) > 0:
+#					list = ' '.join(picsList)
+#					print (list)
+#					os.system("sshpass -p 'raspberry' scp -o StrictHostKeyChecking=no {0} pi@10.0.0.1:/home/pi/pastImages/".format(list) )
+#					os.system("rm {0}".format(list) )
+#					picsList = []
 			elif runThread is 'T1closeT2':
 				print '10.2: T2 recieved close message'
 				break
@@ -130,4 +136,5 @@ def main():
 	t2.start()
 
 if __name__ == '__main__':
+	file = open("imgText4.txt", 'w')
 	main()

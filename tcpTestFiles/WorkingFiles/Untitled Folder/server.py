@@ -1,3 +1,6 @@
+#Written by Vlatko Klabucar
+#Simple HTTP Server. Posts a single image or provides GET information
+
 from twisted.web.server import Site
 from twisted.web.resource import Resource
 from twisted.internet import reactor
@@ -18,5 +21,5 @@ class UploadImage(Resource):
 root = Resource()
 root.putChild("upload-image", UploadImage())
 factory = Site(root)
-reactor.listenTCP(8888, factory)
+reactor.listenTCP(8888, factory, 200, '18.111.126.196')
 reactor.run()

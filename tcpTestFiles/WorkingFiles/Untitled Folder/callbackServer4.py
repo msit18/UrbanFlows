@@ -40,46 +40,41 @@ class DataProtocol (protocol.Protocol):
 
 	def connectionMade(self):
 		self.factory.numConnections += 1
-		print >>log, "Connection made at {0}. Number of active connections: {1}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), self.factory.numConnections)
+		print "Connection made at {0}. Number of active connections: {1}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), self.factory.numConnections)
 
 	def connectionLost(self, reason):
 		self.factory.numConnections -= 1
-		print >>log, "Connection lost at {0}. Number of active connections: {1}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), self.factory.numConnections)
+		print "Connection lost at {0}. Number of active connections: {1}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), self.factory.numConnections)
 
 	def dataReceived(self, data):
-		print >>log, "DATARECEIVED. Server received data: {0}".format(data)
+		print "DATARECEIVED. Server received data: {0}".format(data)
 		msgFromClient = [data for data in data.split()]
 		if msgFromClient[0] == "ip":
 			print "FOUND AN IP"
 			self.d.addCallback(self.gotIP, msgFromClient[2])
 			self.d.addErrback(self.failedIP)
 			self.d.callback(msgFromClient[1])
-		elif msgFromClient[0] == 'imgName':
-			print "FOUND AN IMGNAME"
-			#print msgFromClient[1]
-			f.finStatus = False
-			self.setImgName(msgFromClient[1])
 		elif msgFromClient[0] == 'finished':
-			print >>log, "client is finished"
+			print "client is finished"
 			endGame = threads.deferToThread(self.checkEnd)
 		elif msgFromClient[0] == 'ERROR':
-			print >>log, "ERROR FROM PICAMERA at {0}".format(time.strftime("%Y-%m-%d-%H:%M:%S"))
+			print "ERROR FROM PICAMERA at {0}".format(time.strftime("%Y-%m-%d-%H:%M:%S"))
 			#TODO: what to do if there is a camera error in one of them?
 		else:
-			print >>log, "Time: {0}. I don't know what this is: {1}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), data)
+			print "Time: {0}. I don't know what this is: {1}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), data)
 
 	def gotIP(self, piGroup, ipAddr):
-		print >>log, "RUNNING GOTIP"
+		print "RUNNING GOTIP"
 		#adds key and a list containing IP address
 		if (piGroup in dictFormat) == False:
-			print >>log, "I didn't have this cluster key"
+			print "I didn't have this cluster key"
 			dictFormat[piGroup] = [ipAddr]
 		#appends new IP to the end of the key's list
 		elif (piGroup in dictFormat) == True:
-			print >>log, "it's true! I have this cluster in my keys"
+			print "it's true! I have this cluster in my keys"
 			dictFormat[piGroup].append(ipAddr)
 		else:
-			print >>log, "Got something that wasn't an IP. Adding to dict anyway"
+			print "Got something that wasn't an IP. Adding to dict anyway"
 			dictFormat[piGroup] = [ipAddr]
 		print dictFormat
 		reactor.callInThread(self.checkConnections, piGroup)
@@ -90,7 +85,7 @@ class DataProtocol (protocol.Protocol):
 
 	#Called in seperate threads. TEST WITH RASPIES
 	def checkConnections(self, dataKey):
-		print >>log, "RUNNING CHECKCONNECTIONS"
+		print "RUNNING CHECKCONNECTIONS"
 		numValues = len(dictFormat[dataKey])
 		while numValues < 0: #Set value to number of Raspies in each cluster
 			numValues = len(dictFormat[dataKey])
@@ -101,7 +96,7 @@ class DataProtocol (protocol.Protocol):
 	
 	#largely redundant method but provides a log of the message
 	def writeToClient(self, msg):
-		print >>log, "WRITETOCLIENT. Write message to client: {0}".format(msg)
+		print "WRITETOCLIENT. Write message to client: {0}".format(msg)
 		self.transport.write(msg)
 
 	def startTakingPictures(self, data):
@@ -114,15 +109,6 @@ class DataProtocol (protocol.Protocol):
 	def failedSendCmds(self,failure):
 		print "FAILURE: failedSendCmds"
 		sys.stderr.write(str(failure))
-
-	def setImgName(self, value):
-		print "SETIMGNAME RUNNING"
-		global imgName
-		imgName = value
-		print "This img name will be {0}".format(imgName)
-		self.d.addCallback(a.check)
-		self.d.addErrback(self.failedSendCmds)
-		self.transport.write("Okay gotNameSendImg")
 
 	def checkEnd(self):
 		print "RUNNING CHECKEND"
@@ -138,18 +124,17 @@ class DataProtocol (protocol.Protocol):
 #Used for HTTP network.  Receives images and saves them to the server
 class UploadImage(Resource):
 
-	def check(self, second):
-		print "UPLOADIMAGE CHECK. This is the imageName: {0}".format(imgName)
-
 	def render_GET(self, request):
 		print "RENDER GETTING"
 		return '<html><body><p>This is the server for the MIT SENSEable City Urban Flows Project.'\
 		'  It receives images and saves them to the server.</p></body></html>'
 
 	def render_POST(self, request):
-		print "RENDER Posting: {0}".format(imgName)
+		name = request.getHeader('filename')
+		print name
+		print "RENDER Posting: {0}".format(name)
 		print f.getFinStatus()
-		with open(imgName, "wb") as file:
+		with open(name, "wb") as file:
 			file.write(request.content.read())
 		v = request.notifyFinish()
 		v.addCallback(self.fin)
@@ -169,21 +154,21 @@ class UploadImage(Resource):
 		print err
 
 if __name__ == '__main__':
-	log = open('ServerLog-{0}.txt'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), 'w')
+	#log = open('ServerLog-{0}.txt'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), 'w')
 	f = MasterVariables()
 	f.userInput()
 
 	#TCP network
 	d = defer.Deferred()
 	b = DataFactory()
-	reactor.listenTCP(8888, b, 200, '18.111.103.156')
+	reactor.listenTCP(8888, b, 200, '18.111.29.234')
 
 	#HTTP network
 	a = UploadImage()
 	root = Resource()
 	root.putChild("upload-image", a)
 	factory = Site(root)
-	reactor.listenTCP(8880, factory, 200, '18.111.103.156')
+	reactor.listenTCP(8880, factory, 200, '18.111.29.234')
 
 	reactor.run()
 

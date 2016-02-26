@@ -22,7 +22,8 @@ class method(Agent):
 		    'POST',
 		    "http://localhost:8888/upload-image",
 		    Headers({'User-Agent': ['Twisted Web Client Example'],
-		    		'Content-Type': ['text/x-greeting']}),
+		    		'Content-Type': ['text/x-greeting'],
+		    		'fileName': ['parrot.jpg']}),
 		    body)
 
 		d.addCallback(self.cbResponse)
