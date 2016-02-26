@@ -98,7 +98,7 @@ with picamera.PiCamera() as camera:
 
     time.sleep(2)    # Camera Initialize
     start = time.time()
-    camera.capture_sequence(filenames(), use_video_port=True)
+    camera.capture_sequence(filenames(), use_video_port=False)
     finish = time.time()
 
 print('Captured %d frames at total %.2ffps' % (frames, frames / (finish - start)))
