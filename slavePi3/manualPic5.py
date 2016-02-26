@@ -44,7 +44,7 @@ class CamWork:
 				print "totalExpected: ", totalExpected
 
 				timePlusTenMin = time.time()+5
-			elif timeNow >= prgmEndTime: #Runs picture taking process as normal
+			elif: #Runs picture taking process as normal
 				while timeNow > timePlusFPSTimeInterval:
 					timePlusFPSTimeInterval = timeNow + inputFPSTimeInterval
 					start = time.time()
