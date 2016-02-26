@@ -192,12 +192,11 @@ class myProtocol(protocol.Protocol):
 			camera.framerate = self.frameRate
 			v = camera.capture_sequence([
 				datetime.datetime.now().strftime ('%M_%S_%f') + '.jpg'
-				# datetime.datetime.now().strftime ('%d-%m-%Y-%H_%M_%S_%f') + '_TT'\
-				#  + str(listServerArgs[0]) + '_RES' + str(resH) + '_PIC' + str(numPics) +\
-				#   '_TI' + str(timeInterval) + '_FR' + str(frameRate) + '.jpg'
+				# datetime.datetime.now().strftime ('%d-%m-%Y-%H_%M_%S_%f') + '.jpg'
 				for i in range(self.numPics)
 				], use_video_port=True)
 			self.numPicsTaken+=1
+
 		self.getList("foo")
 		h.addCallback(self.poolingProcess)
 		h.callback("FIRE")

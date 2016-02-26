@@ -94,6 +94,8 @@ class takePictures():
 						timeAvg.append(fpsTime)
 						#print 'Captured {0} frames at {1}fps in {2}secs'\
 						#.format( str(sum(numPicArray)), str(numPics/(finish-start)), str(finish-start))
+						self.numPicsTaken = numPicArray
+						print self.numPicsTaken
 			endTime = time.time()
 			totalTime = endTime-timeStart
 			totalFPS = sum(numPicArray)/totalTime

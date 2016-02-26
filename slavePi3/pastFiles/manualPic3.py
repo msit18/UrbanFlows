@@ -63,11 +63,15 @@ class takePictures(threading.Thread):
 					with picamera.PiCamera() as camera:
 						camera.resolution = (resW, resH)
 						camera.framerate = frameRate
+						#file.write(str(x) + " ")
 						camera.capture_sequence([
-							datetime.datetime.now().strftime ('%d-%m-%Y-%H_%M_%S_%f') + '_TT' + str(sys.argv[1]) + '_RES' + str(resH) + '_PIC'\
-											 + str(numPics) + '_TI' + str(timeInterval) + '_FR' + str(frameRate) + '.jpg'
+							datetime.datetime.now().strftime('%M_%S_%f') + '.jpg'
+							#datetime.datetime.now().strftime ('%d-%m-%Y-%H_%M_%S_%f') + '_TT' + str(sys.argv[1]) + '_RES' + str(resH) + '_PIC'\
+							#				 + str(numPics) + '_TI' + str(timeInterval) + '_FR' + str(frameRate) + '.jpg'
 							for i in range(numPics)
 							], use_video_port=True)
+						x = datetime.datetime.now().strftime('%M_%S_%f')
+						file.write(str(x) + " ")
 					finish = time.time()
 					#Analyzing time and frames
  					fpsTime = (finish-start)
@@ -77,6 +81,7 @@ class takePictures(threading.Thread):
 					timeAvg.append(fpsTime)
 #					print 'Captured {0} frames at {1}fps in {2}secs'.format( str(numPics), str(numPics/(finish-start)), str(finish-start))
 					self.queue.put('beginT2')
+			file.close()
 			endTime = time.time()
 			totalTime = endTime-timeStart
 			totalFPS = sum(numPicArray)/totalTime
@@ -131,4 +136,5 @@ def main():
 	t2.start()
 
 if __name__ == '__main__':
+	file = open("imgText4.txt", 'w')
 	main()
