@@ -54,6 +54,5 @@ class inputChecks():
 			print "Sorry, total time cannot be 0. Please enter a different time."
 			self.totalTimeCheck()
 
-	def resWCheck(self)
-:		
+	def resWCheck(self):		
 

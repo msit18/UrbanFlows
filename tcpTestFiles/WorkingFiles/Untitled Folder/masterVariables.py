@@ -2,6 +2,8 @@
 #Stores the Finished variable for callbackServer3.py
 #Also stores all the user inputs for the camera
 
+import time
+
 class MasterVariables():
 	def __init__(self):
 		self.finStatus = False
@@ -44,12 +46,13 @@ class MasterVariables():
 
 	def getParam(self):
 		var = self.getCamVid()
+		startAtTime = time.time() + 30
 		if var == "camera":
-			self.param = "{0} {1} {2} {3} {4} {5} {6}".format(self.getCamVid(), self.getTotalTimeSec(),\
+			self.param = "camera {0} {1} {2} {3} {4} {5} {6}".format(self.getTotalTimeSec(),\
 			 self.getResW(), self.getResH(), self.getNumPics(), self.getTimeInterval(),\
-			 self.getFR())
+			 self.getFR(), startAtTime)
 		elif var == "video":
-			self.param = "{0} {1} {2} {3} {4}".format(self.getCamVid(), self.getVidTimeSec(),\
+			self.param = "video {0} {1} {2} {3}".format(self.getVidTimeSec(),\
 			self.getResW(), self.getResH(), self.getFR())
 		return self.param
 

@@ -54,11 +54,6 @@ class DataProtocol (protocol.Protocol):
 			self.d.addCallback(self.gotIP, msgFromClient[2])
 			self.d.addErrback(self.failedIP)
 			self.d.callback(msgFromClient[1])
-		# elif msgFromClient[0] == 'imgName':
-		# 	print "FOUND AN IMGNAME"
-		# 	#print msgFromClient[1]
-		# 	f.finStatus = False
-		# 	self.setImgName(msgFromClient[1])
 		elif msgFromClient[0] == 'finished':
 			print "client is finished"
 			endGame = threads.deferToThread(self.checkEnd)
@@ -115,15 +110,6 @@ class DataProtocol (protocol.Protocol):
 		print "FAILURE: failedSendCmds"
 		sys.stderr.write(str(failure))
 
-	# def setImgName(self, value):
-	# 	print "SETIMGNAME RUNNING"
-	# 	global imgName
-	# 	imgName = value
-	# 	print "This img name will be {0}".format(imgName)
-	# 	self.d.addCallback(a.check)
-	# 	self.d.addErrback(self.failedSendCmds)
-	# 	self.transport.write("Okay gotNameSendImg")
-
 	def checkEnd(self):
 		print "RUNNING CHECKEND"
 		value = f.getFinStatus()
@@ -137,9 +123,6 @@ class DataProtocol (protocol.Protocol):
 
 #Used for HTTP network.  Receives images and saves them to the server
 class UploadImage(Resource):
-
-	# def check(self, second):
-	# 	print "UPLOADIMAGE CHECK. This is the imageName: {0}".format(imgName)
 
 	def render_GET(self, request):
 		print "RENDER GETTING"
@@ -178,14 +161,14 @@ if __name__ == '__main__':
 	#TCP network
 	d = defer.Deferred()
 	b = DataFactory()
-	reactor.listenTCP(8888, b, 200, 'localhost')
+	reactor.listenTCP(8888, b, 200, '18.111.29.234')
 
 	#HTTP network
 	a = UploadImage()
 	root = Resource()
 	root.putChild("upload-image", a)
 	factory = Site(root)
-	reactor.listenTCP(8880, factory, 200, 'localhost')
+	reactor.listenTCP(8880, factory, 200, '18.111.29.234')
 
 	reactor.run()
 
