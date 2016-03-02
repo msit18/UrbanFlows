@@ -71,10 +71,11 @@ class myProtocol(protocol.Protocol):
 			#TAKING PICTURES IN SEPARATE THREAD. Has errback handling here
 			if msgFromServer[2] == "camera":
 				print "this is a camera command"
-				callLaterTimeCollectImgs = float(msgFromServer[9]) + 1
-				startAtTime = self.calculateTimeDifference(msgFromServer[9])
+				print "msgFromServer[9]: ", msgFromServer[9] + msgFromServer[10]
+				startAtTime = self.calculateTimeDifference(msgFromServer[9], msgFromServer[10])
+				callLaterTimeCollectImgs = startAtTime + 1
 				result = threads.deferToThread(self.takePicture, int(msgFromServer[3]), int(msgFromServer[4]),\
-					int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), int(msgFromServer[8]), float(startAtTime))
+					int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), int(msgFromServer[8]), startAtTime)
 			elif msgFromServer[2] == "video":
 				print "this is the video method. Video method has not been completed"
 				self.clientParams = "{0} {1} {2} {3} {4}".format(\
@@ -92,8 +93,9 @@ class myProtocol(protocol.Protocol):
 		self.transport.write("ERROR PICAMERA")
 		sys.stderr.write(str(failure))
 
-	def calculateTimeDifference(self, timeToEnd):
-		endTime = datetime.datetime.strptime(timeToEnd, "%x %X")
+	def calculateTimeDifference(self, dateToEnd, timeToEnd):
+		fullString = dateToEnd + " " + timeToEnd
+		endTime = datetime.datetime.strptime(fullString, "%x %X")
 		print "endTime: ", endTime
 
 		nowTime = datetime.datetime.today()
@@ -108,9 +110,7 @@ class myProtocol(protocol.Protocol):
 #HAVE THE FPS UPDATED AT A CERTAIN TIME FRAME ON A GRAPH IF POSSIBLE.
 	def takePicture (self, inputTotalTime, inputResW, inputResH, inputNumPics, inputFPSTimeInterval, inputFramerate, inputStartTime):
 		print "takePicture method!"
-		#startPictures = time.time()
 		while time.time() < inputStartTime:
-			#startPictures = time.time()
 			pass
 		else:
 			try:
@@ -180,9 +180,8 @@ class myProtocol(protocol.Protocol):
 		return self.runSendImg
 
 	def sendImages(self, inputStartTimePlusOne):
-		startSend = time.time()
-		while startSend < inputStartTimePlusOne:
-			startSend = time.time()
+		while time.time() < inputStartTimePlusOne:
+			pass
 		else:
 			print "sendImages method!"
 			while self.runSendImg == True:
@@ -190,15 +189,17 @@ class myProtocol(protocol.Protocol):
 				if len(self.fileList) > 0:
 					for img in self.fileList:
 							print img
-							os.system('curl --header "filename: {0}" -X POST --data-binary @{0} http://18.111.29.234:8880/upload-image'.format(img))
+							os.system('curl --header "filename: {0}" -X POST --data-binary @{0} http://18.189.101.178:8880/upload-image'.format(img))
 							os.system('rm {0}'.format(img))
 				print self.getRunSendImgMethod()
 			else: #if self.runSendImg is False
+				print "runing last glob"
 				self.fileList = glob.glob('*.jpg')
+				print self.fileList
 				if len(self.fileList) > 0:
 					for img in self.fileList:
 							print img
-							os.system('curl --header "filename: {0}" -X POST --data-binary @{0} http://18.111.29.234:8880/upload-image'.format(img))
+							os.system('curl --header "filename: {0}" -X POST --data-binary @{0} http://18.189.101.178:8880/upload-image'.format(img))
 							os.system('rm {0}'.format(img))		
 					print "done! :D"
 				else:
@@ -211,7 +212,7 @@ if __name__ == '__main__':
 
 	#TCP network: Connects on port 8888. HTTP network: Connects on port 8880
 	data = "start"
-	reactor.connectTCP('18.111.29.234', 8888, DataClientFactory(data), timeout=200)
+	reactor.connectTCP('18.189.101.178', 8888, DataClientFactory(data), timeout=200)
 
 	reactor.run()
 
