@@ -11,12 +11,13 @@
 from twisted.internet.protocol import Factory
 from twisted.internet import reactor, protocol, defer, threads
 import sys, time
-from masterVariables import MasterVariables
+from masterVariables2 import MasterVariables
 
 from twisted.web.server import Site, NOT_DONE_YET
 from twisted.web.resource import Resource
 
 import cgi
+import subprocess
 
 #sets up the Protocol class
 class DataFactory(Factory):
@@ -126,16 +127,21 @@ if __name__ == '__main__':
 	f = MasterVariables()
 	f.userInput()
 
+	ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
+	serverIP = ip_address.split()[0]
+
 	#TCP network
 	d = defer.Deferred()
 	b = DataFactory()
-	reactor.listenTCP(8888, b, 200, '18.189.101.178')
+	reactor.listenTCP(8888, b, 200, serverIP)
 
 	#HTTP network
 	a = UploadImage()
 	root = Resource()
 	root.putChild("upload-image", a)
 	factory = Site(root)
-	reactor.listenTCP(8880, factory, 200, '18.189.101.178')
+	reactor.listenTCP(8880, factory, 200, serverIP)
+
+	print "SERVER IP IS: ", serverIP
 
 	reactor.run()
