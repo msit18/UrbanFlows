@@ -72,8 +72,9 @@ class myProtocol(protocol.Protocol):
 			if msgFromServer[2] == "camera":
 				print "this is a camera command"
 				callLaterTimeCollectImgs = float(msgFromServer[9]) + 1
+				startAtTime = self.calculateTimeDifference(msgFromServer[9])
 				result = threads.deferToThread(self.takePicture, int(msgFromServer[3]), int(msgFromServer[4]),\
-					int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), int(msgFromServer[8]), float(msgFromServer[9]))
+					int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), int(msgFromServer[8]), float(startAtTime))
 			elif msgFromServer[2] == "video":
 				print "this is the video method. Video method has not been completed"
 				self.clientParams = "{0} {1} {2} {3} {4}".format(\
@@ -91,17 +92,26 @@ class myProtocol(protocol.Protocol):
 		self.transport.write("ERROR PICAMERA")
 		sys.stderr.write(str(failure))
 
-	def writeToServer(self, msg):
-		print "WRITETOSERVER. Write message to server: {0}".format(msg)
-		self.transport.write(msg)
+	def calculateTimeDifference(self, timeToEnd):
+		endTime = datetime.datetime.strptime(timeToEnd, "%x %X")
+		print "endTime: ", endTime
+
+		nowTime = datetime.datetime.today()
+		print "nowTime: ", nowTime
+
+		difference = endTime - nowTime
+		print "difference: ", difference
+		print difference.total_seconds()
+		return time.time() + difference.total_seconds()
 
 #WOULD BE FUN TODO: REPLACE WHILE LOOP WITH PRINTING UPDATES ON FILE TO A GRAPH APPROACH.
 #HAVE THE FPS UPDATED AT A CERTAIN TIME FRAME ON A GRAPH IF POSSIBLE.
 	def takePicture (self, inputTotalTime, inputResW, inputResH, inputNumPics, inputFPSTimeInterval, inputFramerate, inputStartTime):
 		print "takePicture method!"
-		startPictures = time.time()
+		#startPictures = time.time()
 		while time.time() < inputStartTime:
-			startPictures = time.time()
+			#startPictures = time.time()
+			pass
 		else:
 			try:
 				#Keeps track of time for updates 
@@ -190,6 +200,7 @@ class myProtocol(protocol.Protocol):
 							print img
 							os.system('curl --header "filename: {0}" -X POST --data-binary @{0} http://18.111.29.234:8880/upload-image'.format(img))
 							os.system('rm {0}'.format(img))		
+					print "done! :D"
 				else:
 					print "tadaaaa"
 					reactor.stop()

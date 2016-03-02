@@ -1,8 +1,9 @@
 #Written by Michelle Sit
-#Stores the Finished variable for callbackServer3.py
+#Stores the Finished variable for callbackServer4.py
 #Also stores all the user inputs for the camera
 
 import time
+import datetime
 
 class MasterVariables():
 	def __init__(self):
@@ -16,6 +17,7 @@ class MasterVariables():
 		self.goInput = ""
 		self.param = ""
 		self.camVid = ""
+		self.ServerStartTime = ""
 
 	def getFinStatus(self):
 		return self.finStatus
@@ -44,6 +46,9 @@ class MasterVariables():
 	def getCamVid(self):
 		return self.camVid
 
+	def getStartTime(self):
+		return self.ServerStartTime
+
 	def getParam(self):
 		var = self.getCamVid()
 		startAtTime = time.time() + 30
@@ -66,11 +71,13 @@ class MasterVariables():
 			self.ServerTimeInterval = raw_input ("Enter time interval (seconds) for frames"\
 			" to be taken in (fps): ")
 			self.ServerFrameRate = raw_input ('Enter framerate: ')
+			d = datetime.datetime.today()
+			self.ServerStartTime = raw_input("Enter date and time that you would like to start the program at (ex - 11/04/16 15:45:58). Current time is {0} : ".format(time.strftime("%x %X")))
 			print "Thank you for your input. Please check the following"
 			print "{0} | TotalTime(sec): {1} | ResW: {2} | ResH: {3} | NumPics: {4} |"\
-			"TimeInterval(sec): {5} | FR: {6}".format(self.getCamVid(), \
+			"TimeInterval(sec): {5} | FR: {6} | StartTime: {7}".format(self.getCamVid(), \
 			self.getTotalTimeSec(), self.getResW(), self.getResH(),\
-			self.getNumPics(), self.getTimeInterval(), self.getFR())
+			self.getNumPics(), self.getTimeInterval(), self.getFR(), self.getStartTime())
 
 		elif self.camVid == "video":
 			self.ServerVidTimeSec = raw_input('Enter individual video time(sec): ')
@@ -93,3 +100,6 @@ class MasterVariables():
 			print "Running server now"
 		elif goInput == "no":
 			self.userInput()
+
+#For time thing: figure out the difference in time between the time desired and time now (days, minutes, seconds). Then add that difference
+#to the current time.

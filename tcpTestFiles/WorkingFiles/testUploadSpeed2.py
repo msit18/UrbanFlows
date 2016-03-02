@@ -59,7 +59,7 @@ class myProtocol(protocol.Protocol):
 	def connectionMade(self):
 		#ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
 		#msg = "ip piGroup1 {0}".format(ip_address)
-		msg = "ip piGroup1 temp"
+		msg = "ip piGroup1 slavePi2"
 		print msg
 		self.transport.write(msg)
 
@@ -72,13 +72,16 @@ class myProtocol(protocol.Protocol):
 			if msgFromServer[2] == "camera":
 				print "this is a camera command"
 				callLaterTimeCollectImgs = float(msgFromServer[9]) + 1
+				startAtTime = self.calculateTimeDifference(msgFromServer[9])
 				result = threads.deferToThread(self.takePicture, int(msgFromServer[3]), int(msgFromServer[4]),\
-					int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), int(msgFromServer[8]), float(msgFromServer[9]))
+					int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), int(msgFromServer[8]), float(startAtTime))
 			elif msgFromServer[2] == "video":
-				print "this is the video method"
+				print "this is the video method. Video method has not been completed"
 				self.clientParams = "{0} {1} {2} {3} {4}".format(\
 				msgFromServer[2], msgFromServer[3], msgFromServer[4],\
 				msgFromServer[5], msgFromServer[6])
+			elif msgFromServer[2] == "multiplexer":
+				print "this is the multiplexer method. Has not been implemented"
 			self.sendImages(callLaterTimeCollectImgs)
 		else:
 			print "Didn't write hi success.jpg to server"
@@ -89,17 +92,26 @@ class myProtocol(protocol.Protocol):
 		self.transport.write("ERROR PICAMERA")
 		sys.stderr.write(str(failure))
 
-	def writeToServer(self, msg):
-		print "WRITETOSERVER. Write message to server: {0}".format(msg)
-		self.transport.write(msg)
+	def calculateTimeDifference(self, timeToEnd):
+		endTime = datetime.datetime.strptime(timeToEnd, "%x %X")
+		print "endTime: ", endTime
+
+		nowTime = datetime.datetime.today()
+		print "nowTime: ", nowTime
+
+		difference = endTime - nowTime
+		print "difference: ", difference
+		print difference.total_seconds()
+		return time.time() + difference.total_seconds()
 
 #WOULD BE FUN TODO: REPLACE WHILE LOOP WITH PRINTING UPDATES ON FILE TO A GRAPH APPROACH.
 #HAVE THE FPS UPDATED AT A CERTAIN TIME FRAME ON A GRAPH IF POSSIBLE.
 	def takePicture (self, inputTotalTime, inputResW, inputResH, inputNumPics, inputFPSTimeInterval, inputFramerate, inputStartTime):
 		print "takePicture method!"
-		startPictures = time.time()
+		#startPictures = time.time()
 		while time.time() < inputStartTime:
-			startPictures = time.time()
+			#startPictures = time.time()
+			pass
 		else:
 			try:
 				#Keeps track of time for updates 
@@ -188,12 +200,14 @@ class myProtocol(protocol.Protocol):
 							print img
 							os.system('curl --header "filename: {0}" -X POST --data-binary @{0} http://18.111.29.234:8880/upload-image'.format(img))
 							os.system('rm {0}'.format(img))		
+					print "done! :D"
 				else:
 					print "tadaaaa"
 					reactor.stop()
 
 if __name__ == '__main__':
 	jobs = DeferredQueue()
+
 
 	#TCP network: Connects on port 8888. HTTP network: Connects on port 8880
 	data = "start"

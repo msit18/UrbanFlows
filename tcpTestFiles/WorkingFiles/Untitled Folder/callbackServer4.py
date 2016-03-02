@@ -1,8 +1,7 @@
-#Still being written: callback server.  Used with callbackClient3.py to send data and messages
+#Still being written: callback server.  Used with testUploadSpeed2.py to send data and messages
 
 #TODO: NEED TO FIX LOST CONNECTIONS THING
 #TODO: NEED TO INCORPORATE THE TEAM LEADER PI KEEPING TRACK OF CONNECTIONS
-#TODO: TEST WITH RASPIES
 #TODO: ERROR HANDLING
 
 #Written by Michelle Sit
@@ -13,7 +12,6 @@ from twisted.internet.protocol import Factory
 from twisted.internet import reactor, protocol, defer, threads
 import sys, time
 from masterVariables import MasterVariables
-#from time import strftime
 
 from twisted.web.server import Site, NOT_DONE_YET
 from twisted.web.resource import Resource
@@ -54,9 +52,6 @@ class DataProtocol (protocol.Protocol):
 			self.d.addCallback(self.gotIP, msgFromClient[2])
 			self.d.addErrback(self.failedIP)
 			self.d.callback(msgFromClient[1])
-		elif msgFromClient[0] == 'finished':
-			print "client is finished"
-			endGame = threads.deferToThread(self.checkEnd)
 		elif msgFromClient[0] == 'ERROR':
 			print "ERROR FROM PICAMERA at {0}".format(time.strftime("%Y-%m-%d-%H:%M:%S"))
 			#TODO: what to do if there is a camera error in one of them?
@@ -110,17 +105,6 @@ class DataProtocol (protocol.Protocol):
 		print "FAILURE: failedSendCmds"
 		sys.stderr.write(str(failure))
 
-	def checkEnd(self):
-		print "RUNNING CHECKEND"
-		value = f.getFinStatus()
-		print value
-		while value == False:
-			value = f.getFinStatus()
-		else:
-			print "end end end end end!"
-			self.transport.loseConnection()
-			return "done"
-
 #Used for HTTP network.  Receives images and saves them to the server
 class UploadImage(Resource):
 
@@ -131,27 +115,11 @@ class UploadImage(Resource):
 
 	def render_POST(self, request):
 		name = request.getHeader('filename')
-		print name
 		print "RENDER Posting: {0}".format(name)
-		print f.getFinStatus()
 		with open(name, "wb") as file:
 			file.write(request.content.read())
-		v = request.notifyFinish()
-		v.addCallback(self.fin)
-		v.addErrback(self.errFin)
-		request.finish()
 		print "finished writing file"
-		return NOT_DONE_YET
-
-	def fin(self, notifyFinStat):
-		print "FIN"
-		print f.finStatus
-		f.finStatus = True
-		print f.getFinStatus()
-
-	def errFin (self, err):
-		print "ERR"
-		print err
+		return '<html><body>Image uploaded :) </body></html>'
 
 if __name__ == '__main__':
 	#log = open('ServerLog-{0}.txt'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), 'w')
@@ -161,15 +129,13 @@ if __name__ == '__main__':
 	#TCP network
 	d = defer.Deferred()
 	b = DataFactory()
-	reactor.listenTCP(8888, b, 200, '18.111.29.234')
+	reactor.listenTCP(8888, b, 200, '18.189.101.178')
 
 	#HTTP network
 	a = UploadImage()
 	root = Resource()
 	root.putChild("upload-image", a)
 	factory = Site(root)
-	reactor.listenTCP(8880, factory, 200, '18.111.29.234')
+	reactor.listenTCP(8880, factory, 200, '18.189.101.178')
 
 	reactor.run()
-
-#self.d.errback(ValueError("Couldn't process your IP request"))
