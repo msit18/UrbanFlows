@@ -6,9 +6,9 @@
 from twisted.internet import reactor, protocol, defer, threads
 import subprocess
 #HTTP
-from twisted.web.client import Agent
-from twisted.web.http_headers import Headers
-from twisted.web.client import FileBodyProducer
+#from twisted.web.client import Agent
+#from twisted.web.http_headers import Headers
+#from twisted.web.client import FileBodyProducer
 
 #Threading for picture transfer
 #from manualPic_capturePhotos import takePictures
@@ -17,15 +17,15 @@ import glob
 import time
 import sys
 
-from random import randrange
+#from random import randrange
 from twisted.internet.defer import DeferredQueue
-from twisted.internet.task import deferLater, cooperate
+#from twisted.internet.task import deferLater, cooperate
 
 #Picture taking method
 import picamera
 import datetime
-import string
-import numpy as np
+#import string
+#import numpy as np
 
 
 #TCP network portion
@@ -71,7 +71,6 @@ class myProtocol(protocol.Protocol):
 			#TAKING PICTURES IN SEPARATE THREAD. Has errback handling here
 			if msgFromServer[2] == "camera":
 				print "this is a camera command"
-				print "msgFromServer[9]: ", msgFromServer[9] + msgFromServer[10]
 				startAtTime = self.calculateTimeDifference(msgFromServer[9], msgFromServer[10])
 				callLaterTimeCollectImgs = startAtTime + 1
 				result = threads.deferToThread(self.takePicture, int(msgFromServer[3]), int(msgFromServer[4]),\
@@ -96,14 +95,8 @@ class myProtocol(protocol.Protocol):
 	def calculateTimeDifference(self, dateToEnd, timeToEnd):
 		fullString = dateToEnd + " " + timeToEnd
 		endTime = datetime.datetime.strptime(fullString, "%x %X")
-		print "endTime: ", endTime
-
 		nowTime = datetime.datetime.today()
-		print "nowTime: ", nowTime
-
 		difference = endTime - nowTime
-		print "difference: ", difference
-		print difference.total_seconds()
 		return time.time() + difference.total_seconds()
 
 #WOULD BE FUN TODO: REPLACE WHILE LOOP WITH PRINTING UPDATES ON FILE TO A GRAPH APPROACH.
@@ -179,36 +172,28 @@ class myProtocol(protocol.Protocol):
 	def getRunSendImgMethod(self):
 		return self.runSendImg
 
+	def curlUploadImg (self):
+		self.fileList = glob.glob('*.jpg')
+		if len(self.fileList) > 0:
+			for img in self.fileList:
+				os.system('curl --header "filename: {0}" -X POST --data-binary @{0} http://18.189.101.178:8880/upload-image'.format(img))
+				os.system('rm {0}'.format(img))
+
 	def sendImages(self, inputStartTimePlusOne):
 		while time.time() < inputStartTimePlusOne:
 			pass
 		else:
 			print "sendImages method!"
 			while self.runSendImg == True:
-				self.fileList = glob.glob('*.jpg')
-				if len(self.fileList) > 0:
-					for img in self.fileList:
-							print img
-							os.system('curl --header "filename: {0}" -X POST --data-binary @{0} http://18.189.101.178:8880/upload-image'.format(img))
-							os.system('rm {0}'.format(img))
+				self.curlUploadImg()
 				print self.getRunSendImgMethod()
 			else: #if self.runSendImg is False
 				print "runing last glob"
-				self.fileList = glob.glob('*.jpg')
-				print self.fileList
-				if len(self.fileList) > 0:
-					for img in self.fileList:
-							print img
-							os.system('curl --header "filename: {0}" -X POST --data-binary @{0} http://18.189.101.178:8880/upload-image'.format(img))
-							os.system('rm {0}'.format(img))		
-					print "done! :D"
-				else:
-					print "tadaaaa"
-					reactor.stop()
+				self.curlUploadImg()	
+				print "done! :D"
 
 if __name__ == '__main__':
 	jobs = DeferredQueue()
-
 
 	#TCP network: Connects on port 8888. HTTP network: Connects on port 8880
 	data = "start"
