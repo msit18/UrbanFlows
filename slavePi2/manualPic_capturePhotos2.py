@@ -6,13 +6,17 @@
 
 #Edited from manualPic_capturePhotos.py
 
+#WOULD BE FUN TODO: REPLACE WHILE LOOP WITH PRINTING UPDATES ON FILE TO A GRAPH APPROACH.
+#HAVE THE FPS UPDATED AT A CERTAIN TIME FRAME ON A GRAPH IF POSSIBLE.
+
 import time
 import picamera
 import datetime
 import os
-import string
+#import string
 import sys
-import numpy as np
+#import numpy as np
+import glob
 
 class takePictureClass():
 	def __init__(self):
@@ -87,11 +91,34 @@ class takePictureClass():
 				for i in range(inputNumPics)
 				], use_video_port=True)
 
+	def getRunSendImgMethod(self):
+		return self.runSendImg
+
+	def curlUploadImg (self):
+		self.fileList = glob.glob('*.jpg')
+		if len(self.fileList) > 0:
+			for img in self.fileList:
+				os.system('curl --header "filename: {0}" -X POST --data-binary @{0} http://18.189.101.178:8880/upload-image'.format(img))
+				os.system('rm {0}'.format(img))
+
+	def sendImages(self, inputStartTimePlusOne):
+		while time.time() < inputStartTimePlusOne:
+			pass
+		else:
+			print "sendImages method!"
+			while self.runSendImg == True:
+				self.curlUploadImg()
+				print self.getRunSendImgMethod()
+			else: #if self.runSendImg is False
+				print "runing last glob"
+				self.curlUploadImg()	
+				print "done! :D"
+
 if __name__ == '__main__':
 	t = takePictureClass()
 	#camLog = open('CamLog-{0}.txt'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), 'w')
 
-	t.takePicture()
+	#t.takePicture()
 
 #Error handling can be handled in callbackClient class
 		# except (picamera.exc.PiCameraError, picamera.exc.PiCameraMMALError):

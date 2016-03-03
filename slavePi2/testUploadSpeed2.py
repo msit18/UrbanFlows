@@ -71,12 +71,11 @@ class myProtocol(protocol.Protocol):
 			#TAKING PICTURES IN SEPARATE THREAD. Has errback handling here
 			if msgFromServer[2] == "camera":
 				print "this is a camera command"
-				global tp
-				tp.takePictureClass()
 				startAtTime = self.calculateTimeDifference(msgFromServer[9], msgFromServer[10])
 				callLaterTimeCollectImgs = startAtTime + 1
 				result = threads.deferToThread(tp.takePicture, int(msgFromServer[3]), int(msgFromServer[4]),\
 					int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), int(msgFromServer[8]), startAtTime)
+				tp.sendImages(callLaterTimeCollectImgs)
 			elif msgFromServer[2] == "video":
 				print "this is the video method. Video method has not been completed"
 				self.clientParams = "{0} {1} {2} {3} {4}".format(\
@@ -84,7 +83,6 @@ class myProtocol(protocol.Protocol):
 				msgFromServer[5], msgFromServer[6])
 			elif msgFromServer[2] == "multiplexer":
 				print "this is the multiplexer method. Has not been implemented"
-			self.sendImages(callLaterTimeCollectImgs)
 		else:
 			print "Didn't write hi success.jpg to server"
 
@@ -100,32 +98,6 @@ class myProtocol(protocol.Protocol):
 		nowTime = datetime.datetime.today()
 		difference = endTime - nowTime
 		return time.time() + difference.total_seconds()
-
-#WOULD BE FUN TODO: REPLACE WHILE LOOP WITH PRINTING UPDATES ON FILE TO A GRAPH APPROACH.
-#HAVE THE FPS UPDATED AT A CERTAIN TIME FRAME ON A GRAPH IF POSSIBLE.
-
-	def getRunSendImgMethod(self):
-		return tp.runSendImg
-
-	def curlUploadImg (self):
-		self.fileList = glob.glob('*.jpg')
-		if len(self.fileList) > 0:
-			for img in self.fileList:
-				os.system('curl --header "filename: {0}" -X POST --data-binary @{0} http://18.189.101.178:8880/upload-image'.format(img))
-				os.system('rm {0}'.format(img))
-
-	def sendImages(self, inputStartTimePlusOne):
-		while time.time() < inputStartTimePlusOne:
-			pass
-		else:
-			print "sendImages method!"
-			while tp.runSendImg == True:
-				self.curlUploadImg()
-				print self.getRunSendImgMethod()
-			else: #if tp.runSendImg is False
-				print "runing last glob"
-				self.curlUploadImg()	
-				print "done! :D"
 
 if __name__ == '__main__':
 	jobs = DeferredQueue()
