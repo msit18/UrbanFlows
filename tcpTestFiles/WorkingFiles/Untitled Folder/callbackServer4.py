@@ -13,7 +13,7 @@ from twisted.internet import reactor, protocol, defer, threads
 import sys, time
 from masterVariables2 import MasterVariables
 
-from twisted.web.server import Site, NOT_DONE_YET
+from twisted.web.server import Site
 from twisted.web.resource import Resource
 
 import cgi
@@ -87,7 +87,7 @@ class DataProtocol (protocol.Protocol):
 			numValues = len(dictFormat[dataKey])
 		else:
 			print "SENDING CMDS"
-			self.d.addCallback(self.startTakingPictures)
+			self.d.addCallback(self.startProgram)
 		 	self.d.addErrback(self.failedSendCmds)
 	
 	#largely redundant method but provides a log of the message
@@ -95,9 +95,9 @@ class DataProtocol (protocol.Protocol):
 		print "WRITETOCLIENT. Write message to client: {0}".format(msg)
 		self.transport.write(msg)
 
-	def startTakingPictures(self, data):
+	def startProgram(self, data):
 		print "STARTTAKINGPICTURES"
-		sendMsg = "Okay startTakingPictures {0}".format(f.getParam())
+		sendMsg = "Okay startProgram {0}".format(f.getParam())
 		print sendMsg
 		reactor.callLater(0.1, self.writeToClient, sendMsg)
 

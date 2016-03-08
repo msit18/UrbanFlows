@@ -13,9 +13,7 @@ import time
 import picamera
 import datetime
 import os
-#import string
 import sys
-#import numpy as np
 import glob
 
 class takePictureClass():
@@ -77,6 +75,7 @@ class takePictureClass():
 			except:
 				print "noooooooooooooo break"
 				print sys.exc_info()[0]
+				return "PICAMERROR" #Need to test this
 				raise
 
 	def piCamTakePictures(self, inputResW, inputResH, inputNumPics, inputFramerate):
@@ -94,20 +93,20 @@ class takePictureClass():
 	def getRunSendImgMethod(self):
 		return self.runSendImg
 
-	def curlUploadImg (self):
+	def curlUploadImg (self, serverIP):
 		self.fileList = glob.glob('*.jpg')
 		if len(self.fileList) > 0:
 			for img in self.fileList:
-				os.system('curl --header "filename: {0}" -X POST --data-binary @{0} http://18.189.101.178:8880/upload-image'.format(img))
+				os.system('curl --header "filename: {0}" -X POST --data-binary @{0} http://{1}:8880/upload-image'.format(img, serverIP))
 				os.system('rm {0}'.format(img))
 
-	def sendImages(self, inputStartTimePlusOne):
+	def sendImages(self, inputStartTimePlusOne, serverIP):
 		while time.time() < inputStartTimePlusOne:
 			pass
 		else:
 			print "sendImages method!"
 			while self.runSendImg == True:
-				self.curlUploadImg()
+				self.curlUploadImg(serverIP)
 				print self.getRunSendImgMethod()
 			else: #if self.runSendImg is False
 				print "runing last glob"
@@ -117,8 +116,6 @@ class takePictureClass():
 if __name__ == '__main__':
 	t = takePictureClass()
 	#camLog = open('CamLog-{0}.txt'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), 'w')
-
-	#t.takePicture()
 
 #Error handling can be handled in callbackClient class
 		# except (picamera.exc.PiCameraError, picamera.exc.PiCameraMMALError):

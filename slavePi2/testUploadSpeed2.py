@@ -12,20 +12,17 @@ import subprocess
 
 #Threading for picture transfer
 from manualPic_capturePhotos2 import takePictureClass
+from videoMode3 import takeVideoClass
 import os
 import glob
 import time
 import sys
 
-#from random import randrange
 from twisted.internet.defer import DeferredQueue
-#from twisted.internet.task import deferLater, cooperate
 
 #Picture taking method
-import picamera
+#import picamera
 import datetime
-#import string
-#import numpy as np
 
 
 #TCP network portion
@@ -50,11 +47,6 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 class myProtocol(protocol.Protocol):
 	def __init__(self, factory):
 		self.factory = factory
-		self.fileList = []
-		self.name = ""
-		self.clientParams = ""
-		self.numPicsTaken = 0
-		#self.runSendImg = True
 
 	def connectionMade(self):
 		#ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
@@ -66,21 +58,28 @@ class myProtocol(protocol.Protocol):
 	def dataReceived(self, data):
 		print "Data received from Server: {0}".format(data)
 		msgFromServer = [data for data in data.split()]
-		if msgFromServer[1] == "startTakingPictures":
+		if msgFromServer[1] == "startProgram":
 			print "GOT A STARTTAKINGPICTURES"
-			#TAKING PICTURES IN SEPARATE THREAD. Has errback handling here
+			#inputTotalTime, inputResW, inputResH, inputNumPics, inputFPSTimeInterval, inputFramerate, inputStartTime
 			if msgFromServer[2] == "camera":
 				print "this is a camera command"
 				startAtTime = self.calculateTimeDifference(msgFromServer[9], msgFromServer[10])
 				callLaterTimeCollectImgs = startAtTime + 1
 				result = threads.deferToThread(tp.takePicture, int(msgFromServer[3]), int(msgFromServer[4]),\
 					int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), int(msgFromServer[8]), startAtTime)
-				tp.sendImages(callLaterTimeCollectImgs)
+				tp.sendImages(callLaterTimeCollectImgs, serverIP)
+				#result.addErrback(failedMethod)
+				
+			#VideoTime, ResW, ResH, totalRunTime, framerate, startTime
 			elif msgFromServer[2] == "video":
-				print "this is the video method. Video method has not been completed"
-				self.clientParams = "{0} {1} {2} {3} {4}".format(\
-				msgFromServer[2], msgFromServer[3], msgFromServer[4],\
-				msgFromServer[5], msgFromServer[6])
+				print "this is the video command"
+				print "msgFromServer[8-9] ", msgFromServer[8] + msgFromServer[9]
+				startAtTime = self.calculateTimeDifference(msgFromServer[8], msgFromServer[9])
+				callLaterTimeCollectImgs = startAtTime + 1
+				result = threads.deferToThread(tp.takeVideo, int(msgFromServer[3]), int(msgFromServer[4]), int(msgFromServer[5]),\
+					int(msgFromServer[6]), int(msgFromServer[7]), startAtTime)
+				tv.sendVideos(callLaterTimeCollectImgs, serverIP)
+
 			elif msgFromServer[2] == "multiplexer":
 				print "this is the multiplexer method. Has not been implemented"
 		else:
@@ -101,11 +100,13 @@ class myProtocol(protocol.Protocol):
 
 if __name__ == '__main__':
 	jobs = DeferredQueue()
-	#tp = takePictureClass()
+	serverIP = "18.189.101.178"
+	tp = takePictureClass()
+	tv = takeVideoClass()
 
 	#TCP network: Connects on port 8888. HTTP network: Connects on port 8880
 	data = "start"
-	reactor.connectTCP('18.189.101.178', 8888, DataClientFactory(data), timeout=200)
+	reactor.connectTCP(serverIP, 8888, DataClientFactory(data), timeout=200)
 
 	reactor.run()
 

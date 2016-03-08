@@ -38,12 +38,13 @@ class MasterVariables():
 			 self.ServerResW, self.ServerResH, self.ServerNumPics, self.ServerTimeInterval,\
 			 self.ServerFrameRate, self.ServerStartTime)
 		elif self.camVid == "video":
-			self.param = "video {0} {1} {2} {3}".format(self.ServerVidTimeSec,\
-			self.ServerResW, self.ServerResH, self.ServerFrameRate)
+			self.param = "video {0} {1} {2} {3} {4}".format(self.ServerVidTimeSec,\
+			self.ServerResW, self.ServerResH, self.ServerFrameRate, self.ServerStartTime)
 		return self.param
 
 	def userInput(self):
 		self.camVid = raw_input ('Enter camera or video: ')
+		self.checkIfTimeIsValid()
 		if self.camVid == "camera":
 			self.ServerTotalTimeSec = raw_input('Enter total run time in seconds: ')
 			self.ServerResW = raw_input('Enter resolution width: ')
@@ -52,7 +53,6 @@ class MasterVariables():
 			self.ServerTimeInterval = raw_input ("Enter time interval (seconds) for frames"\
 			" to be taken in (fps): ")
 			self.ServerFrameRate = raw_input ('Enter framerate: ')
-			self.checkIfTimeIsValid()
 			print "Thank you for your input. Please check the following"
 			print "{0} | TotalTime(sec): {1} | ResW: {2} | ResH: {3} | NumPics: {4} | "\
 			"TimeInterval(sec): {5} | FR: {6} | StartTime: {7}".format(self.camVid, \
@@ -66,9 +66,12 @@ class MasterVariables():
 			#self.ServerTotalTimeSec = input('Enter total run time in seconds: ')
 			self.ServerFrameRate = raw_input ('Enter framerate: ')
 			print "Thank you for your input. Please check the following"
-			print "{0} | VidTime(sec): {1} | ResW: {2} | ResH: {3} | FR: {4}"\
+			print "{0} | VidTime(sec): {1} | ResW: {2} | ResH: {3} | FR: {4} | StartTime: {5}"\
 			.format(self.camVid, self.ServerVidTimeSec, self.ServerResW,\
-			self.ServerResH, self.ServerFrameRate)
+			self.ServerResH, self.ServerFrameRate, self.ServerStartTime)
+
+		elif self.camVid == "multiplexer":
+			self.
 
 		else:
 			print "Wrong input. Please try again"
