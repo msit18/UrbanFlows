@@ -1,3 +1,8 @@
+#Written by Michelle Sit. Adapted from various manualPic4 codes and edited
+#Used in the testUploadSpeed2.py method to take pictures given the server inputs
+
+#Updates are currently scheduled for every 5 seconds
+
 import time
 import datetime
 import picamera
@@ -34,14 +39,14 @@ class CamWork:
 				print "10.2 Ten second Update: Total number of pictures is {0},"\
 				" total time elapsed is {1}, totalFPS is {2}".format(str(totalNumPicsTaken),\
 				str(tenMinTotalRunTime), str(tenMinFPSUpdate) )
-				#estimating PictureNumbers
-				estTime = math.ceil(prgmEndTime-timeNow)
-				if estTime > 0:
-					expectedNumPicsToTakeNext = estTime*math.ceil(tenMinFPSUpdate)
-				print "expectedNumPicsToTakeNext: ", expectedNumPicsToTakeNext
-				print "totalNumPicsTaken: ", totalNumPicsTaken
-				totalExpected = expectedNumPicsToTakeNext + totalNumPicsTaken
-				print "totalExpected: ", totalExpected
+				# #estimating PictureNumbers
+				# estTime = math.ceil(prgmEndTime-timeNow)
+				# if estTime > 0:
+				# 	expectedNumPicsToTakeNext = estTime*math.ceil(tenMinFPSUpdate)
+				# print "expectedNumPicsToTakeNext: ", expectedNumPicsToTakeNext
+				# print "totalNumPicsTaken: ", totalNumPicsTaken
+				# totalExpected = expectedNumPicsToTakeNext + totalNumPicsTaken
+				# print "totalExpected: ", totalExpected
 
 				timePlusTenMin = time.time()+5
 			elif: #Runs picture taking process as normal
@@ -62,9 +67,7 @@ class CamWork:
 		totalFPS = totalNumPicsTaken/totalTime
 		print "10.2: Captured {0} total pictures.  Total time was {1}, total FPS is {2}"\
 		.format(str(totalNumPicsTaken), str(inputTotalTime), str(totalFPS) )
-
 		print "CAMERA IS FINISHED. RETURN TRUE"
-		return "True"
 
 	def piCamTakePictures(self, inputResW, inputResH, inputNumPics, inputFramerate):
 		with picamera.PiCamera() as camera:
@@ -80,4 +83,4 @@ class CamWork:
 
 if __name__ == '__main__':
 	c = CamWork()
-	c.takePicture(120, 640, 480, 60, 1, 90)
+	c.takePicture(inputTotalTime, inputResW, inputResH, inputNumPics, inputFPSTimeInterval, inputFramerate)

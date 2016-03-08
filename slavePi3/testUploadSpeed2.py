@@ -59,7 +59,7 @@ class myProtocol(protocol.Protocol):
 	def connectionMade(self):
 		#ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
 		#msg = "ip piGroup1 {0}".format(ip_address)
-		msg = "ip piGroup1 temp"
+		msg = "ip piGroup1 slavePi3"
 		print msg
 		self.transport.write(msg)
 
@@ -75,7 +75,7 @@ class myProtocol(protocol.Protocol):
 				result = threads.deferToThread(self.takePicture, int(msgFromServer[3]), int(msgFromServer[4]),\
 					int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), int(msgFromServer[8]), float(msgFromServer[9]))
 			elif msgFromServer[2] == "video":
-				print "this is the video method"
+				print "this is the video method. Video method has not been completed"
 				self.clientParams = "{0} {1} {2} {3} {4}".format(\
 				msgFromServer[2], msgFromServer[3], msgFromServer[4],\
 				msgFromServer[5], msgFromServer[6])
