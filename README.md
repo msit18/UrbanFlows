@@ -55,30 +55,6 @@ SlavePi5 Files:
 #tcpTestFiles
 All experimental files and sample codes for the Twisted framework   
 
-TCP files:
-*   quoteserver.py, quoteclient.py, tcpClient2.py, tcpClient3.py, tcpClient4.py tcpServer.py, tcpClient.py
-
-HTTP files:
-*   response.py - HTTP client code.  Tried to figure out GET and POST methods
-*   sendBody.py - HTTP client example code
-*   server2.py - Working HTTP code written by Vlatko Klabucar.  Runs a HTTP server.
-*   newHTTPServer.py - Example Twisted Dev code.  Creates a HTTP server.
-*   client2.py - HTTP code written by Vlatko Klabucar.  Runs a HTTP client but doesn't work.
-
-SSH files:
-*   sshsimpleserver.py, sshsimpleclient.py, echoclient_ssh.py, exampleConchCode.py, sshclient.py, sshsimpleclient3.py, sshsimpleserver2.py, exampleSSHClient.py, sshserver.py, sshserver2.py
-
-Other files:
-*   stringprod.py - Twisted producer/consumer example file
-*   localServer - sets up a localhost server for TCP and SSH
-
-#tcpTestFiles/WorkingFiles
-All files work and are clearly labeled.
-
-Relevant TCP files:
-*   tcpServerEdit2.py, tcpClientEdit2.py - Working on these files as of 9/23/15 to create TCP client-server
-*   tcpClientEditAlias.py, tcpClientEditAlias2.py, tcpClientEditAlias3.py - Used to test TCP server's ability to handle multiple clients
-
 HTTP files written by Vlatko Klabucar:
 *   send-image.sh - Uses curl to post image to HTTP server
 *   client.py - HTTP client.  Needs to be debugged
