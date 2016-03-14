@@ -36,6 +36,7 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 	def clientConnectionFailed(self, connector, reason):
 		print 'Connection failed at {0}:'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), reason.getErrorMessage()
 		for x in range(5):
+			print "restart attempt: ", x
 			protocol.ReconnectingClientFactory.clientConnectionFailed(self, connector, reason)
 		else:
 			#HOW TO DEAL WITH THIS?
