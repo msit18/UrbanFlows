@@ -38,11 +38,12 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 		for x in range(5):
 			protocol.ReconnectingClientFactory.clientConnectionFailed(self, connector, reason)
 		else:
-			reactor.stop()
+			#HOW TO DEAL WITH THIS?
+			#reactor.stop()
 
 	def clientConnectionLost(self, connector, reason):
 		print 'Connection lost at {0}:'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), reason.getErrorMessage()
-		reactor.stop()
+		#reactor.stop()
 
 class myProtocol(protocol.Protocol):
 	def __init__(self, factory):

@@ -1,7 +1,12 @@
 #Still being written: callback server.  Used with testUploadSpeed2.py to send data and messages
 
 #TODO: NEED TO FIX LOST CONNECTIONS THING
-#TODO: NEED TO INCORPORATE THE TEAM LEADER PI KEEPING TRACK OF CONNECTIONS
+
+#TODO: Not implemented: A scaleable method of keeping track of the clusters. Nahom proposed
+#having a team leader pi who is responsible for pinging its teammates when the server detects
+#that a connection has been lost. Instead of pinging all of the clients, just ping 1/4 (the
+#team leaders) who then ping their team members and report back if they have lost someone.
+
 #TODO: ERROR HANDLING
 
 #Written by Michelle Sit

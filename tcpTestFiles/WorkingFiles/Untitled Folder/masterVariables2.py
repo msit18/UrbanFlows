@@ -3,6 +3,7 @@
 #Also stores all the user inputs for the camera
 
 #Nice TODO: Sanitize user input to make sure it is valid
+#TODO: The inputted fps is not actually what the camera performs at
 
 import time
 import datetime
