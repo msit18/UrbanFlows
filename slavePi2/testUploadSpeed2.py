@@ -31,17 +31,23 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 		self.data = data
 
 	def buildProtocol(self, addr):
+		self.resetDelay()
 		return myProtocol(self)
 
 	def clientConnectionFailed(self, connector, reason):
 		print 'Connection failed at {0}:'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), reason.getErrorMessage()
-		for x in range(5):
-			print "restart attempt: ", x
-			protocol.ReconnectingClientFactory.clientConnectionFailed(self, connector, reason)
-		else:
-			print "else loop"
-			#HOW TO DEAL WITH THIS?
-			#reactor.stop()
+		print "TWISTED CONNECTING METHOD"
+		protocol.ReconnectingClientFactory.clientConnectionFailed(self, connector, reason)
+		print "RESTARTING WIFI"
+		os.system("./restartWifi.sh")
+
+		# for x in range(5):
+		# 	print "restart attempt: ", x
+		# 	protocol.ReconnectingClientFactory.clientConnectionFailed(self, connector, reason)
+		# else:
+		# 	print "else loop"
+		# 	os.system("./restartWifi.sh")
+		# 	#reactor.stop()
 
 	def clientConnectionLost(self, connector, reason):
 		print 'Connection lost at {0}:'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), reason.getErrorMessage()

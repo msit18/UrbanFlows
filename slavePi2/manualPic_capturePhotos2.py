@@ -93,12 +93,13 @@ class takePictureClass():
 	def getRunSendImgMethod(self):
 		return self.runSendImg
 
+#The handling else statement isn't working as it should. Stalls and DL thing goes to 0
 	def curlUploadImg (self, serverIP):
 		self.fileList = glob.glob('*.jpg')
 		if len(self.fileList) > 0:
 			for img in self.fileList:
 				os.system('if balExp=$(curl --header "filename: {0}" -X POST --data-binary @{0}' \
-					' http://{1}:8880/upload-image); then rm {0}; else echo "fAIL"; fi'.format(img, serverIP))
+					' http://{1}:8880/upload-image); then rm {0}; else . ./restartWifi.sh; fi'.format(img, serverIP))
 
 				# os.system('status = $(curl --header "filename: {0}" -X POST --data-binary @{0} '\
 				# 	'http://{1}:8880/upload-image) ; echo "SPACE SPACE SPACE" ; echo $status ; '\
