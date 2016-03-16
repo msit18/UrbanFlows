@@ -39,6 +39,7 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 			print "restart attempt: ", x
 			protocol.ReconnectingClientFactory.clientConnectionFailed(self, connector, reason)
 		else:
+			print "else loop"
 			#HOW TO DEAL WITH THIS?
 			#reactor.stop()
 
@@ -102,7 +103,9 @@ class myProtocol(protocol.Protocol):
 
 if __name__ == '__main__':
 	jobs = DeferredQueue()
-	serverIP = "18.189.101.178"
+	print sys.argv[1]
+	serverIP = sys.argv[1]
+#	serverIP = "18.189.104.190"
 	tp = takePictureClass()
 	tv = takeVideoClass()
 

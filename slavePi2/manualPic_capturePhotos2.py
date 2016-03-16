@@ -97,8 +97,13 @@ class takePictureClass():
 		self.fileList = glob.glob('*.jpg')
 		if len(self.fileList) > 0:
 			for img in self.fileList:
-				os.system('curl --header "filename: {0}" -X POST --data-binary @{0} http://{1}:8880/upload-image'.format(img, serverIP))
-				os.system('rm {0}'.format(img))
+				os.system('if balExp=$(curl --header "filename: {0}" -X POST --data-binary @{0}' \
+					' http://{1}:8880/upload-image); then rm {0}; else echo "fAIL"; fi'.format(img, serverIP))
+
+				# os.system('status = $(curl --header "filename: {0}" -X POST --data-binary @{0} '\
+				# 	'http://{1}:8880/upload-image) ; echo "SPACE SPACE SPACE" ; echo $status ; '\
+				# 	'if [ 0 -eq $status]; then rm {0} ; fi ;'.format(img, serverIP))
+				#os.system('rm {0}'.format(img))
 
 	def sendImages(self, inputStartTimePlusOne, serverIP):
 		while time.time() < inputStartTimePlusOne:
@@ -107,10 +112,10 @@ class takePictureClass():
 			print "sendImages method!"
 			while self.runSendImg == True:
 				self.curlUploadImg(serverIP)
-				print self.getRunSendImgMethod()
+				#print self.getRunSendImgMethod()
 			else: #if self.runSendImg is False
 				print "runing last glob"
-				self.curlUploadImg()	
+				self.curlUploadImg(serverIP)	
 				print "done! :D"
 
 if __name__ == '__main__':
