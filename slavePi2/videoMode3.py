@@ -30,7 +30,10 @@ class takeVideoClass():
 	#					for k in range(numCycles)]):
 						camera.wait_recording(inputVidTime)
 			except:
-				print "error"	
+				print "error"
+				os.system('echo "Camera for PI2 is broken. Error message: \n {0} \n'\
+				'-------end of message --------- \n" | mail -s "Camera Broken" msit@wellesley.edu'\
+				.format(sys.exc_info()))
 
 	def getRunSendVidMethod(self):
 		return self.runSendVid
@@ -58,13 +61,3 @@ class takeVideoClass():
 
 if __name__ == '__main__':
 	tv = takeVideoClass()
-
-		# except (picamera.exc.PiCameraError, picamera.exc.PiCameraMMALError):
-		# 	print "caught error"
-		# 	self.queue.put('exit')
-		# 	time.sleep(1)
-		# 	os.system("sshpass -p 'raspberry' ssh pi@10.0.0.1 -o StrictHostKeyChecking=no python flash.py camError 2")
-		# except:
-		# 	self.queue.put('exit')
-		# 	time.sleep(1)
-		# 	os.system("sshpass -p 'raspberry' ssh pi@10.0.0.1 -o StrictHostKeyChecking=no python flash.py error 2")

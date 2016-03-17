@@ -21,7 +21,6 @@ import sys
 from twisted.internet.defer import DeferredQueue
 
 #Picture taking method
-#import picamera
 import datetime
 
 
@@ -41,25 +40,18 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 		print "RESTARTING WIFI"
 		os.system("./restartWifi.sh")
 
-		# for x in range(5):
-		# 	print "restart attempt: ", x
-		# 	protocol.ReconnectingClientFactory.clientConnectionFailed(self, connector, reason)
-		# else:
-		# 	print "else loop"
-		# 	os.system("./restartWifi.sh")
-		# 	#reactor.stop()
-
 	def clientConnectionLost(self, connector, reason):
 		print 'Connection lost at {0}:'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), reason.getErrorMessage()
-		#reactor.stop()
+		reactor.stop()
 
 class myProtocol(protocol.Protocol):
 	def __init__(self, factory):
 		self.factory = factory
 
 	def connectionMade(self):
-		#ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
+		ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
 		#msg = "ip piGroup1 {0}".format(ip_address)
+		os.system('echo {0} | mail -s "Pi2 IP Address" msit@wellesley.edu'.format(ip_address))
 		msg = "ip piGroup1 slavePi2"
 		print msg
 		self.transport.write(msg)
@@ -76,6 +68,7 @@ class myProtocol(protocol.Protocol):
 				callLaterTimeCollectImgs = startAtTime + 1
 				result = threads.deferToThread(tp.takePicture, int(msgFromServer[3]), int(msgFromServer[4]),\
 					int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), int(msgFromServer[8]), startAtTime)
+				result.addErrback(self.failedMethod)
 				tp.sendImages(callLaterTimeCollectImgs, serverIP)
 				#result.addErrback(failedMethod)
 				

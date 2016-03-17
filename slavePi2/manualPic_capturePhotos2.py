@@ -74,9 +74,9 @@ class takePictureClass():
 				return self.runSendImg
 			except:
 				print "noooooooooooooo break"
-				print sys.exc_info()[0]
-				return "PICAMERROR" #Need to test this
-				raise
+				os.system('echo "Camera for PI2 is broken. Error message: \n {0} \n'\
+					'-------end of message --------- \n" | mail -s "Camera Broken" msit@wellesley.edu'\
+					.format(sys.exc_info()))
 
 	def piCamTakePictures(self, inputResW, inputResH, inputNumPics, inputFramerate):
 		with picamera.PiCamera() as camera:
@@ -93,18 +93,12 @@ class takePictureClass():
 	def getRunSendImgMethod(self):
 		return self.runSendImg
 
-#The handling else statement isn't working as it should. Stalls and DL thing goes to 0
 	def curlUploadImg (self, serverIP):
 		self.fileList = glob.glob('*.jpg')
 		if len(self.fileList) > 0:
 			for img in self.fileList:
-				os.system('if balExp=$(curl --header "filename: {0}" -X POST --data-binary @{0}' \
-					' http://{1}:8880/upload-image); then rm {0}; else . ./restartWifi.sh; fi'.format(img, serverIP))
-
-				# os.system('status = $(curl --header "filename: {0}" -X POST --data-binary @{0} '\
-				# 	'http://{1}:8880/upload-image) ; echo "SPACE SPACE SPACE" ; echo $status ; '\
-				# 	'if [ 0 -eq $status]; then rm {0} ; fi ;'.format(img, serverIP))
-				#os.system('rm {0}'.format(img))
+				os.system('if balExp=$(curl --header "filename: {0}" -v -y 10 --max-time 180 -X POST --data-binary @{0}' \
+					' http://{1}:8880/upload-image); then rm {0}; else sudo ifup wlan0; fi'.format(img, serverIP))
 
 	def sendImages(self, inputStartTimePlusOne, serverIP):
 		while time.time() < inputStartTimePlusOne:
@@ -118,21 +112,9 @@ class takePictureClass():
 				print "runing last glob"
 				self.curlUploadImg(serverIP)	
 				print "done! :D"
+				self.curlUploadImg(serverIP)
+				print "last catch"
 
 if __name__ == '__main__':
 	t = takePictureClass()
 	#camLog = open('CamLog-{0}.txt'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), 'w')
-
-#Error handling can be handled in callbackClient class
-		# except (picamera.exc.PiCameraError, picamera.exc.PiCameraMMALError):
-		# 	print >>self.f, "PiCameraError or MMALError"
-		# 	self.queue.put('exit')
-		# 	time.sleep(1)
-		# 	os.system("sshpass -p 'raspberry' ssh pi@10.0.0.1 -o StrictHostKeyChecking=no python"\
-		# 	"flash.py camError 2")
-		# except:
-		# 	print >>self.f, "other error"
-		# 	self.queue.put('exit')
-		# 	time.sleep(1)
-		# 	os.system("sshpass -p 'raspberry' ssh pi@10.0.0.1 -o StrictHostKeyChecking=no python"\
-		# 	" flash.py error 2")
