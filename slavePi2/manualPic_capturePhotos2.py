@@ -77,6 +77,7 @@ class takePictureClass():
 				os.system('echo "Camera for PI2 is broken. Error message: \n {0} \n'\
 					'-------end of message --------- \n" | mail -s "Camera Broken" msit@wellesley.edu'\
 					.format(sys.exc_info()))
+				raise
 
 	def piCamTakePictures(self, inputResW, inputResH, inputNumPics, inputFramerate):
 		with picamera.PiCamera() as camera:
