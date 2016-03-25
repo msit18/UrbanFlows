@@ -7,8 +7,6 @@
 #that a connection has been lost. Instead of pinging all of the clients, just ping 1/4 (the
 #team leaders) who then ping their team members and report back if they have lost someone.
 
-#TODO: ERROR HANDLING
-
 #Written by Michelle Sit
 #Many thanks to Vlatko Klabucar for helping me with the HTTP part!  Also many thanks to Nahom Marie
 #for helping me with the architecture of this system!
@@ -41,6 +39,7 @@ class DataProtocol (protocol.Protocol):
 	def __init__(self, factory, d):
 		self.factory = factory
 		self.d = defer.Deferred()
+		self.lostPiDictionary = {}
 
 	def connectionMade(self):
 		self.factory.numConnections += 1
@@ -49,36 +48,60 @@ class DataProtocol (protocol.Protocol):
 	def connectionLost(self, reason):
 		self.factory.numConnections -= 1
 		print "Connection lost at {0}. Number of active connections: {1}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), self.factory.numConnections)
+		if self.factory.numConnections <= 0:
+			print "Before: ", dictFormat
+			dictFormat.clear()
+			print "After: ", dictFormat
+		else:
+			self.writeToClient("lookingForLostPi")
 
 	def dataReceived(self, data):
 		print "DATARECEIVED. Server received data: {0}".format(data)
 		msgFromClient = [data for data in data.split()]
 		if msgFromClient[0] == "ip":
 			print "FOUND AN IP"
-			self.d.addCallback(self.gotIP, msgFromClient[2])
+			self.d.addCallback(self.updatingIPDictionary, msgFromClient[1], msgFromClient[2])
 			self.d.addErrback(self.failedIP)
-			self.d.callback(msgFromClient[1])
+			self.d.callback(dictFormat)
+			reactor.callInThread(self.checkConnections, msgFromClient[1])
 		elif msgFromClient[0] == 'ERROR':
 			print "ERROR FROM PICAMERA at {0}".format(time.strftime("%Y-%m-%d-%H:%M:%S"))
-			#TODO: what to do if there is a camera error in one of them?
+		elif msgFromClient[0] == 'respondingToLostPiPing':
+			self.updatingIPDictionary(self.lostPiDictionary, msgFromClient[1], msgFromClient[2])
 		else:
 			print "Time: {0}. I don't know what this is: {1}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), data)
 
-	def gotIP(self, piGroup, ipAddr):
+	def updatingIPDictionary(self, dictionary, piGroup, ipAddr):
 		print "RUNNING GOTIP"
 		#adds key and a list containing IP address
-		if (piGroup in dictFormat) == False:
-			print "I didn't have this cluster key"
-			dictFormat[piGroup] = [ipAddr]
+		if (piGroup in dictionary) == False:
+			print "I didn't have this cluster key for {0}".format(dictionary)
+			dictionary[piGroup] = [ipAddr]
 		#appends new IP to the end of the key's list
-		elif (piGroup in dictFormat) == True:
-			print "it's true! I have this cluster in my keys"
-			dictFormat[piGroup].append(ipAddr)
+		elif (piGroup in dictionary) == True:
+			print "it's true! I have this cluster in my keys for {0}".format(dictionary)
+			dictionary[piGroup].append(ipAddr)
 		else:
-			print "Got something that wasn't an IP. Adding to dict anyway"
-			dictFormat[piGroup] = [ipAddr]
-		print dictFormat
-		reactor.callInThread(self.checkConnections, piGroup)
+			print "Got something that wasn't an IP. Adding to dict anyway for {0}".format(dictionary)
+			dictionary[piGroup] = [ipAddr]
+		print dictionary
+		#reactor.callInThread(self.checkConnections, piGroup)
+
+	# def gotIP(self, piGroup, ipAddr):
+	# 	print "RUNNING GOTIP"
+	# 	#adds key and a list containing IP address
+	# 	if (piGroup in dictFormat) == False:
+	# 		print "I didn't have this cluster key"
+	# 		dictFormat[piGroup] = [ipAddr]
+	# 	#appends new IP to the end of the key's list
+	# 	elif (piGroup in dictFormat) == True:
+	# 		print "it's true! I have this cluster in my keys"
+	# 		dictFormat[piGroup].append(ipAddr)
+	# 	else:
+	# 		print "Got something that wasn't an IP. Adding to dict anyway"
+	# 		dictFormat[piGroup] = [ipAddr]
+	# 	print dictFormat
+	# 	reactor.callInThread(self.checkConnections, piGroup)
 
 	def failedIP(self, failure):
 		print "FAILURE: NOTIP"

@@ -72,7 +72,8 @@ class MasterVariables():
 			self.ServerResH, self.ServerFrameRate, self.ServerStartTime)
 
 		elif self.camVid == "multiplexer":
-			self.
+			print "still working on this feature. Please try again"
+			self.userInput()
 
 		else:
 			print "Wrong input. Please try again"
