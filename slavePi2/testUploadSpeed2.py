@@ -59,37 +59,33 @@ class myProtocol(protocol.Protocol):
 	def dataReceived(self, data):
 		print "Data received from Server: {0}".format(data)
 		msgFromServer = [data for data in data.split()]
+		#TODO: FIGURE OUT HOW TO CATCH THE CAMERA ERROR AND STOP THE REACTOR
 		if msgFromServer[1] == "startProgram":
-			try:
-				print "GOT A STARTTAKINGPICTURES"
-				#inputTotalTime, inputResW, inputResH, inputNumPics, inputFPSTimeInterval, inputFramerate, inputStartTime
-				if msgFromServer[2] == "camera":
-					print "this is a camera command"
-					startAtTime = self.calculateTimeDifference(msgFromServer[9], msgFromServer[10])
-					callLaterTimeCollectImgs = startAtTime + 1
-					result = threads.deferToThread(tp.takePicture, int(msgFromServer[3]), int(msgFromServer[4]),\
-						int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), int(msgFromServer[8]), startAtTime)
-					#NOTE: THIS FAILED METHOD DOESN'T CATCH THE CAMERA ERROR
-					result.addErrback(self.failedMethod)
-					tp.sendImages(callLaterTimeCollectImgs, serverIP)
-					#result.addErrback(failedMethod)
-					
-				#VideoTime, ResW, ResH, totalRunTime, framerate, startTime
-				elif msgFromServer[2] == "video":
-					print "this is the video command"
-					print "msgFromServer[8-9] ", msgFromServer[8] + msgFromServer[9]
-					startAtTime = self.calculateTimeDifference(msgFromServer[8], msgFromServer[9])
-					callLaterTimeCollectImgs = startAtTime + 1
-					result = threads.deferToThread(tp.takeVideo, int(msgFromServer[3]), int(msgFromServer[4]), int(msgFromServer[5]),\
-						int(msgFromServer[6]), int(msgFromServer[7]), startAtTime)
-					tv.sendVideos(callLaterTimeCollectImgs, serverIP)
+			print "GOT A STARTTAKINGPICTURES"
+			#inputTotalTime, inputResW, inputResH, inputNumPics, inputFPSTimeInterval, inputFramerate, inputStartTime
+			if msgFromServer[2] == "camera":
+				print "this is a camera command"
+				startAtTime = self.calculateTimeDifference(msgFromServer[9], msgFromServer[10])
+				callLaterTimeCollectImgs = startAtTime + 1
+				result = threads.deferToThread(tp.takePicture, int(msgFromServer[3]), int(msgFromServer[4]),\
+					int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), int(msgFromServer[8]), startAtTime)
+				#NOTE: THIS FAILED METHOD DOESN'T CATCH THE CAMERA ERROR
+				result.addErrback(lambda _: reactor.callFromThread(reactor.stop()))
+				tp.sendImages(callLaterTimeCollectImgs, serverIP)
+				#result.addErrback(failedMethod)
+				
+			#VideoTime, ResW, ResH, totalRunTime, framerate, startTime
+			elif msgFromServer[2] == "video":
+				print "this is the video command"
+				print "msgFromServer[8-9] ", msgFromServer[8] + msgFromServer[9]
+				startAtTime = self.calculateTimeDifference(msgFromServer[8], msgFromServer[9])
+				callLaterTimeCollectImgs = startAtTime + 1
+				result = threads.deferToThread(tp.takeVideo, int(msgFromServer[3]), int(msgFromServer[4]), int(msgFromServer[5]),\
+					int(msgFromServer[6]), int(msgFromServer[7]), startAtTime)
+				tv.sendVideos(callLaterTimeCollectImgs, serverIP)
 
-				elif msgFromServer[2] == "multiplexer":
-					print "this is the multiplexer method. Has not been implemented"
-#TO DO: FIGURE OUT HOW TO CATCH THE CAMERA ERROR AND STOP THE REACTOR
-			except:
-				print "Stopping reactor"
-				reactor.stop()
+			elif msgFromServer[2] == "multiplexer":
+				print "this is the multiplexer method. Has not been implemented"
 
 		elif msgFromServer[0] == "lookingForLostPi":
 			self.transport.write("respondingToLostPiPing piGroup1 slavePi2")
