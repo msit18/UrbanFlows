@@ -46,6 +46,8 @@ class MasterVariables():
 	def userInput(self):
 		self.camVid = raw_input ('Enter camera or video: ')
 		self.checkIfTimeIsValid()
+		#self.ServerStartTime = time.strftime("%x %X")
+		print "Starting time: ", self.ServerStartTime
 		if self.camVid == "camera":
 			self.ServerTotalTimeSec = raw_input('Enter total run time in seconds: ')
 			self.ServerResW = raw_input('Enter resolution width: ')

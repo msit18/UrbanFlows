@@ -28,106 +28,87 @@ class DataFactory(Factory):
 
 	def __init__(self, data=None):
 		self.data = data
+		self.ipDictionary = {}
 
 	def buildProtocol(self, addr):
 		return DataProtocol(self, d)
 
 class DataProtocol (protocol.Protocol):
-	global dictFormat
-	dictFormat = {}
 
 	def __init__(self, factory, d):
 		self.factory = factory
 		self.d = defer.Deferred()
-		self.lostPiDictionary = {}
+		self.name = None
 
 	def connectionMade(self):
 		self.factory.numConnections += 1
+		#self.factory.ipDictionary.append(self)
+		#print "Echoers: ", self.factory.ipDictionary
 		print "Connection made at {0}. Number of active connections: {1}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), self.factory.numConnections)
 
 	def connectionLost(self, reason):
 		self.factory.numConnections -= 1
+		if self.name in self.factory.ipDictionary:
+			del self.factory.ipDictionary[self.name]
+		print "Echoers: ", self.factory.ipDictionary
 		print "Connection lost at {0}. Number of active connections: {1}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), self.factory.numConnections)
-		if self.factory.numConnections <= 0:
-			print "Before: ", dictFormat
-			dictFormat.clear()
-			print "After: ", dictFormat
-		else:
-			self.writeToClient("lookingForLostPi")
 
 	def dataReceived(self, data):
 		print "DATARECEIVED. Server received data: {0}".format(data)
+		# for echoer in self.factory.ipDictionary:
+		# 	echoer.transport.write(data)
 		msgFromClient = [data for data in data.split()]
 		if msgFromClient[0] == "ip":
 			print "FOUND AN IP"
-			self.d.addCallback(self.updatingIPDictionary, msgFromClient[1], msgFromClient[2])
-			self.d.addErrback(self.failedIP)
-			self.d.callback(dictFormat)
-			reactor.callInThread(self.checkConnections, msgFromClient[1])
+			self.name = msgFromClient[2]
+			self.factory.ipDictionary[self.name] = self
+			print "Echoers: ", self.factory.ipDictionary
+		 	self.checkConnections()
 		elif msgFromClient[0] == 'ERROR':
 			print "ERROR FROM PICAMERA at {0}".format(time.strftime("%Y-%m-%d-%H:%M:%S"))
-		elif msgFromClient[0] == 'respondingToLostPiPing':
-			self.updatingIPDictionary(self.lostPiDictionary, msgFromClient[1], msgFromClient[2])
 		else:
 			print "Time: {0}. I don't know what this is: {1}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), data)
 
-	def updatingIPDictionary(self, dictionary, piGroup, ipAddr):
-		print "RUNNING GOTIP"
-		#adds key and a list containing IP address
-		if (piGroup in dictionary) == False:
-			print "I didn't have this cluster key for {0}".format(dictionary)
-			dictionary[piGroup] = [ipAddr]
-		#appends new IP to the end of the key's list
-		elif (piGroup in dictionary) == True:
-			print "it's true! I have this cluster in my keys for {0}".format(dictionary)
-			dictionary[piGroup].append(ipAddr)
-		else:
-			print "Got something that wasn't an IP. Adding to dict anyway for {0}".format(dictionary)
-			dictionary[piGroup] = [ipAddr]
-		print dictionary
-		#reactor.callInThread(self.checkConnections, piGroup)
-
-	# def gotIP(self, piGroup, ipAddr):
+	# def updatingIPDictionary(self, dictionary, piGroup, ipAddr):
 	# 	print "RUNNING GOTIP"
 	# 	#adds key and a list containing IP address
-	# 	if (piGroup in dictFormat) == False:
-	# 		print "I didn't have this cluster key"
-	# 		dictFormat[piGroup] = [ipAddr]
+	# 	if (piGroup in dictionary) == False:
+	# 		print "I didn't have this cluster key for {0}".format(dictionary)
+	# 		dictionary[piGroup] = [ipAddr]
 	# 	#appends new IP to the end of the key's list
-	# 	elif (piGroup in dictFormat) == True:
-	# 		print "it's true! I have this cluster in my keys"
-	# 		dictFormat[piGroup].append(ipAddr)
+	# 	elif (piGroup in dictionary) == True:
+	# 		print "it's true! I have this cluster in my keys for {0}".format(dictionary)
+	# 		dictionary[piGroup].append(ipAddr)
 	# 	else:
-	# 		print "Got something that wasn't an IP. Adding to dict anyway"
-	# 		dictFormat[piGroup] = [ipAddr]
-	# 	print dictFormat
-	# 	reactor.callInThread(self.checkConnections, piGroup)
+	# 		print "Got something that wasn't an IP. Adding to dict anyway for {0}".format(dictionary)
+	# 		dictionary[piGroup] = [ipAddr]
+	# 	print dictionary
 
 	def failedIP(self, failure):
 		print "FAILURE: NOTIP"
 		sys.stderr.write(str(failure))
 
-	#Called in seperate threads. TEST WITH RASPIES
-	def checkConnections(self, dataKey):
+	#Called in seperate threads
+	def checkConnections(self):
 		print "RUNNING CHECKCONNECTIONS"
-		numValues = len(dictFormat[dataKey])
-		while numValues < 0: #Set value to number of Raspies in each cluster
-			numValues = len(dictFormat[dataKey])
+		numValues = len(self.factory.ipDictionary)
+		while numValues < 1: #Set value to total number of Raspies -1
+			numValues = len(self.factory.ipDictionary)
 		else:
 			print "SENDING CMDS"
-			self.d.addCallback(self.startProgram)
-		 	self.d.addErrback(self.failedSendCmds)
+			self.startProgram()
 	
 	#largely redundant method but provides a log of the message
 	def writeToClient(self, msg):
 		print "WRITETOCLIENT. Write message to client: {0}".format(msg)
 		self.transport.write(msg)
 
-	def startProgram(self, data):
+	def startProgram(self):
 		print "STARTTAKINGPICTURES"
-		sendMsg = "Okay startProgram {0}".format(f.getParam())
-		print sendMsg
-		reactor.callLater(0.1, self.writeToClient, sendMsg)
+		for echoer in self.factory.ipDictionary:
+			sendMsg = "Okay startProgram {0}".format(f.getParam())
+			print sendMsg
+			self.factory.ipDictionary[echoer].transport.write(sendMsg)
 
 #TODO: Put in a timeout to check if the msgs were received
 	def failedSendCmds(self,failure):
