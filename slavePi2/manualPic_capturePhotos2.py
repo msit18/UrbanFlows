@@ -20,7 +20,8 @@ class takePictureClass():
 	def __init__(self):
 		self.runSendImg = True
 
-	def takePicture (self, inputTotalTime, inputResW, inputResH, inputNumPics, inputFPSTimeInterval, inputFramerate, inputStartTime):
+	def takePicture (self, inputTotalTime, inputResW, inputResH, inputNumPics,\
+						inputFPSTimeInterval, inputFramerate, inputStartTime):
 		#print "takePicture method!"
 		while time.time() < inputStartTime:
 			pass
