@@ -109,6 +109,7 @@ class takePictureClass():
 				self.curlUploadImg(serverIP)	
 				self.curlUploadImg(serverIP)
 				print "last catch"
+				return "finished"
 
 if __name__ == '__main__':
 	t = takePictureClass()
