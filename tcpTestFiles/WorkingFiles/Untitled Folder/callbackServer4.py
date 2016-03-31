@@ -60,14 +60,15 @@ class DataProtocol (protocol.Protocol):
 			self.factory.ipDictionary[self.name] = self
 			print "Echoers: ", self.factory.ipDictionary
 			print "RUNNING CHECKCONNECTIONS"
-			if len(self.factory.ipDictionary) > 0: #Set value to total number of Raspies -1
+			if len(self.factory.ipDictionary) > (totalNumRaspies-1): #Set value to total number of Raspies -1
 				self.verifyConnections()
 		elif msgFromClient[0] == 'CAMERROR':
 			print "ERROR FROM {1} PICAMERA at {0}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), msgFromClient[1])
 
 		elif msgFromClient[0] == 'checkCamPi':
 			self.factory.checkCamPi += 1
-			if self.factory.checkCamPi > 0:
+			if self.factory.checkCamPi > (totalNumRaspies-1):
+				print "All raspies are ready to start process"
 				print "Running send cmds"
 				self.startProgram()
 			else:
@@ -75,7 +76,7 @@ class DataProtocol (protocol.Protocol):
 
 		elif msgFromClient[0] == 'finished':
 			self.factory.finished += 1
-			if self.factory.finished > 0:
+			if self.factory.finished > (totalNumRaspies-1):
 				print "All raspies are finished"
 			else:
 				print "Still waiting on other raspies to finish taking or uploading pictures. {0} raspies are finished".format(self.factory.finished)
@@ -140,6 +141,7 @@ if __name__ == '__main__':
 
 	ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
 	serverIP = ip_address.split()[0]
+	totalNumRaspies = 4
 
 	#TCP network
 	d = defer.Deferred()
