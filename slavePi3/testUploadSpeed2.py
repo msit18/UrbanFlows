@@ -83,19 +83,18 @@ class myProtocol(protocol.Protocol):
 			#VideoTime, ResW, ResH, totalRunTime, framerate, startTime
 			elif msgFromServer[1] == "video":
 				print "this is the video command"
-				print "msgFromServer[7-8] ", msgFromServer[7] + " " + msgFromServer[8]
+				tv.runSendVid = True
 				startAtTime = self.calculateTimeDifference(msgFromServer[7], msgFromServer[8])
 				callLaterTimeCollectImgs = startAtTime + 1
 				result = threads.deferToThread(tp.takeVideo, int(msgFromServer[2]), int(msgFromServer[3]), int(msgFromServer[4]),\
 					int(msgFromServer[5]), int(msgFromServer[6]), startAtTime)
 				result.addErrback(self.failedMethod)
-				tv.sendVideos(callLaterTimeCollectImgs, serverIP)
+				endOfProcess = tv.sendVideos(callLaterTimeCollectImgs, serverIP)
+				print endOfProcess
+				result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, endOfProcess))
 
 			elif msgFromServer[1] == "multiplexer":
 				print "this is the multiplexer method. Has not been implemented"
-
-		elif msgFromServer[0] == "checkConnection":
-			print "Checking internet connection"
 
 		elif msgFromServer[0] == "checkCamera":
 			startAtTime = self.calculateTimeDifference(msgFromServer[1], msgFromServer[2])

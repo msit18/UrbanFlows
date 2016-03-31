@@ -29,14 +29,13 @@ class takeVideoClass():
 						#datetime.datetime.now().strftime('%d-%m-%Y-%H_%M_%S_%f') + '_TT' + str(inputTotalTime) + '_VT' + str(inputVidTime) + '_RH' + str(inputResH) + '_FR' + str(inputFramerate) + ".h264"]):
 	#					for k in range(numCycles)]):
 						camera.wait_recording(inputVidTime)
+				print "CAMERA IS FINISHED. RETURN FALSE"
+				self.runSendVid = False
 			except:
 				print "error"
-				os.system('echo "Camera for PI2 is broken. Error message: \n {0} \n'\
-				'-------end of message --------- \n" | mail -s "Camera Broken" msit@wellesley.edu'\
-				.format(sys.exc_info()))
-
-	def getRunSendVidMethod(self):
-		return self.runSendVid
+				self.runSendVid = False
+				print "Switched runSendVid"
+				raise
 
 	def curlUploadVid (self, serverIP):
 		self.fileList = glob.glob('*.h264')
@@ -52,11 +51,11 @@ class takeVideoClass():
 			print "sendImages method!"
 			while self.runSendVid == True:
 				self.curlUploadVid(serverIP)
-				print self.getRunSendVidMethod()
-			else: #if self.runSendVid is False
+			else:
 				print "runing last glob"
 				self.curlUploadVid()	
 				print "done! :D"
+				return "finished"
 
 
 if __name__ == '__main__':
