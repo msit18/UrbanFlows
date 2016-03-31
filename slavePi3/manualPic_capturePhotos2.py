@@ -21,7 +21,7 @@ class takePictureClass():
 		self.runSendImg = True
 
 	def takePicture (self, inputTotalTime, inputResW, inputResH, inputNumPics, inputFPSTimeInterval, inputFramerate, inputStartTime):
-		print "takePicture method!"
+		#print "takePicture method!"
 		while time.time() < inputStartTime:
 			pass
 		else:
@@ -74,10 +74,10 @@ class takePictureClass():
 				return self.runSendImg
 			except:
 				print "noooooooooooooo break"
-				os.system('echo "Camera for PI3 is broken. Error message: \n {0} \n'\
+				reactor.stop()
+				os.system('echo "Camera for {1} is broken. Error message: \n {0} \n'\
 					'-------end of message --------- \n" | mail -s "Camera Broken" msit@wellesley.edu'\
-					.format(sys.exc_info()))
-				raise
+					.format(sys.exc_info(), piName))
 
 	def piCamTakePictures(self, inputResW, inputResH, inputNumPics, inputFramerate):
 		with picamera.PiCamera() as camera:
@@ -95,7 +95,6 @@ class takePictureClass():
 		return self.runSendImg
 
 	def curlUploadImg (self, serverIP):
-		pass
 		self.fileList = glob.glob('*.jpg')
 		if len(self.fileList) > 0:
 			for img in self.fileList:
@@ -106,16 +105,16 @@ class takePictureClass():
 		while time.time() < inputStartTimePlusOne:
 			pass
 		else:
-			print "sendImages method!"
+			#print "sendImages method!"
 			while self.runSendImg == True:
 				self.curlUploadImg(serverIP)
 				#print self.getRunSendImgMethod()
 			else: #if self.runSendImg is False
-				print "runing last glob"
+				#print "runing last glob"
 				self.curlUploadImg(serverIP)	
-				print "done! :D"
+				#print "done! :D"
 				self.curlUploadImg(serverIP)
-				print "last catch"
+				#print "last catch"
 
 if __name__ == '__main__':
 	t = takePictureClass()
