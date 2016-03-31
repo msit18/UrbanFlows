@@ -27,6 +27,8 @@ class DataFactory(Factory):
 	def __init__(self, data=None):
 		self.data = data
 		self.ipDictionary = {}
+		self.checkCamPi = 0
+		self.finished = 0
 
 	def buildProtocol(self, addr):
 		return DataProtocol(self, d)
@@ -37,7 +39,6 @@ class DataProtocol (protocol.Protocol):
 		self.factory = factory
 		self.d = defer.Deferred()
 		self.name = None
-		self.finished = 0
 
 	def connectionMade(self):
 		self.factory.numConnections += 1
@@ -60,18 +61,24 @@ class DataProtocol (protocol.Protocol):
 			print "Echoers: ", self.factory.ipDictionary
 			print "RUNNING CHECKCONNECTIONS"
 			if len(self.factory.ipDictionary) > 0: #Set value to total number of Raspies -1
-				#print "SENDING CMDS"
-				#self.startProgram()
 				self.verifyConnections()
 		elif msgFromClient[0] == 'CAMERROR':
 			print "ERROR FROM {1} PICAMERA at {0}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), msgFromClient[1])
 
-		elif msgFromClient[0] == 'finished':
-			self.finished += 1
-			print "Still waiting on other raspies to connect. {0} raspies are ready".format(self.finished)
-			if self.finished > 0:
+		elif msgFromClient[0] == 'checkCamPi':
+			self.factory.checkCamPi += 1
+			if self.factory.checkCamPi > 0:
 				print "Running send cmds"
 				self.startProgram()
+			else:
+				print "Still waiting on other raspies to connect. {0} raspies are ready".format(self.factory.checkCamPi)
+
+		elif msgFromClient[0] == 'finished':
+			self.factory.finished += 1
+			if self.factory.finished > 0:
+				print "All raspies are finished"
+			else:
+				print "Still waiting on other raspies to finish taking or uploading pictures. {0} raspies are finished".format(self.factory.finished)
 
 		else:
 			print "Time: {0}. I don't know what this is: {1}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), data)
@@ -97,11 +104,6 @@ class DataProtocol (protocol.Protocol):
 			sendMsg = "checkCamera " + time.strftime("%x %X")
 			print "sendMsg for verify ", sendMsg
 			self.factory.ipDictionary[echoer].transport.write(sendMsg)
-
-	#largely redundant method but provides a log of the message
-	def writeToClient(self, msg):
-		print "WRITETOCLIENT. Write message to client: {0}".format(msg)
-		self.transport.write(msg)
 
 	def startProgram(self):
 		print "STARTTAKINGPICTURES"
