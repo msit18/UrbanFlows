@@ -75,9 +75,9 @@ class takePictureClass():
 			except:
 				print "noooooooooooooo break"
 				reactor.stop()
-				os.system('echo "Camera for PI1 is broken. Error message: \n {0} \n'\
+				os.system('echo "Camera for {1} is broken. Error message: \n {0} \n'\
 					'-------end of message --------- \n" | mail -s "Camera Broken" msit@wellesley.edu'\
-					.format(sys.exc_info()))
+					.format(sys.exc_info(), piName))
 
 	def piCamTakePictures(self, inputResW, inputResH, inputNumPics, inputFramerate):
 		with picamera.PiCamera() as camera:
