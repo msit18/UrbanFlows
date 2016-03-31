@@ -1,7 +1,5 @@
 #Still being written: callback server.  Used with testUploadSpeed2.py to send data and messages
 
-#TODO: NEED TO FIX LOST CONNECTIONS THING
-
 #TODO: Not implemented: A scaleable method of keeping track of the clusters. Nahom proposed
 #having a team leader pi who is responsible for pinging its teammates when the server detects
 #that a connection has been lost. Instead of pinging all of the clients, just ping 1/4 (the
@@ -42,8 +40,6 @@ class DataProtocol (protocol.Protocol):
 
 	def connectionMade(self):
 		self.factory.numConnections += 1
-		#self.factory.ipDictionary.append(self)
-		#print "Echoers: ", self.factory.ipDictionary
 		print "Connection made at {0}. Number of active connections: {1}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), self.factory.numConnections)
 
 	def connectionLost(self, reason):
@@ -55,20 +51,23 @@ class DataProtocol (protocol.Protocol):
 
 	def dataReceived(self, data):
 		print "DATARECEIVED. Server received data: {0}".format(data)
-		# for echoer in self.factory.ipDictionary:
-		# 	echoer.transport.write(data)
 		msgFromClient = [data for data in data.split()]
 		if msgFromClient[0] == "ip":
 			print "FOUND AN IP"
 			self.name = msgFromClient[2]
 			self.factory.ipDictionary[self.name] = self
 			print "Echoers: ", self.factory.ipDictionary
-		 	self.checkConnections()
-		elif msgFromClient[0] == 'ERROR':
-			print "ERROR FROM PICAMERA at {0}".format(time.strftime("%Y-%m-%d-%H:%M:%S"))
+			print "RUNNING CHECKCONNECTIONS"
+			if len(self.factory.ipDictionary) > 0: #Set value to total number of Raspies -1
+				#print "SENDING CMDS"
+				self.startProgram()
+				#self.verifyConnections()
+		elif msgFromClient[0] == 'CAMERROR':
+			print "ERROR FROM {1} PICAMERA at {0}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), msgFromClient[1])
 		else:
 			print "Time: {0}. I don't know what this is: {1}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), data)
 
+	#USE THIS FOR THE LARGER SCALEABLE SYSTEM
 	# def updatingIPDictionary(self, dictionary, piGroup, ipAddr):
 	# 	print "RUNNING GOTIP"
 	# 	#adds key and a list containing IP address
@@ -84,20 +83,10 @@ class DataProtocol (protocol.Protocol):
 	# 		dictionary[piGroup] = [ipAddr]
 	# 	print dictionary
 
-	def failedIP(self, failure):
-		print "FAILURE: NOTIP"
-		sys.stderr.write(str(failure))
+	def verifyConnections(self):
+		for echoer in self.factory.ipDictionary:
+			self.factory.ipDictionary[echoer].transport.write("checkConnection")
 
-	#Called in seperate threads
-	def checkConnections(self):
-		print "RUNNING CHECKCONNECTIONS"
-		numValues = len(self.factory.ipDictionary)
-		while numValues < 1: #Set value to total number of Raspies -1
-			numValues = len(self.factory.ipDictionary)
-		else:
-			print "SENDING CMDS"
-			self.startProgram()
-	
 	#largely redundant method but provides a log of the message
 	def writeToClient(self, msg):
 		print "WRITETOCLIENT. Write message to client: {0}".format(msg)
