@@ -102,12 +102,14 @@ class takePictureClass():
 		else:
 			#print "sendImages method!"
 			while self.runSendImg == True:
+				#print "runSendImg is true"
 				self.curlUploadImg(serverIP)
 			else:
 				#print "runing last glob"
 				self.curlUploadImg(serverIP)	
 				self.curlUploadImg(serverIP)
 				print "last catch"
+				return "finished"
 
 if __name__ == '__main__':
 	t = takePictureClass()

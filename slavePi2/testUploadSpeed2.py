@@ -58,31 +58,52 @@ class myProtocol(protocol.Protocol):
 	def dataReceived(self, data):
 		print "Data received from Server: {0}".format(data)
 		msgFromServer = [data for data in data.split()]
-		if msgFromServer[1] == "startProgram":
+		if msgFromServer[0] == "startProgram":
 			print "GOT A STARTTAKINGPICTURES"
 			#inputTotalTime, inputResW, inputResH, inputNumPics, inputFPSTimeInterval, inputFramerate, inputStartTime
-			if msgFromServer[2] == "camera":
+			if msgFromServer[1] == "camera":
 				print "this is a camera command"
-				startAtTime = self.calculateTimeDifference(msgFromServer[9], msgFromServer[10])
-				callLaterTimeCollectImgs = startAtTime + 1
-				result = threads.deferToThread(tp.takePicture, int(msgFromServer[3]), int(msgFromServer[4]),\
-					int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), int(msgFromServer[8]), startAtTime)
-				result.addErrback(self.failedMethod)
-				tp.sendImages(callLaterTimeCollectImgs, serverIP)
-				
-			#VideoTime, ResW, ResH, totalRunTime, framerate, startTime
-			elif msgFromServer[2] == "video":
-				print "this is the video command"
-				print "msgFromServer[8-9] ", msgFromServer[8] + msgFromServer[9]
+				print "inputTotalTime ", msgFromServer[2]
+				print "inputResW ", msgFromServer[3]
+				print "inputResH ", msgFromServer[4]
+				print "inputNumPics", msgFromServer[5]
+				print "inputFPSTimeInterval ", msgFromServer[6]
+				print "inputFramerate ", msgFromServer[7]
+				print "inputStartTime ", msgFromServer[8] + msgFromServer[9]
+				tp.runSendImg = True
 				startAtTime = self.calculateTimeDifference(msgFromServer[8], msgFromServer[9])
 				callLaterTimeCollectImgs = startAtTime + 1
-				result = threads.deferToThread(tp.takeVideo, int(msgFromServer[3]), int(msgFromServer[4]), int(msgFromServer[5]),\
-					int(msgFromServer[6]), int(msgFromServer[7]), startAtTime)
+				result = threads.deferToThread(tp.takePicture, int(msgFromServer[2]), int(msgFromServer[3]),\
+					int(msgFromServer[4]), int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), startAtTime)
+				result.addErrback(self.failedMethod)
+				endOfProcess = tp.sendImages(callLaterTimeCollectImgs, serverIP)
+				print endOfProcess
+				result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, endOfProcess))
+				
+			#VideoTime, ResW, ResH, totalRunTime, framerate, startTime
+			elif msgFromServer[1] == "video":
+				print "this is the video command"
+				print "msgFromServer[7-8] ", msgFromServer[7] + " " + msgFromServer[8]
+				startAtTime = self.calculateTimeDifference(msgFromServer[7], msgFromServer[8])
+				callLaterTimeCollectImgs = startAtTime + 1
+				result = threads.deferToThread(tp.takeVideo, int(msgFromServer[2]), int(msgFromServer[3]), int(msgFromServer[4]),\
+					int(msgFromServer[5]), int(msgFromServer[6]), startAtTime)
 				result.addErrback(self.failedMethod)
 				tv.sendVideos(callLaterTimeCollectImgs, serverIP)
 
-			elif msgFromServer[2] == "multiplexer":
+			elif msgFromServer[1] == "multiplexer":
 				print "this is the multiplexer method. Has not been implemented"
+
+		elif msgFromServer[0] == "checkConnection":
+			print "Checking internet connection"
+
+		elif msgFromServer[0] == "checkCamera":
+			startAtTime = self.calculateTimeDifference(msgFromServer[1], msgFromServer[2])
+			callLaterTimeCollectImgs = startAtTime + 1
+			result = threads.deferToThread(tp.takePicture, 1, 640, 480, 1, 1, 90, startAtTime)
+			result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, "checkCamPi"))
+			result.addErrback(self.failedMethod)
+			tp.sendImages(callLaterTimeCollectImgs, serverIP)
 
 		else:
 			print "Didn't write hi success.jpg to server"
