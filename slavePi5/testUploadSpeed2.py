@@ -49,10 +49,10 @@ class myProtocol(protocol.Protocol):
 		self.factory = factory
 
 	def connectionMade(self):
-		ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
+		#ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
 		#msg = "ip piGroup1 {0}".format(ip_address)
-		os.system('echo {0} | mail -s "Pi5 IP Address" msit@wellesley.edu'.format(ip_address))
-		msg = "ip piGroup1 slavePi5"
+		#os.system('echo {0} | mail -s "{1} IP Address" msit@wellesley.edu'.format(ip_address, piName))
+		msg = "ip piGroup1 {0}".format(piName)
 		print msg
 		self.transport.write(msg)
 
@@ -87,8 +87,6 @@ class myProtocol(protocol.Protocol):
 			elif msgFromServer[2] == "multiplexer":
 				print "this is the multiplexer method. Has not been implemented"
 
-		elif msgFromServer[0] == "lookingForLostPi":
-			self.transport.write("respondingToLostPiPing piGroup1 slavePi5")
 		else:
 			print "Didn't write hi success.jpg to server"
 
@@ -109,6 +107,7 @@ if __name__ == '__main__':
 	jobs = DeferredQueue()
 	print sys.argv[1]
 	serverIP = sys.argv[1]
+	piName = sys.argv[2]
 #	serverIP = "18.189.104.190"
 	tp = takePictureClass()
 	tv = takeVideoClass()
