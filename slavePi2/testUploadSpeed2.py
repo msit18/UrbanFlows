@@ -76,12 +76,14 @@ class myProtocol(protocol.Protocol):
 				result = threads.deferToThread(tp.takePicture, int(msgFromServer[2]), int(msgFromServer[3]),\
 					int(msgFromServer[4]), int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), startAtTime)
 				result.addErrback(self.failedMethod)
-				tp.sendImages(callLaterTimeCollectImgs, serverIP)
+				endOfProcess = tp.sendImages(callLaterTimeCollectImgs, serverIP)
+				print endOfProcess
+				result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, endOfProcess))
 				
 			#VideoTime, ResW, ResH, totalRunTime, framerate, startTime
 			elif msgFromServer[1] == "video":
 				print "this is the video command"
-				print "msgFromServer[8-9] ", msgFromServer[7] + " " + msgFromServer[8]
+				print "msgFromServer[7-8] ", msgFromServer[7] + " " + msgFromServer[8]
 				startAtTime = self.calculateTimeDifference(msgFromServer[7], msgFromServer[8])
 				callLaterTimeCollectImgs = startAtTime + 1
 				result = threads.deferToThread(tp.takeVideo, int(msgFromServer[2]), int(msgFromServer[3]), int(msgFromServer[4]),\
@@ -99,7 +101,7 @@ class myProtocol(protocol.Protocol):
 			startAtTime = self.calculateTimeDifference(msgFromServer[1], msgFromServer[2])
 			callLaterTimeCollectImgs = startAtTime + 1
 			result = threads.deferToThread(tp.takePicture, 1, 640, 480, 1, 1, 90, startAtTime)
-			result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, "finished"))
+			result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, "checkCamPi"))
 			result.addErrback(self.failedMethod)
 			tp.sendImages(callLaterTimeCollectImgs, serverIP)
 
