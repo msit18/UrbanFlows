@@ -71,13 +71,11 @@ class takePictureClass():
 				#.format(str(totalNumPicsTaken), str(inputTotalTime), str(totalFPS) )
 				print "CAMERA IS FINISHED. RETURN FALSE"
 				self.runSendImg = False
-				return self.runSendImg
 			except:
 				print "noooooooooooooo break"
-				reactor.stop()
-				os.system('echo "Camera for {1} is broken. Error message: \n {0} \n'\
-					'-------end of message --------- \n" | mail -s "Camera Broken" msit@wellesley.edu'\
-					.format(sys.exc_info(), piName))
+				self.runSendImg = False
+				print "Switched runSendImg"
+				raise
 
 	def piCamTakePictures(self, inputResW, inputResH, inputNumPics, inputFramerate):
 		with picamera.PiCamera() as camera:
@@ -90,9 +88,6 @@ class takePictureClass():
 				#   '_TI' + str(timeInterval) + '_FR' + str(frameRate) + '.jpg'
 				for i in range(inputNumPics)
 				], use_video_port=True)
-
-	def getRunSendImgMethod(self):
-		return self.runSendImg
 
 	def curlUploadImg (self, serverIP):
 		self.fileList = glob.glob('*.jpg')
@@ -107,14 +102,13 @@ class takePictureClass():
 		else:
 			#print "sendImages method!"
 			while self.runSendImg == True:
+				#print "runSendImg is true"
 				self.curlUploadImg(serverIP)
-				#print self.getRunSendImgMethod()
-			else: #if self.runSendImg is False
+			else:
 				#print "runing last glob"
 				self.curlUploadImg(serverIP)	
-				#print "done! :D"
 				self.curlUploadImg(serverIP)
-				#print "last catch"
+				print "last catch"
 
 if __name__ == '__main__':
 	t = takePictureClass()

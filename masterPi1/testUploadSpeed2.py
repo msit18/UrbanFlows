@@ -51,7 +51,6 @@ class myProtocol(protocol.Protocol):
 	def connectionMade(self):
 		#ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
 		#msg = "ip piGroup1 {0}".format(ip_address)
-		#os.system('echo {0} | mail -s "{1} IP Address" msit@wellesley.edu'.format(ip_address, piName))
 		msg = "ip piGroup1 {0}".format(piName)
 		print msg
 		self.transport.write(msg)
@@ -59,42 +58,60 @@ class myProtocol(protocol.Protocol):
 	def dataReceived(self, data):
 		print "Data received from Server: {0}".format(data)
 		msgFromServer = [data for data in data.split()]
-		#TODO: FIGURE OUT HOW TO CATCH THE CAMERA ERROR AND STOP THE REACTOR
-		if msgFromServer[1] == "startProgram":
+		if msgFromServer[0] == "startProgram":
 			print "GOT A STARTTAKINGPICTURES"
 			#inputTotalTime, inputResW, inputResH, inputNumPics, inputFPSTimeInterval, inputFramerate, inputStartTime
-			if msgFromServer[2] == "camera":
+			if msgFromServer[1] == "camera":
 				print "this is a camera command"
-				startAtTime = self.calculateTimeDifference(msgFromServer[9], msgFromServer[10])
-				callLaterTimeCollectImgs = startAtTime + 1
-				result = threads.deferToThread(tp.takePicture, int(msgFromServer[3]), int(msgFromServer[4]),\
-					int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), int(msgFromServer[8]), startAtTime)
-				#NOTE: THIS FAILED METHOD DOESN'T CATCH THE CAMERA ERROR
-				result.addErrback(lambda _: reactor.callFromThread(reactor.stop()))
-				tp.sendImages(callLaterTimeCollectImgs, serverIP)
-				#result.addErrback(failedMethod)
-				
-			#VideoTime, ResW, ResH, totalRunTime, framerate, startTime
-			elif msgFromServer[2] == "video":
-				print "this is the video command"
-				print "msgFromServer[8-9] ", msgFromServer[8] + msgFromServer[9]
+				print "inputTotalTime ", msgFromServer[2]
+				print "inputResW ", msgFromServer[3]
+				print "inputResH ", msgFromServer[4]
+				print "inputNumPics", msgFromServer[5]
+				print "inputFPSTimeInterval ", msgFromServer[6]
+				print "inputFramerate ", msgFromServer[7]
+				print "inputStartTime ", msgFromServer[8] + msgFromServer[9]
+				tp.runSendImg = True
 				startAtTime = self.calculateTimeDifference(msgFromServer[8], msgFromServer[9])
 				callLaterTimeCollectImgs = startAtTime + 1
-				result = threads.deferToThread(tp.takeVideo, int(msgFromServer[3]), int(msgFromServer[4]), int(msgFromServer[5]),\
-					int(msgFromServer[6]), int(msgFromServer[7]), startAtTime)
+				result = threads.deferToThread(tp.takePicture, int(msgFromServer[2]), int(msgFromServer[3]),\
+					int(msgFromServer[4]), int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), startAtTime)
+				result.addErrback(self.failedMethod)
+				tp.sendImages(callLaterTimeCollectImgs, serverIP)
+				
+			#VideoTime, ResW, ResH, totalRunTime, framerate, startTime
+			elif msgFromServer[1] == "video":
+				print "this is the video command"
+				print "msgFromServer[8-9] ", msgFromServer[7] + " " + msgFromServer[8]
+				startAtTime = self.calculateTimeDifference(msgFromServer[7], msgFromServer[8])
+				callLaterTimeCollectImgs = startAtTime + 1
+				result = threads.deferToThread(tp.takeVideo, int(msgFromServer[2]), int(msgFromServer[3]), int(msgFromServer[4]),\
+					int(msgFromServer[5]), int(msgFromServer[6]), startAtTime)
+				result.addErrback(self.failedMethod)
 				tv.sendVideos(callLaterTimeCollectImgs, serverIP)
 
-			elif msgFromServer[2] == "multiplexer":
+			elif msgFromServer[1] == "multiplexer":
 				print "this is the multiplexer method. Has not been implemented"
+
+		elif msgFromServer[0] == "checkConnection":
+			print "Checking internet connection"
+
+		elif msgFromServer[0] == "checkCamera":
+			startAtTime = self.calculateTimeDifference(msgFromServer[1], msgFromServer[2])
+			callLaterTimeCollectImgs = startAtTime + 1
+			result = threads.deferToThread(tp.takePicture, 1, 640, 480, 1, 1, 90, startAtTime)
+			result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, "finished"))
+			result.addErrback(self.failedMethod)
+			tp.sendImages(callLaterTimeCollectImgs, serverIP)
 
 		else:
 			print "Didn't write hi success.jpg to server"
 
 	def failedMethod(self,failure):
 		print "FAILURE: ERROR WITH PICTURE TAKING METHOD"
-		#TODO: FIGURE OUT HOW TO DISTINGUISH BETWEEN DIFFERENT PICAM ERRORS
-		self.transport.write("ERROR PICAMERA")
-		sys.stderr.write(str(failure))
+		self.transport.write("CAMERROR {0}".format(piName))
+		os.system('echo "Camera for {1} is broken. Error message: \n {0} \n'\
+			'-------end of message --------- \n" | mail -s "Camera Broken" msit@wellesley.edu'\
+			.format(str(failure), piName))
 
 	def calculateTimeDifference(self, dateToEnd, timeToEnd):
 		fullString = dateToEnd + " " + timeToEnd
