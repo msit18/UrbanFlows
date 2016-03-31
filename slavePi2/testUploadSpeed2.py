@@ -49,17 +49,15 @@ class myProtocol(protocol.Protocol):
 		self.factory = factory
 
 	def connectionMade(self):
-		ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
+		#ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
 		#msg = "ip piGroup1 {0}".format(ip_address)
-		os.system('echo {0} | mail -s "Pi2 IP Address" msit@wellesley.edu'.format(ip_address))
-		msg = "ip piGroup1 slavePi2"
+		msg = "ip piGroup1 {0}".format(piName)
 		print msg
 		self.transport.write(msg)
 
 	def dataReceived(self, data):
 		print "Data received from Server: {0}".format(data)
 		msgFromServer = [data for data in data.split()]
-		#TODO: FIGURE OUT HOW TO CATCH THE CAMERA ERROR AND STOP THE REACTOR
 		if msgFromServer[1] == "startProgram":
 			print "GOT A STARTTAKINGPICTURES"
 			#inputTotalTime, inputResW, inputResH, inputNumPics, inputFPSTimeInterval, inputFramerate, inputStartTime
@@ -69,10 +67,8 @@ class myProtocol(protocol.Protocol):
 				callLaterTimeCollectImgs = startAtTime + 1
 				result = threads.deferToThread(tp.takePicture, int(msgFromServer[3]), int(msgFromServer[4]),\
 					int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), int(msgFromServer[8]), startAtTime)
-				#NOTE: THIS FAILED METHOD DOESN'T CATCH THE CAMERA ERROR
-				result.addErrback(lambda _: reactor.callFromThread(reactor.stop()))
+				result.addErrback(self.failedMethod)
 				tp.sendImages(callLaterTimeCollectImgs, serverIP)
-				#result.addErrback(failedMethod)
 				
 			#VideoTime, ResW, ResH, totalRunTime, framerate, startTime
 			elif msgFromServer[2] == "video":
@@ -82,21 +78,21 @@ class myProtocol(protocol.Protocol):
 				callLaterTimeCollectImgs = startAtTime + 1
 				result = threads.deferToThread(tp.takeVideo, int(msgFromServer[3]), int(msgFromServer[4]), int(msgFromServer[5]),\
 					int(msgFromServer[6]), int(msgFromServer[7]), startAtTime)
+				result.addErrback(self.failedMethod)
 				tv.sendVideos(callLaterTimeCollectImgs, serverIP)
 
 			elif msgFromServer[2] == "multiplexer":
 				print "this is the multiplexer method. Has not been implemented"
 
-		elif msgFromServer[0] == "lookingForLostPi":
-			self.transport.write("respondingToLostPiPing piGroup1 slavePi2")
 		else:
 			print "Didn't write hi success.jpg to server"
 
 	def failedMethod(self,failure):
 		print "FAILURE: ERROR WITH PICTURE TAKING METHOD"
-		#TODO: FIGURE OUT HOW TO DISTINGUISH BETWEEN DIFFERENT PICAM ERRORS
-		self.transport.write("ERROR PICAMERA")
-		sys.stderr.write(str(failure))
+		self.transport.write("CAMERROR {0}".format(piName))
+		os.system('echo "Camera for {1} is broken. Error message: \n {0} \n'\
+			'-------end of message --------- \n" | mail -s "Camera Broken" msit@wellesley.edu'\
+			.format(str(failure), piName))
 
 	def calculateTimeDifference(self, dateToEnd, timeToEnd):
 		fullString = dateToEnd + " " + timeToEnd
@@ -109,6 +105,7 @@ if __name__ == '__main__':
 	jobs = DeferredQueue()
 	print sys.argv[1]
 	serverIP = sys.argv[1]
+	piName = sys.argv[2]
 #	serverIP = "18.189.104.190"
 	tp = takePictureClass()
 	tv = takeVideoClass()
