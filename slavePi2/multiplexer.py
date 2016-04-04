@@ -91,8 +91,6 @@ def filenames():
         		print 'Captured %d images so far, at %.02f fps' % (frame, frame / (now - start))
         	now = time.time()
         	
-		
-        	
 # Multiplexer architecture capturing sequence
 with picamera.PiCamera() as camera:
 	camera.resolution = (2560, 1920)
@@ -100,11 +98,6 @@ with picamera.PiCamera() as camera:
 	camera.framerate = 20
 	camera.start_preview()
 
-	# Optional Camera LED OFF
-	#gp.setmode(gp.BCM)
-	#camera.led = False
-
-	time.sleep(2)    # Camera Initialize
 	startTime = time.time()
 	camera.capture_sequence(filenames(), use_video_port=True)
 	finishTime = time.time()
