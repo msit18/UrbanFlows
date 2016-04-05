@@ -19,6 +19,7 @@ import glob
 class takePictureClass():
 	def __init__(self):
 		self.runSendImg = True
+		self.fileList = []
 
 	def takePicture (self, inputTotalTime, inputResW, inputResH, inputNumPics,\
 						inputFPSTimeInterval, inputFramerate, inputStartTime):
@@ -63,13 +64,13 @@ class takePictureClass():
 							fpsTime = (finish-start)
 							fps = inputNumPics/fpsTime
 							totalNumPicsTaken += inputNumPics
-							#print 'Captured {0} frames at {1}fps in {2}secs'\
-							#.format(str(totalNumPicsTaken), str(inputNumPics/fpsTime), str(fpsTime))
+							print 'Captured {0} frames at {1}fps in {2}secs'\
+							.format(str(totalNumPicsTaken), str(inputNumPics/fpsTime), str(fpsTime))
 				endTime = time.time()
 				totalTime = endTime-prgmStartTime
 				totalFPS = totalNumPicsTaken/totalTime
-				#print "10.2: Captured {0} total pictures.  Total time was {1}, total FPS is {2}"\
-				#.format(str(totalNumPicsTaken), str(inputTotalTime), str(totalFPS) )
+				print "10.2: Captured {0} total pictures.  Total time was {1}, total FPS is {2}"\
+				.format(str(totalNumPicsTaken), str(inputTotalTime), str(totalFPS) )
 				print "CAMERA IS FINISHED. RETURN FALSE"
 				self.runSendImg = False
 			except:
@@ -88,14 +89,24 @@ class takePictureClass():
 				#  + str(listServerArgs[0]) + '_RES' + str(resH) + '_PIC' + str(numPics) +\
 				#   '_TI' + str(timeInterval) + '_FR' + str(frameRate) + '.jpg'
 				for i in range(inputNumPics)
-				], use_video_port=True)
+				], use_video_port=False)
 
 	def curlUploadImg (self, serverIP):
-		self.fileList = glob.glob('*.jpg')
+		#self.fileList = glob.glob('*.jpg')
+		#THIS IS INCORRECT.
+		print "curlUploadImg was called. This is the list so far: ", self.fileList
 		if len(self.fileList) > 0:
+			print "fileList has customers: ", self.fileList
 			for img in self.fileList:
-				os.system('if balExp=$(curl --header "filename: {0}" -v -y 10 --max-time 180 -X POST --data-binary @{0}' \
-					' http://{1}:8880/upload-image); then rm {0}; else sudo ifup wlan0; fi'.format(img, serverIP))
+				os.system('if balExp=$(curl -X GET http://{1}:8880/upload-image);' \
+					' then balExp=$(curl --header "filename: {0}" -y 10 --max-time 180 -X POST --data-binary @{0}' \
+					' http://{1}:8880/upload-image); rm {0}; else sudo ifup wlan0; fi'.format(img, serverIP))
+				# os.system('curl --header "filename: {0}" -v -y 10 --max-time 180 -X POST --data-binary @{0}' \
+				# 	' http://{1}:8880/upload-image'.format(img, serverIP))
+		elif len(self.fileList) <= 0:
+			print "Scooping up new clients"
+			self.fileList = glob.glob('*.jpg')
+
 
 	def sendImages(self, inputStartTimePlusOne, serverIP):
 		while time.time() < inputStartTimePlusOne:
@@ -114,4 +125,6 @@ class takePictureClass():
 
 if __name__ == '__main__':
 	t = takePictureClass()
+	now = time.time()+1
+	t.takePicture(10, 2594, 1944, 3, 1, 90, now)
 	#camLog = open('CamLog-{0}.txt'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), 'w')
