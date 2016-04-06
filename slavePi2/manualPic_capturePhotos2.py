@@ -19,7 +19,7 @@ import glob
 class takePictureClass():
 	def __init__(self):
 		self.runSendImg = True
-		self.fileList = []
+		# self.fileList = []
 
 	def takePicture (self, inputTotalTime, inputResW, inputResH, inputNumPics,\
 						inputFPSTimeInterval, inputFramerate, inputStartTime):
@@ -92,9 +92,7 @@ class takePictureClass():
 				], use_video_port=False)
 
 	def curlUploadImg (self, serverIP):
-		#self.fileList = glob.glob('*.jpg')
-		#THIS IS INCORRECT.
-		print "curlUploadImg was called. This is the list so far: ", self.fileList
+		self.fileList = glob.glob('*.jpg')
 		if len(self.fileList) > 0:
 			print "fileList has customers: ", self.fileList
 			for img in self.fileList:
@@ -103,9 +101,6 @@ class takePictureClass():
 					' http://{1}:8880/upload-image); rm {0}; else sudo ifup wlan0; fi'.format(img, serverIP))
 				# os.system('curl --header "filename: {0}" -v -y 10 --max-time 180 -X POST --data-binary @{0}' \
 				# 	' http://{1}:8880/upload-image'.format(img, serverIP))
-		elif len(self.fileList) <= 0:
-			print "Scooping up new clients"
-			self.fileList = glob.glob('*.jpg')
 
 
 	def sendImages(self, inputStartTimePlusOne, serverIP):
