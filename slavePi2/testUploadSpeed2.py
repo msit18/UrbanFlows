@@ -72,7 +72,8 @@ class myProtocol(protocol.Protocol):
 				print "inputStartTime ", msgFromServer[8] + msgFromServer[9]
 				tp.runSendImg = True
 				a = defer.Deferred()
-				a.callback (lambda _: self.transport.write("DEFERRED HAS FIRED"))
+				a.addCallback(self.printSome)
+				a.callback ("DEFERRED HAS FIRED")
 				startAtTime = self.calculateTimeDifference(msgFromServer[8], msgFromServer[9])
 				callLaterTimeCollectImgs = startAtTime + 1
 				result = threads.deferToThread(tp.takePicture, int(msgFromServer[2]), int(msgFromServer[3]),\
@@ -108,6 +109,9 @@ class myProtocol(protocol.Protocol):
 
 		else:
 			print "Didn't write hi success.jpg to server"
+
+	def printSome (self, inputHere):
+		print "PRINTSOME: ", inputHere
 
 	def failedMethod(self,failure):
 		print "FAILURE: ERROR WITH PICTURE TAKING METHOD"
