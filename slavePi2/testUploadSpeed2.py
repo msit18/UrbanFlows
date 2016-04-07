@@ -71,9 +71,6 @@ class myProtocol(protocol.Protocol):
 				print "inputFramerate ", msgFromServer[7]
 				print "inputStartTime ", msgFromServer[8] + msgFromServer[9]
 				tp.runSendImg = True
-				a = defer.Deferred()
-				a.addCallback(self.printSome)
-				a.callback ("DEFERRED HAS FIRED")
 				startAtTime = self.calculateTimeDifference(msgFromServer[8], msgFromServer[9])
 				callLaterTimeCollectImgs = startAtTime + 1
 				result = threads.deferToThread(tp.takePicture, int(msgFromServer[2]), int(msgFromServer[3]),\

@@ -15,6 +15,7 @@ import datetime
 import os
 import sys
 import glob
+from twisted.internet import defer
 
 class takePictureClass():
 	def __init__(self):
@@ -64,13 +65,13 @@ class takePictureClass():
 							fpsTime = (finish-start)
 							fps = inputNumPics/fpsTime
 							totalNumPicsTaken += inputNumPics
-							print 'Captured {0} frames at {1}fps in {2}secs'\
-							.format(str(totalNumPicsTaken), str(inputNumPics/fpsTime), str(fpsTime))
+							# print 'Captured {0} frames at {1}fps in {2}secs'\
+							# .format(str(totalNumPicsTaken), str(inputNumPics/fpsTime), str(fpsTime))
 				endTime = time.time()
 				totalTime = endTime-prgmStartTime
 				totalFPS = totalNumPicsTaken/totalTime
-				print "10.2: Captured {0} total pictures.  Total time was {1}, total FPS is {2}"\
-				.format(str(totalNumPicsTaken), str(inputTotalTime), str(totalFPS) )
+				# print "10.2: Captured {0} total pictures.  Total time was {1}, total FPS is {2}"\
+				# .format(str(totalNumPicsTaken), str(inputTotalTime), str(totalFPS) )
 				print "CAMERA IS FINISHED. RETURN FALSE"
 				self.runSendImg = False
 			except:
@@ -92,34 +93,41 @@ class takePictureClass():
 				], use_video_port=False)
 
 	def curlUploadImg (self, serverIP):
+		print "curlUploadImg called"
 		self.fileList = glob.glob('*.jpg')
 		if len(self.fileList) > 0:
 			print "fileList has customers: ", self.fileList
 			for img in self.fileList:
-				os.system('if balExp=$(curl -X GET http://{1}:8880/upload-image);' \
-					' then balExp=$(curl --header "filename: {0}" -y 10 --max-time 180 -X POST --data-binary @{0}' \
-					' http://{1}:8880/upload-image); rm {0}; else sudo ifup wlan0; fi'.format(img, serverIP))
-				# os.system('curl --header "filename: {0}" -v -y 10 --max-time 180 -X POST --data-binary @{0}' \
-				# 	' http://{1}:8880/upload-image'.format(img, serverIP))
+				a = defer.Deferred()
+				a.callback(lambda _: os.system('if balExp=$(curl -X GET http://{0}:8880/upload-image);' \
+									' then : ; else sudo ifup wlan0; fi'.format(serverIP)))
+				a.addCallback(lambda _: os.system('curl --header "filename: {0}" -y 10 --max-time 180 -X '\
+								'POST --data-binary @{0} http://{1}:8880/upload-image'.format(img, serverIP)))
+				a.addCallback(lambda _: os.system('rm {0}'.format(img)))
+				a.addErrback(lambda _: self.curlUploadImgErrback)
 
+	def curlUploadImgErrback(self):
+		return "Error!!"
 
 	def sendImages(self, inputStartTimePlusOne, serverIP):
 		while time.time() < inputStartTimePlusOne:
 			pass
 		else:
+			self.curlUploadImg(serverIP)
+			return "finished"
 			#print "sendImages method!"
-			while self.runSendImg == True:
-				#print "runSendImg is true"
-				self.curlUploadImg(serverIP)
-			else:
-				#print "runing last glob"
-				self.curlUploadImg(serverIP)	
-				self.curlUploadImg(serverIP)
-				print "last catch"
-				return "finished"
+			# while self.runSendImg == True:
+			# 	#print "runSendImg is true"
+			# 	self.curlUploadImg(serverIP)
+			# else:
+			# 	#print "runing last glob"
+			# 	self.curlUploadImg(serverIP)	
+			# 	self.curlUploadImg(serverIP)
+			# 	print "last catch"
+			# 	return "finished"
 
 if __name__ == '__main__':
 	t = takePictureClass()
-	now = time.time()+1
-	t.takePicture(10, 2594, 1944, 3, 1, 90, now)
+	# now = time.time()+1
+	# t.takePicture(10, 2594, 1944, 3, 1, 90, now)
 	#camLog = open('CamLog-{0}.txt'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), 'w')
