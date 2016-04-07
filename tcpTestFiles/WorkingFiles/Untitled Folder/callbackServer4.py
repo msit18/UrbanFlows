@@ -141,7 +141,7 @@ if __name__ == '__main__':
 
 	ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
 	serverIP = ip_address.split()[0]
-	totalNumRaspies = 4
+	totalNumRaspies = 1
 
 	#TCP network
 	d = defer.Deferred()
