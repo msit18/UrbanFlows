@@ -20,7 +20,7 @@ from twisted.internet import defer
 class takePictureClass():
 	def __init__(self):
 		self.runSendImg = True
-		# self.fileList = []
+		self.fileList = []
 
 	def takePicture (self, inputTotalTime, inputResW, inputResH, inputNumPics,\
 						inputFPSTimeInterval, inputFramerate, inputStartTime):
@@ -114,7 +114,10 @@ class takePictureClass():
 			pass
 		else:
 			self.curlUploadImg(serverIP)
-			return "finished"
+			if self.runSendImg == True:
+				self.curlUploadImg(serverIP)
+			else:
+				return "finished"
 			#print "sendImages method!"
 			# while self.runSendImg == True:
 			# 	#print "runSendImg is true"
@@ -125,6 +128,31 @@ class takePictureClass():
 			# 	self.curlUploadImg(serverIP)
 			# 	print "last catch"
 			# 	return "finished"
+
+	def sendImagesNew(self, inputStartTimePlusOne, serverIP):
+		while time.time() < inputStartTimePlusOne:
+			pass
+		else:
+			while self.runSendImg == True:
+				print "while loop for runSendImg called"
+				self.fileList = glob.glob('*.jpg')
+				if len(self.fileList) > 0:
+					print "fileList has customers: ", self.fileList
+					for img in self.fileList:
+						a = defer.Deferred()
+						a.callback(lambda _: os.system('if balExp=$(curl -X GET http://{0}:8880/upload-image);' \
+											' then : ; else sudo ifup wlan0; fi'.format(serverIP)))
+						a.addCallback(lambda _: os.system('curl --header "filename: {0}" -y 10 --max-time 180 -X '\
+										'POST --data-binary @{0} http://{1}:8880/upload-image'.format(img, serverIP)))
+						a.addCallback(lambda _: os.system('rm {0}'.format(img)))
+						a.addErrback(lambda _: self.curlUploadImgErrback)
+			else:
+				print "runing last glob"
+				self.curlUploadImg(serverIP)	
+				self.curlUploadImg(serverIP)
+				print "last catch"
+				return "finished"
+
 
 if __name__ == '__main__':
 	t = takePictureClass()
