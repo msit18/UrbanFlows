@@ -23,7 +23,7 @@ class takePictureClass():
 		self.fileList = []
 
 	def takePicture (self, inputTotalTime, inputResW, inputResH, inputNumPics,\
-						inputFPSTimeInterval, inputFramerate, inputStartTime):
+						inputFPSTimeInterval, inputFramerate, inputStartTime, serverIP):
 		#print "takePicture method!"
 		while time.time() < inputStartTime:
 			pass
@@ -98,54 +98,52 @@ class takePictureClass():
 		if len(self.fileList) > 0:
 			print "fileList has customers: ", self.fileList
 			for img in self.fileList:
-				a = defer.Deferred()
-				a.callback(lambda _: os.system('if balExp=$(curl -X GET http://{0}:8880/upload-image);' \
-									' then : ; else sudo ifup wlan0; fi'.format(serverIP)))
-				a.addCallback(lambda _: os.system('curl --header "filename: {0}" -y 10 --max-time 180 -X '\
-								'POST --data-binary @{0} http://{1}:8880/upload-image'.format(img, serverIP)))
-				a.addCallback(lambda _: os.system('rm {0}'.format(img)))
-				a.addErrback(lambda _: self.curlUploadImgErrback)
+				# a = defer.Deferred()
+				# a.callback(lambda _: os.system('if balExp=$(curl -X GET http://{0}:8880/upload-image);' \
+				# 					' then echo $balExp ; else sudo ifup wlan0; fi'.format(serverIP)))
+				# a.addCallback(lambda _: os.system('curl --header "filename: {0}" -y 10 --max-time 180 -X '\
+				# 				'POST --data-binary @{0} http://{1}:8880/upload-image; wait'.format(img, serverIP)))
+				# a.addCallback(lambda _: os.system('rm {0}'.format(img)))
+				# a.addErrback(lambda _: self.curlUploadImgErrback)
+				os.system(
+					'if balExp=$(curl -X GET http://{0}:8880/upload-image);'\
+					'then curl --header "filename: {1}" -y 10 --max-time 180 -X POST --data-binary @{1} http://{0}:8880/upload-image &'\
+					'wait;'\
+					'rm {1};'\
+					'else sudo ifup wlan0;'\
+					'fi'.format(serverIP, img)
+					)
 
 	def curlUploadImgErrback(self):
 		return "Error!!"
-
-	def sendImages(self, inputStartTimePlusOne, serverIP):
-		while time.time() < inputStartTimePlusOne:
-			pass
-		else:
-			self.curlUploadImg(serverIP)
-			if self.runSendImg == True:
-				self.curlUploadImg(serverIP)
-			else:
-				return "finished"
-			#print "sendImages method!"
-			# while self.runSendImg == True:
-			# 	#print "runSendImg is true"
-			# 	self.curlUploadImg(serverIP)
-			# else:
-			# 	#print "runing last glob"
-			# 	self.curlUploadImg(serverIP)	
-			# 	self.curlUploadImg(serverIP)
-			# 	print "last catch"
-			# 	return "finished"
 
 	def sendImagesNew(self, inputStartTimePlusOne, serverIP):
 		while time.time() < inputStartTimePlusOne:
 			pass
 		else:
 			while self.runSendImg == True:
-				print "while loop for runSendImg called"
+				# print "while loop for runSendImg called"
 				self.fileList = glob.glob('*.jpg')
 				if len(self.fileList) > 0:
 					print "fileList has customers: ", self.fileList
 					for img in self.fileList:
-						a = defer.Deferred()
-						a.callback(lambda _: os.system('if balExp=$(curl -X GET http://{0}:8880/upload-image);' \
-											' then : ; else sudo ifup wlan0; fi'.format(serverIP)))
-						a.addCallback(lambda _: os.system('curl --header "filename: {0}" -y 10 --max-time 180 -X '\
-										'POST --data-binary @{0} http://{1}:8880/upload-image'.format(img, serverIP)))
-						a.addCallback(lambda _: os.system('rm {0}'.format(img)))
-						a.addErrback(lambda _: self.curlUploadImgErrback)
+						# a = defer.Deferred()
+						# a.callback(lambda _: os.system('if balExp=$(curl -X GET http://{0}:8880/upload-image);' \
+						# 					' then echo $balExp ; else sudo ifup wlan0; fi'.format(serverIP)))
+						# a.addCallback(lambda _: os.system('curl -C - --header "filename: {0}" -y 10 --max-time 180 -X '\
+						# 				'POST --data-binary @{0} http://{1}:8880/upload-image; wait'.format(img, serverIP)))
+						# a.addCallback(lambda _: os.system('rm {0}'.format(img)))
+						# a.addErrback(lambda _: self.curlUploadImgErrback)
+						os.system(
+							'if balExp=$(curl -X GET http://{0}:8880/upload-image);'\
+							'then curl -C - --header "filename: {1}" -y 10 --max-time 180 -X POST --data-binary @{1} http://{0}:8880/upload-image &'\
+							'wait;'\
+							'rm {1};'\
+							'else sudo ifup wlan0;'\
+							'fi'.format(serverIP, img)
+							)
+				print "sleeping for 1 seconds"
+				time.sleep(1)
 			else:
 				print "runing last glob"
 				self.curlUploadImg(serverIP)	
