@@ -31,7 +31,7 @@ class multiplexerClass():
 		self.runSendMP = True
 
 	#Switches cameras. Taken from 'ivport_capture_sequence_A.py'
-	def cam_change(self):
+	def cam_change(self, inputFPSTimeInterval):
 		global cam
 		gp.setmode(gp.BOARD)
 		if cam == 1:
@@ -54,9 +54,16 @@ class multiplexerClass():
 		        gp.output(7, True)
 		        gp.output(11, True)
 		        gp.output(12, False)
-		cam += 1
-		if cam > 4:
+		#cam += 1
+		timeStartCam1 = time.time()
+		timeAfterSwitchingCams = time.time()
+		if timeAfterSwitchingCams - timeStartCam1 < inputFPSTimeInterval & cam < 5:
+			cam += 1
+			timeAfterSwitchingCams = time.time()
+
+		elif cam > 4:
 			cam = 1
+			timeStartCam1 = time.time()
 
 	def takePicturesMP(self, inputTotalTime, inputResW, inputResH,  inputFramerate, inputStartTime):
 		while time.time() < inputStartTime:
@@ -69,11 +76,14 @@ class multiplexerClass():
 					camera.framerate = inputFramerate
 
 					startTime = time.time()
-					camera.capture_sequence(filenames(), use_video_port=True)
+					camera.capture_sequence(filenames(inputFPSTimeInterval), use_video_port=True)
 					finishTime = time.time()
 					timeRan = finishTime - startTime
 					# print 'Program captured %d images at %.2f fps' % (frame, frame / timeRan)
 					# print 'Finished running in %.02f seconds' % timeRan
+				print "multiplexer is finished taking pictures"
+				send.runSendMP = False
+				print "ended runSendMP"
 			except:
 				print "error"
 				self.runSendMP = False
@@ -84,11 +94,8 @@ class multiplexerClass():
 	#Updated to test to make sure we can limit the running to a certain amount of time.
 	#Original model goes while frame < frames
 	def filenames(self, inputFPSTimeInterval):
-		#Current number of pics taken
-	    	global frame
-	    	#global fpspc
-	    	frame = 0
-	    	#fpspc = []
+	    	# .global frame
+	    	# frame = 0
 	    	start = time.time()
 	    	now = start
 		while now - start < inputFPSTimeInterval:
@@ -97,9 +104,8 @@ class multiplexerClass():
 			time.sleep(0.007)
 			#timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%H:%M:%S:%f')
 			timestamp = datetime.datetime.now().strftime ('%M_%S_%f')
-			#fpspc.append('cam %d' % cam + ' ' + datetime.datetime.fromtimestamp(time.time()).strftime('%H:%M:%S:%f'))
 			yield 'cam%d_%s.jpg' % (cam, timestamp)
-			frame += 1
+			# frame += 1
 			#Prints a statment for every 20 pictures captured to update total FPS
 			# if frame % 20 == 0:
 			# 	print 'Captured %d images so far, at %.02f fps' % (frame, frame / (now - start))
