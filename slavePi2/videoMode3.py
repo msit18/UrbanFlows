@@ -12,7 +12,7 @@ import sys
 #Takes video
 class takeVideoClass():
 	def __init__(self):
-		self.runSendVid = True
+		self.runUpload = True
 
 	#def takeVideo (self, inputVidTime, inputResW, inputResH, inputTotalRunTime, inputFramerate, inputStartTime):
 	def takeVideo (self, inputVidTime, inputResW, inputResH, inputFramerate, inputStartTime):
@@ -30,31 +30,53 @@ class takeVideoClass():
 	#					for k in range(numCycles)]):
 						camera.wait_recording(inputVidTime)
 				print "CAMERA IS FINISHED. RETURN FALSE"
-				self.runSendVid = False
+				self.runUpload = False
 			except:
 				print "error"
-				self.runSendVid = False
-				print "Switched runSendVid"
+				self.runUpload = False
+				print "Switched runUpload"
 				raise
 
-	def curlUploadVid (self, serverIP):
-		self.fileList = glob.glob('*.h264')
+	def curlUpload (self, serverIP):
+		print "curlUpload called"
+		self.fileList = glob.glob('*.jpg')
 		if len(self.fileList) > 0:
-			for video in self.fileList:
-				os.system('curl --header "filename: {0}" -X POST --data-binary @{0} http://{1}:8880/upload-image'.format(video, serverIP))
-				os.system('rm {0}'.format(video))
+			print "fileList has customers: ", self.fileList
+			for item in self.fileList:
+				os.system(
+					'if balExp=$(curl -X GET http://{0}:8880/upload-image);'\
+					'then curl --header "filename: {1}" -y 10 --max-time 180 -X POST --data-binary @{1} http://{0}:8880/upload-image &'\
+					'wait;'\
+					'rm {1};'\
+					'else sudo ifup wlan0;'\
+					'fi'.format(serverIP, item)
+					)
 
-	def sendVideos(self, inputStartTimePlusOne, serverIP):
+	def sendUpload(self, inputStartTimePlusOne, serverIP):
 		while time.time() < inputStartTimePlusOne:
 			pass
 		else:
-			print "sendImages method!"
-			while self.runSendVid == True:
-				self.curlUploadVid(serverIP)
+			while self.runUpload == True:
+				# print "while loop for runSenditem called"
+				self.fileList = glob.glob('*.jpg')
+				if len(self.fileList) > 0:
+					print "fileList has customers: ", self.fileList
+					for item in self.fileList:
+						os.system(
+							'if balExp=$(curl -X GET http://{0}:8880/upload-image);'\
+							'then curl -C - --header "filename: {1}" -y 10 --max-time 180 -X POST --data-binary @{1} http://{0}:8880/upload-image &'\
+							'wait;'\
+							'rm {1};'\
+							'else sudo ifup wlan0;'\
+							'fi'.format(serverIP, item)
+							)
+				print "sleeping for 1 seconds"
+				time.sleep(1)
 			else:
 				print "runing last glob"
-				self.curlUploadVid()	
-				print "done! :D"
+				self.curlUpload(serverIP)	
+				self.curlUpload(serverIP)
+				print "last catch"
 				return "finished"
 
 

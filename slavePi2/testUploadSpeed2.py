@@ -63,38 +63,32 @@ class myProtocol(protocol.Protocol):
 			#inputTotalTime, inputResW, inputResH, inputNumPics, inputFPSTimeInterval, inputFramerate, inputStartTime
 			if msgFromServer[1] == "camera":
 				print "this is a camera command"
-				print "inputTotalTime ", msgFromServer[2]
-				print "inputResW ", msgFromServer[3]
-				print "inputResH ", msgFromServer[4]
-				print "inputNumPics", msgFromServer[5]
-				print "inputFPSTimeInterval ", msgFromServer[6]
-				print "inputFramerate ", msgFromServer[7]
-				print "inputStartTime ", msgFromServer[8] + msgFromServer[9]
-				tp.runSendImg = True
+				tp.runUpload = True
 				startAtTime = self.calculateTimeDifference(msgFromServer[8], msgFromServer[9])
 				callLaterTimeCollectImgs = startAtTime + 1
 				result = threads.deferToThread(tp.takePicture, int(msgFromServer[2]), int(msgFromServer[3]),\
 					int(msgFromServer[4]), int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), startAtTime, serverIP)
 				result.addErrback(self.failedMethod)
-				endOfProcess = tp.sendImagesNew(callLaterTimeCollectImgs, serverIP)
+				endOfProcess = tp.sendUpload(callLaterTimeCollectImgs, serverIP)
 				print endOfProcess
 				result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, endOfProcess))
 				
 			#VideoTime, ResW, ResH, totalRunTime, framerate, startTime
 			elif msgFromServer[1] == "video":
 				print "this is the video command"
-				tv.runSendVid = True
+				tv.runUpload = True
 				startAtTime = self.calculateTimeDifference(msgFromServer[7], msgFromServer[8])
 				callLaterTimeCollectImgs = startAtTime + 1
 				result = threads.deferToThread(tp.takeVideo, int(msgFromServer[2]), int(msgFromServer[3]), int(msgFromServer[4]),\
 					int(msgFromServer[5]), int(msgFromServer[6]), startAtTime)
 				result.addErrback(self.failedMethod)
-				endOfProcess = tv.sendVideos(callLaterTimeCollectImgs, serverIP)
+				endOfProcess = tv.sendUpload(callLaterTimeCollectImgs, serverIP)
 				print endOfProcess
 				result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, endOfProcess))
 
 			elif msgFromServer[1] == "multiplexer":
 				print "this is the multiplexer method. Has not been implemented"
+				reactor.callLater(0.5, self.transport.write, "finished")
 
 		elif msgFromServer[0] == "checkCamera":
 			startAtTime = self.calculateTimeDifference(msgFromServer[1], msgFromServer[2])
