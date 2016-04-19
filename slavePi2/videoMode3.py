@@ -47,7 +47,7 @@ class takeVideoClass():
 					'if balExp=$(curl -X GET http://{0}:8880/upload-image);'\
 					'then curl --header "filename: {1}" -y 10 --max-time 180 -X POST --data-binary @{1} http://{0}:8880/upload-image &'\
 					'wait;'\
-					'rm {1};'\
+					#'rm {1};'\
 					'else sudo ifup wlan0;'\
 					'fi'.format(serverIP, item)
 					)
@@ -66,7 +66,7 @@ class takeVideoClass():
 							'if balExp=$(curl -X GET http://{0}:8880/upload-image);'\
 							'then curl -C - --header "filename: {1}" -y 10 --max-time 180 -X POST --data-binary @{1} http://{0}:8880/upload-image &'\
 							'wait;'\
-							'rm {1};'\
+							#'rm {1};'\
 							'else sudo ifup wlan0;'\
 							'fi'.format(serverIP, item)
 							)

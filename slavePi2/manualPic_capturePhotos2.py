@@ -12,6 +12,7 @@ import os
 import sys
 import glob
 from twisted.internet import defer
+import subprocess
 
 class takePictureClass():
 	def __init__(self):
@@ -100,13 +101,14 @@ class takePictureClass():
 				# 				'POST --data-binary @{0} http://{1}:8880/upload-image; wait'.format(item, serverIP)))
 				# a.addCallback(lambda _: os.system('rm {0}'.format(item)))
 				# a.addErrback(lambda _: self.curlUploadErrback)
-				os.system(
+				#os.system(
+				subprocess.call(
 					'if balExp=$(curl -X GET http://{0}:8880/upload-image);'\
 					'then curl --header "filename: {1}" -y 10 --max-time 180 -X POST --data-binary @{1} http://{0}:8880/upload-image &'\
 					'wait;'\
-					'rm {1};'\
+					# 'rm {1};'\
 					'else sudo ifup wlan0;'\
-					'fi'.format(serverIP, item)
+					'fi'.format(serverIP, item), shell=False
 					)
 
 	def curlUploadErrback(self):
@@ -132,7 +134,8 @@ class takePictureClass():
 							'if balExp=$(curl -X GET http://{0}:8880/upload-image);'\
 							'then curl -C - --header "filename: {1}" -y 10 --max-time 180 -X POST --data-binary @{1} http://{0}:8880/upload-image &'\
 							'wait;'\
-							'rm {1};'\
+							# 'rm {1};'\
+							# 'wait;'\
 							'else sudo ifup wlan0;'\
 							'fi'.format(serverIP, item)
 							)
