@@ -96,7 +96,7 @@ class myProtocol(protocol.Protocol):
 			result = threads.deferToThread(tp.takePicture, 1, 640, 480, 1, 1, 90, startAtTime, serverIP)
 			result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, "checkCamPi"))
 			result.addErrback(self.failedMethod)
-			tp.sendImagesNew(callLaterTimeCollectImgs, serverIP)
+			tp.sendUpload(callLaterTimeCollectImgs, serverIP)
 
 		else:
 			print "Didn't write hi success.jpg to server"
