@@ -101,8 +101,8 @@ class takePictureClass():
 				# 				'POST --data-binary @{0} http://{1}:8880/upload-image; wait'.format(item, serverIP)))
 				# a.addCallback(lambda _: os.system('rm {0}'.format(item)))
 				# a.addErrback(lambda _: self.curlUploadErrback)
-				#os.system(
-				subprocess.call(
+				os.system(
+				#subprocess.call(
 					'if balExp=$(curl -X GET http://{0}:8880/upload-image);'\
 					'then curl --header "filename: {1}" -y 10 --max-time 180 -X POST --data-binary @{1} http://{0}:8880/upload-image &'\
 					'wait;'\
