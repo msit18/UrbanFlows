@@ -108,7 +108,7 @@ class takePictureClass():
 					'wait;'\
 					# 'rm {1};'\
 					'else sudo ifup wlan0;'\
-					'fi'.format(serverIP, item), shell=False
+					'fi'.format(serverIP, item)
 					)
 
 	def curlUploadErrback(self):
