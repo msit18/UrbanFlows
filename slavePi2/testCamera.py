@@ -3,6 +3,7 @@ import time
 from twisted.internet import defer, reactor
 import os
 import glob
+import subprocess
 
 def printSome(inputPrint, second):
 	print "PRINTSOME: ", second
@@ -27,14 +28,13 @@ def callbackImg():
 				# sendImg('yep')
 
 callbackImg()
-serverIP = '18.189.119.87'
+serverIP = '18.189.71.62'
 fileList = glob.glob('*.jpg')
 for img in fileList:
-	subprocess.call(
+	cmd = \
 	'if balExp=$(curl -X GET http://{0}:8880/upload-image);'\
-	'then curl --header "filename: {1}" -y 10 --max-time 180 -X POST --data-binary @{1} http://{0}:8880/upload-image &'\
-	'wait;'\
-	# 'rm {1};'\
-	'else sudo ifup wlan0;'\
-	'fi'.format(serverIP, item)
-	)
+	' then curl --header "filename: {1}" -y 10 --max-time 180 -X POST --data-binary @{1} http://{0}:8880/upload-image &'\
+	' wait;'\
+	' else sudo ifup wlan0; fi'.format(serverIP, img)
+	print cmd
+	subprocess.call(cmd, shell=True)
