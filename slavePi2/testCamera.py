@@ -30,10 +30,11 @@ callbackImg()
 serverIP = '18.189.119.87'
 fileList = glob.glob('*.jpg')
 for img in fileList:
-	a = defer.Deferred()
-	a.callback(lambda _: os.system('if balExp=$(curl -X GET http://{0}:8880/upload-image);' \
-						' then : ; else sudo ifup wlan0; fi'.format(serverIP)))
-	a.addCallback(lambda _: os.system('curl --header "filename: {0}" -y 10 --max-time 180 -X '\
-					'POST --data-binary @{0} http://{1}:8880/upload-image'.format(img, serverIP)))
-	a.addCallback(lambda _: os.system('rm {0}'.format(img)))
-	a.addErrback(printSome, "I messed up")
+	subprocess.call(
+	'if balExp=$(curl -X GET http://{0}:8880/upload-image);'\
+	'then curl --header "filename: {1}" -y 10 --max-time 180 -X POST --data-binary @{1} http://{0}:8880/upload-image &'\
+	'wait;'\
+	# 'rm {1};'\
+	'else sudo ifup wlan0;'\
+	'fi'.format(serverIP, item)
+	)
