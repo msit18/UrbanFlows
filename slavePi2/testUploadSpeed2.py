@@ -11,7 +11,7 @@ import subprocess
 #from twisted.web.client import FileBodyProducer
 
 #Threading for picture transfer
-from manualPic_capturePhotos2 import takePictureClass
+from manualPic_capturePhotos3 import takePictureClass
 from videoMode3 import takeVideoClass
 import os
 import glob

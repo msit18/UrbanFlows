@@ -55,7 +55,9 @@ class takePictureClass():
 						while timeNow > timePlusFPSTimeInterval:
 							timePlusFPSTimeInterval = timeNow + inputFPSTimeInterval
 							start = time.time()
-							subprocess.call("raspistill -t {0} -tl {1} -o {2}.jpg".format(inputFPSTimeInterval, inputTotalTime, datetime.datetime.now().strftime ('%M_%S_%f')))
+							#subprocess.call("raspistill -t {0} -tl {1} -o {2}.jpg".format(inputFPSTimeInterval, inputTotalTime, datetime.datetime.now().strftime ('%M_%S_%f')))
+							self.piCamTakePictures(inputResW, inputResH, inputNumPics, inputFramerate)
+							finish = time.time()
 							#Analyzing time and frames
 							fpsTime = (finish-start)
 							fps = inputNumPics/fpsTime
@@ -93,22 +95,16 @@ class takePictureClass():
 		if len(self.fileList) > 0:
 			print "fileList has customers: ", self.fileList
 			for item in self.fileList:
-				# a = defer.Deferred()
-				# a.callback(lambda _: os.system('if balExp=$(curl -X GET http://{0}:8880/upload-image);' \
-				# 					' then echo $balExp ; else sudo ifup wlan0; fi'.format(serverIP)))
-				# a.addCallback(lambda _: os.system('curl --header "filename: {0}" -y 10 --max-time 180 -X '\
-				# 				'POST --data-binary @{0} http://{1}:8880/upload-image; wait'.format(item, serverIP)))
-				# a.addCallback(lambda _: os.system('rm {0}'.format(item)))
-				# a.addErrback(lambda _: self.curlUploadErrback)
-				os.system(
-				#subprocess.call(
+				cmd = \
 					'if balExp=$(curl -X GET http://{0}:8880/upload-image);'\
-					'then curl --header "filename: {1}" -y 10 --max-time 180 -X POST --data-binary @{1} http://{0}:8880/upload-image &'\
-					'wait;'\
-					# 'rm {1};'\
-					'else sudo ifup wlan0;'\
-					'fi'.format(serverIP, item)
-					)
+					' then curl -C - --header "filename: {1}" -y 10 --max-time 180 -X POST --data-binary @{1} http://{0}:8880/upload-image &'\
+					' wait;'\
+					' rm {1};'\
+					' wait;'\
+					' else sudo ifup wlan0;'\
+					' fi'.format(serverIP, item)
+				print "cmd: ", cmd
+				subprocess.call(cmd, shell=True)
 
 	def curlUploadErrback(self):
 		return "Error!!"
@@ -122,22 +118,16 @@ class takePictureClass():
 				if len(self.fileList) > 0:
 					print "fileList has customers: ", self.fileList
 					for item in self.fileList:
-						# a = defer.Deferred()
-						# a.callback(lambda _: os.system('if balExp=$(curl -X GET http://{0}:8880/upload-image);' \
-						# 					' then echo $balExp ; else sudo ifup wlan0; fi'.format(serverIP)))
-						# a.addCallback(lambda _: os.system('curl -C - --header "filename: {0}" -y 10 --max-time 180 -X '\
-						# 				'POST --data-binary @{0} http://{1}:8880/upload-image; wait'.format(img, serverIP)))
-						# a.addCallback(lambda _: os.system('rm {0}'.format(item)))
-						# a.addErrback(lambda _: self.curlUploadErrback)
-						os.system(
+						cmd = \
 							'if balExp=$(curl -X GET http://{0}:8880/upload-image);'\
-							'then curl -C - --header "filename: {1}" -y 10 --max-time 180 -X POST --data-binary @{1} http://{0}:8880/upload-image &'\
-							'wait;'\
-							# 'rm {1};'\
-							# 'wait;'\
-							'else sudo ifup wlan0;'\
-							'fi'.format(serverIP, item)
-							)
+							' then curl -C - --header "filename: {1}" -y 10 --max-time 180 -X POST --data-binary @{1} http://{0}:8880/upload-image &'\
+							' wait;'\
+							' rm {1};'\
+							' wait;'\
+							' else sudo ifup wlan0;'\
+							' fi'.format(serverIP, item)
+						print "cmd: ", cmd
+						subprocess.call(cmd, shell=True)
 				print "sleeping for 1 seconds"
 				time.sleep(1)
 			else:
