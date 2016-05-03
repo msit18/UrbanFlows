@@ -18,8 +18,57 @@ class takePictureClass():
 	def __init__(self):
 		self.runUpload = True
 
+	def takePicture_rs (self, inputTotalTime, inputResW, inputResH,\
+							inputFPSTimeInterval, inputStartTime):
+		while time.time() < inputStartTime:
+			pass
+		else:
+			try:
+				print "subprocess call raspistill timelapse function"
+				subprocess.call('raspistill -o {0}.jpg -t {1} -tl {2} -w {3} -h {4}'\
+					.format(datetime.datetime.now().strftime ('%M_%S_%f'),\
+					 totalTimeMilliSec, inputFPSTimeInterval, inputResW, inputResH))
+				print "CAMERA IS FINISHED. RETURN FALSE"
+				self.runUpload = False
+
+			except:
+				print "noooooooooooooo break"
+				self.runUpload = False
+				print "Switched runUpload"
+				raise
+
+	def takePicture_cc (self, inputTotalTime, inputResW, inputResH,\
+							inputNumPics, inputFPSTimeInterval, inputStartTime):
+		while time.time() < inputStartTime:
+			pass
+		else:
+			try:
+				prgmEndTime = int(inputTotalTime)+time.time() #When the program ends
+				calculatedFpsTimeInterval = float(inputFPSTimeInterval)/inputNumPics
+				print "the calculatedFpsTimeInterval will be :", calculatedFpsTimeInterval
+				with picamera.PiCamera() as camera:
+					camera.resolution = (inputResW, inputResH)
+					camera.framerate = 90
+
+					while time.time() < prgmEndTime:
+						print time.time()
+						print prgmEndTime
+						for filename in camera.capture_continuous ('{timestamp:%M_%S_%f}.jpg'):
+							print ('Captured {0}'.format(filename))
+							time.sleep(calculatedFpsTimeInterval)
+							if time.time() > prgmEndTime:
+								print "break!"
+								break
+						print "outside for loop, inside while loop"
+					print "finished!"
+			except:
+				print "noooooooooooooo break"
+				self.runUpload = False
+				print "Switched runUpload"
+				raise
+
 	def takePicture (self, inputTotalTime, inputResW, inputResH, inputNumPics,\
-						inputFPSTimeInterval, inputFramerate, inputStartTime, serverIP):
+						inputFPSTimeInterval, inputFramerate, inputStartTime):
 		#print "takePicture method!"
 		while time.time() < inputStartTime:
 			pass
@@ -43,27 +92,16 @@ class takePictureClass():
 				while timeNow < timePlusTenMin and timeNow < prgmEndTime:
 					timeNow = time.time()
 					#Provides updates in 10 minute increments
-					if timeNow >= timePlusTenMin:
-						endTenMinTime = time.time()
-						tenMinTotalRunTime = endTenMinTime-prgmStartTime
-						tenMinFPSUpdate = totalNumPicsTaken/tenMinTotalRunTime
-						#print "10.2 Ten Min Update: Total number of pictures is {0},"\
-						#" total time elapsed is {1}, totalFPS is {2}".format(str(totalNumPicsTaken),\
-						# str(tenMinTotalRunTime), str(tenMinFPSUpdate) )
-						timePlusTenMin = time.time()+5
-					else: #Runs picture taking process as normal
-						while timeNow > timePlusFPSTimeInterval:
-							timePlusFPSTimeInterval = timeNow + inputFPSTimeInterval
-							start = time.time()
-							#subprocess.call("raspistill -t {0} -tl {1} -o {2}.jpg".format(inputFPSTimeInterval, inputTotalTime, datetime.datetime.now().strftime ('%M_%S_%f')))
-							self.piCamTakePictures(inputResW, inputResH, inputNumPics, inputFramerate)
-							finish = time.time()
-							#Analyzing time and frames
-							fpsTime = (finish-start)
-							fps = inputNumPics/fpsTime
-							totalNumPicsTaken += inputNumPics
-							# print 'Captured {0} frames at {1}fps in {2}secs'\
-							# .format(str(totalNumPicsTaken), str(inputNumPics/fpsTime), str(fpsTime))
+					timePlusFPSTimeInterval = timeNow + inputFPSTimeInterval
+					start = time.time()
+					self.piCamTakePictures(inputResW, inputResH, inputNumPics, inputFramerate)
+					finish = time.time()
+					#Analyzing time and frames
+					fpsTime = (finish-start)
+					fps = inputNumPics/fpsTime
+					totalNumPicsTaken += inputNumPics
+					# print 'Captured {0} frames at {1}fps in {2}secs'\
+					# .format(str(totalNumPicsTaken), str(inputNumPics/fpsTime), str(fpsTime))
 				endTime = time.time()
 				totalTime = endTime-prgmStartTime
 				totalFPS = totalNumPicsTaken/totalTime
@@ -140,6 +178,6 @@ class takePictureClass():
 
 if __name__ == '__main__':
 	t = takePictureClass()
-	# now = time.time()+1
-	# t.takePicture(10, 2594, 1944, 3, 1, 90, now)
+	now = time.time()+1
+	t.takePicture_cc(10, 640, 480, 20, 1, now)
 	#camLog = open('CamLog-{0}.txt'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), 'w')
