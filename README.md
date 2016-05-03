@@ -1,12 +1,12 @@
 # UrbanFlows
 
-For the 5Pi architecture, there are 4 slavePies and 1 MasterPi.
-The files in slavePi 2-4 are identical while slavePi5's files have some
-commands that trigger the end of the processes
+Server-client relationship. The working code for the server resides in tcpTestFiles/WorkingFiles/Untitled Folder.
+The most up to date client code resides in the slavePi2 folder. The code in the other folders is either old or
+outdated.
 
 #MasterPi files
 
-Programs that control the piFace:   
+Programs that control the piFace for the 5Pi architecture:   
 *   camVidStartS1.py - Sets camera or video mode, resets variables, and sends commands to slavePies after checking if parameters are permissable (S1)   
 *   resolutionS2.py - Sets resolution (S2)   
 *   timeS3.py - Sets time (S3)   
@@ -21,6 +21,12 @@ Other programs:
 *   removePics.sh - Removes all .jpg and .h264 (video) files from the current Pi   
 *   wifiRestart.sh - Restarts wifi for that Pi.  After 3 tries, triggers flash.py to restart all Pies   
 *   restartWifi.sh - Restarts wifi if wifi is down and Pi is connected by ethernet   
+
+#SlavePi2 files
+
+Relevant files:
+manualPic_capturePhotos2.py/manualPic_capturePhotos3.py, testUploadSpeed2.py, videoMode3.py
+testCamera.py is used as a testing ground for many of the functions that are inputted into manualPic files.
 
 #Common files in all SlavePi folders:   
 The common files here are almost identical across slavePi2-4.  slavePi5 has these files but with an additional
@@ -53,7 +59,8 @@ SlavePi5 Files:
 *   takeVideo.sh - Takes video, sends it to the MasterPi, and sends a finished msg to flash.py  
 
 #tcpTestFiles
-All experimental files and sample codes for the Twisted framework   
+Relevant server files in WorkingFiles/Untitled Folder:
+callbackServer4.py, masterVariables2.py
 
 HTTP files written by Vlatko Klabucar:
 *   send-image.sh - Uses curl to post image to HTTP server
