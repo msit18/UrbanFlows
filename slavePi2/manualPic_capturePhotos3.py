@@ -49,18 +49,23 @@ class takePictureClass():
 				with picamera.PiCamera() as camera:
 					camera.resolution = (inputResW, inputResH)
 					camera.framerate = 90
-
+					start = time.time()
 					while time.time() < prgmEndTime:
 						print time.time()
 						print prgmEndTime
 						for filename in camera.capture_continuous ('{timestamp:%M_%S_%f}.jpg'):
 							print ('Captured {0}'.format(filename))
-							time.sleep(calculatedFpsTimeInterval)
+							#time.sleep(calculatedFpsTimeInterval)
 							if time.time() > prgmEndTime:
 								print "break!"
 								break
 						print "outside for loop, inside while loop"
 					print "finished!"
+					finished = time.time()
+					totalNumPics = len(glob.glob('*.jpg'))
+					totalTime = finished-start
+					fpsTotal = totalNumPics/totalTime
+					print "totalNumPics: {0}. totalTime: {1}. fpsTotal: {2}".format(totalNumPics, totalTime, fpsTotal)
 			except:
 				print "noooooooooooooo break"
 				self.runUpload = False
@@ -179,5 +184,5 @@ class takePictureClass():
 if __name__ == '__main__':
 	t = takePictureClass()
 	now = time.time()+1
-	t.takePicture_cc(10, 640, 480, 20, 1, now)
+	t.takePicture_cc(10, 2592, 1944, 3, 1, now)
 	#camLog = open('CamLog-{0}.txt'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), 'w')
