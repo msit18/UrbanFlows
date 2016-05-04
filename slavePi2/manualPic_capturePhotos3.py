@@ -48,14 +48,14 @@ class takePictureClass():
 				print "the calculatedFpsTimeInterval will be :", calculatedFpsTimeInterval
 				with picamera.PiCamera() as camera:
 					camera.resolution = (inputResW, inputResH)
-					camera.framerate = 90
+					camera.framerate = 10
 					start = time.time()
 					while time.time() < prgmEndTime:
 						print time.time()
 						print prgmEndTime
-						for filename in camera.capture_continuous ('{timestamp:%M_%S_%f}.jpg'):
+						for filename in camera.capture_continuous ('{timestamp:%M_%S_%f}.jpg', burst=True):
 							print ('Captured {0}'.format(filename))
-							#time.sleep(calculatedFpsTimeInterval)
+							time.sleep(calculatedFpsTimeInterval)
 							if time.time() > prgmEndTime:
 								print "break!"
 								break
@@ -184,5 +184,5 @@ class takePictureClass():
 if __name__ == '__main__':
 	t = takePictureClass()
 	now = time.time()+1
-	t.takePicture_cc(10, 2592, 1944, 3, 1, now)
+	t.takePicture_cc(10, 2592, 1944, 10, 1, now)
 	#camLog = open('CamLog-{0}.txt'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), 'w')
