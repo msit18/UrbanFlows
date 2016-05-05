@@ -66,8 +66,8 @@ class myProtocol(protocol.Protocol):
 				tp.runUpload = True
 				startAtTime = self.calculateTimeDifference(msgFromServer[8], msgFromServer[9])
 				callLaterTimeCollectImgs = startAtTime + 1
-				result = threads.deferToThread(tp.takePicture, int(msgFromServer[2]), int(msgFromServer[3]),\
-					int(msgFromServer[4]), int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), startAtTime, serverIP)
+				result = threads.deferToThread(tp.takePicture_cc, int(msgFromServer[2]), int(msgFromServer[3]),\
+					int(msgFromServer[4]), int(msgFromServer[5]), int(msgFromServer[6]), startAtTime)
 				result.addErrback(self.failedMethod)
 				endOfProcess = tp.sendUpload(callLaterTimeCollectImgs, serverIP)
 				print endOfProcess
@@ -93,7 +93,7 @@ class myProtocol(protocol.Protocol):
 		elif msgFromServer[0] == "checkCamera":
 			startAtTime = self.calculateTimeDifference(msgFromServer[1], msgFromServer[2])
 			callLaterTimeCollectImgs = startAtTime + 1
-			result = threads.deferToThread(tp.takePicture, 1, 640, 480, 1, 1, 90, startAtTime, serverIP)
+			result = threads.deferToThread(tp.takePicture_cc, 2, 640, 480, 1, 1, startAtTime)
 			result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, "checkCamPi"))
 			result.addErrback(self.failedMethod)
 			tp.sendUpload(callLaterTimeCollectImgs, serverIP)
