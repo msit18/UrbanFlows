@@ -66,6 +66,8 @@ class takePictureClass():
 					totalTime = finished-start
 					fpsTotal = totalNumPics/totalTime
 					print "totalNumPics: {0}. totalTime: {1}. fpsTotal: {2}".format(totalNumPics, totalTime, fpsTotal)
+					self.runUpload = False
+					print "runUpload is false. Finished"
 			except:
 				print "noooooooooooooo break"
 				self.runUpload = False
