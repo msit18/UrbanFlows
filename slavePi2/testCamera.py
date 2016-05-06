@@ -14,22 +14,25 @@ def sendImg(imgName):
 	a.addCallback(printSome, 'Upload')
 
 def callbackImg():
-	subprocess.call('raspistill -o {0}.jpg -t 20000 -tl 1000 -w 640 -h 480'\
-					.format(datetime.datetime.now().strftime ('%M_%S_%f')), shell=True)
-	#subprocess.call('raspistill -o {:%M_%S_%f}.jpg -t 20000 -tl 1000 -w 640 -h 480'\
-	#				.format(datetime.datetime.now()), shell=True)
-	subprocess.call('raspistill -o %04d.jpg -t 20000 -tl 1000 -w 640 -h 480', shell=True)
-	# with picamera.PiCamera() as camera:
-	# 			camera.resolution = (2592, 1944)
-	# 			camera.framerate = 90
-				# v = camera.capture_sequence([
-				# 	'image%02d.jpg' % i
-				# 	for i in range(4)
-				# 	], use_video_port=False)
+	# subprocess.call('raspistill -o {0}.jpg -t 20000 -tl 1000 -w 640 -h 480'\
+	# 				.format(datetime.datetime.now().strftime ('%M_%S_%f')), shell=True)
+	# #subprocess.call('raspistill -o {:%M_%S_%f}.jpg -t 20000 -tl 1000 -w 640 -h 480'\
+	# #				.format(datetime.datetime.now()), shell=True)
+	# subprocess.call('raspistill -o %04d.jpg -t 20000 -tl 1000 -w 640 -h 480', shell=True)
+	with picamera.PiCamera() as camera:
+				camera.resolution = (2592, 1944)
+				camera.framerate = 90
+				v = camera.capture_sequence(runStuff(), use_video_port=False)
 				# os.system('curl -X GET http://192.168.10.165:8880/upload-image')
 				# d.addCallback(printSome)
 				# d.callback("texttext2")
 				# sendImg('yep')
+
+def runStuff():
+	for i in range(4):
+		time.sleep(1)
+		print "lols"
+		yield 'image_{0}.jpg'.format(i)
 
 callbackImg()
 # serverIP = '18.189.71.62'
