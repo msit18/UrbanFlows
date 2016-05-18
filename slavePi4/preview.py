@@ -8,6 +8,6 @@ import time
 
 camera = picamera.PiCamera()
 camera.start_preview()
-time.sleep(10)
+time.sleep(90)
 camera.stop_preview()
 camera.close()

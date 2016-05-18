@@ -60,14 +60,14 @@ class myProtocol(protocol.Protocol):
 		msgFromServer = [data for data in data.split()]
 		if msgFromServer[0] == "startProgram":
 			print "GOT A STARTTAKINGPICTURES"
-			#inputTotalTime, inputResW, inputResH, inputNumPics, inputFPSTimeInterval, inputFramerate, inputStartTime
+			#inputTotalTime(1), inputResW(2), inputResH(3), inputNumPics(4), inputFPSTimeInterval(5), inputFramerate(6), inputStartTime(7)
 			if msgFromServer[1] == "camera":
 				print "this is a camera command"
 				tp.runUpload = True
 				startAtTime = self.calculateTimeDifference(msgFromServer[8], msgFromServer[9])
 				callLaterTimeCollectImgs = startAtTime + 1
-				result = threads.deferToThread(tp.takePicture, int(msgFromServer[2]), int(msgFromServer[3]),\
-					int(msgFromServer[4]), int(msgFromServer[5]), int(msgFromServer[6]), int(msgFromServer[7]), startAtTime, serverIP)
+				result = threads.deferToThread(tp.takePicture_filenames, int(msgFromServer[2]), int(msgFromServer[3]),\
+					int(msgFromServer[4]), int(msgFromServer[7]), startAtTime)
 				result.addErrback(self.failedMethod)
 				endOfProcess = tp.sendUpload(callLaterTimeCollectImgs, serverIP)
 				print endOfProcess
@@ -93,7 +93,7 @@ class myProtocol(protocol.Protocol):
 		elif msgFromServer[0] == "checkCamera":
 			startAtTime = self.calculateTimeDifference(msgFromServer[1], msgFromServer[2])
 			callLaterTimeCollectImgs = startAtTime + 1
-			result = threads.deferToThread(tp.takePicture, 1, 640, 480, 1, 1, 90, startAtTime, serverIP)
+			result = threads.deferToThread(tp.takePicture_filenames, 2, 640, 480, 1, startAtTime)
 			result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, "checkCamPi"))
 			result.addErrback(self.failedMethod)
 			tp.sendUpload(callLaterTimeCollectImgs, serverIP)
