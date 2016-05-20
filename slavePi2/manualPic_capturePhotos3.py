@@ -18,11 +18,13 @@ class takePictureClass():
 	def __init__(self):
 		self.runUpload = True
 
-	def filenames(self, inputTotalTime):
+	def filenames(self, inputTotalTime, inputResW, inputResH, inputFramerate):
 		print "took some images"
-		nowPlusInputTotalTime = time.time() + inputTotalTime + 2
+		nowPlusInputTotalTime = time.time() + inputTotalTime
 		while time.time() < nowPlusInputTotalTime:
-			yield datetime.datetime.now().strftime ('%M_%S_%f') + '.jpg'
+			yield 'slavePi2_RW' + str(inputResW) + '_RH' + str(inputResH) + '_TT' +\
+				str(inputTotalTime) + '_FR' + str(inputFramerate) + '_' + \
+				datetime.datetime.now().strftime ('%M_%S_%f') + '.jpg'
 
 	def takePicture_filenames(self, inputTotalTime, inputResW, inputResH,\
 							inputFramerate, inputStartTime):
@@ -38,7 +40,7 @@ class takePictureClass():
 			    # Give the camera some warm-up time
 			    time.sleep(2)
 			    start = time.time()
-			    camera.capture_sequence(self.filenames(inputTotalTime), use_video_port=True)
+			    camera.capture_sequence(self.filenames(inputTotalTime, inputResW, inputResH, inputFramerate), use_video_port=True)
 			    finish = time.time()
 			    frames = len(glob.glob('*.jpg'))
 			print('Captured %d frames at %.2ffps' % (frames, frames / (finish - start)))
@@ -150,6 +152,8 @@ class takePictureClass():
 	def curlUpload (self, serverIP):
 		print "curlUploadImg called"
 		self.fileList = glob.glob('*.jpg')
+		self.fileList.extend(glob.glob('*.bin'))
+		self.fileList.sort()
 		if len(self.fileList) > 0:
 			print "fileList has customers: ", self.fileList
 			for item in self.fileList:
@@ -170,6 +174,8 @@ class takePictureClass():
 		else:
 			while self.runUpload == True:
 				self.fileList = glob.glob('*.jpg')
+				self.fileList.extend(glob.glob('*.bin'))
+				self.fileList.sort()
 				if len(self.fileList) > 0:
 					print "fileList has customers: ", self.fileList
 					for item in self.fileList:
@@ -195,6 +201,6 @@ class takePictureClass():
 
 if __name__ == '__main__':
 	t = takePictureClass()
-	#now = time.time()+1
-	#t.takePicture_cc(10, 2592, 1944, 10, 1, now)
+	now = time.time()+1
+	t.takePicture_filenames(10, 2592, 1944, 1, now)
 	#camLog = open('CamLog-{0}.txt'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), 'w')
