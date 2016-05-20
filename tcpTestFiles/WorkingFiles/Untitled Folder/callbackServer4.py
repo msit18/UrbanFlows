@@ -140,8 +140,8 @@ if __name__ == '__main__':
 	f.userInput()
 
 	ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
-	serverIP = ip_address.split()[1]
-	totalNumRaspies = 2
+	serverIP = ip_address.split()[0]
+	totalNumRaspies = f.numRaspiesInCluster
 
 	#TCP network
 	d = defer.Deferred()
