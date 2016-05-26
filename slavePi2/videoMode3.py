@@ -82,3 +82,8 @@ class takeVideoClass():
 
 if __name__ == '__main__':
 	tv = takeVideoClass()
+	now = time.time() + 1
+	tv.takeVideo(180, 1600, 1200, 15, now)
+	# tv.takeVideo(180, 1024, 768, 15, now)
+	# tv.takeVideo(180, 1280, 720, 30, now)
+	# tv.takeVideo(180, 1920, 1080, 30, now)

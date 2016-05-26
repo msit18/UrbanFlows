@@ -20,6 +20,7 @@ class MasterVariables():
 		self.param = ""
 		self.camVid = ""
 		self.ServerStartTime = ""
+		self.numRaspiesInCluster = ""
 
 	def checkIfTimeIsValid(self):
 		while True:
@@ -44,6 +45,7 @@ class MasterVariables():
 		return self.param
 
 	def userInput(self):
+		self.numRaspiesInCluster = raw_input('Enter how many raspies are in this cluster: ')
 		self.camVid = raw_input ('Enter camera or video: ')
 		self.checkIfTimeIsValid()
 		#self.ServerStartTime = time.strftime("%x %X")
@@ -58,9 +60,10 @@ class MasterVariables():
 			self.ServerFrameRate = raw_input ('Enter framerate: ')
 			print "Thank you for your input. Please check the following"
 			print "{0} | TotalTime(sec): {1} | ResW: {2} | ResH: {3} | NumPics: {4} | "\
-			"TimeInterval(sec): {5} | FR: {6} | StartTime: {7}".format(self.camVid, \
+			"TimeInterval(sec): {5} | FR: {6} | StartTime: {7} | NumRaspies: {8}".format(self.camVid, \
 			self.ServerTotalTimeSec, self.ServerResW, self.ServerResH,\
-			self.ServerNumPics, self.ServerTimeInterval, self.ServerFrameRate, self.ServerStartTime)
+			self.ServerNumPics, self.ServerTimeInterval, self.ServerFrameRate, self.ServerStartTime,
+			self.numRaspiesInCluster)
 
 		elif self.camVid == "video":
 			self.ServerVidTimeSec = raw_input('Enter individual video time(sec): ')
@@ -69,9 +72,9 @@ class MasterVariables():
 			#self.ServerTotalTimeSec = input('Enter total run time in seconds: ')
 			self.ServerFrameRate = raw_input ('Enter framerate: ')
 			print "Thank you for your input. Please check the following"
-			print "{0} | VidTime(sec): {1} | ResW: {2} | ResH: {3} | FR: {4} | StartTime: {5}"\
+			print "{0} | VidTime(sec): {1} | ResW: {2} | ResH: {3} | FR: {4} | StartTime: {5} | NumRaspies: {6}"\
 			.format(self.camVid, self.ServerVidTimeSec, self.ServerResW,\
-			self.ServerResH, self.ServerFrameRate, self.ServerStartTime)
+			self.ServerResH, self.ServerFrameRate, self.ServerStartTime, self.numRaspiesInCluster)
 
 		elif self.camVid == "multiplexer":
 			print "still working on this feature. Please try again"
