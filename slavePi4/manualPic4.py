@@ -120,21 +120,20 @@ class queuePictures(threading.Thread):
 		while True:
 			runThread = self.queue.get()
 			if runThread is 'beginT2':
-				picsList = glob.glob('*.jpg')
-				pass
-#				while len(picsList) > 0:
-#					list = ' '.join(picsList)
-#					print (list)
-#					os.system("sshpass -p 'raspberry' scp -o StrictHostKeyChecking=no {0} pi@10.0.0.1:/home/pi/pastImages/".format(list) )
-#					os.system("rm {0}".format(list) )
-#					picsList = []
+				picsList = glob.glob('/home/pi/*.jpg')
+				while len(picsList) > 0:
+					list = ' '.join(picsList)
+					print (list)
+					os.system("sshpass -p 'raspberry' scp -o StrictHostKeyChecking=no {0} pi@10.0.0.1:/home/pi/pastImages/".format(list) )
+					os.system("rm {0}".format(list) )
+					picsList = []
 			elif runThread is 'T1closeT2':
 				print >>self.f, '10.2: T2 recieved close message'
-#				self.f.close()
+				self.f.close()
 				break
 			elif runThread is 'exit':
 				print >>self.f, "10.2 broken"
-#				self.f.close()
+				self.f.close()
 				break
 
 def main():
