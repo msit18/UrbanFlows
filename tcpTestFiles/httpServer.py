@@ -66,8 +66,8 @@ if __name__ == '__main__':
 	# root = Resource()
 	# root.putChild("upload-image", c)
 	# factory = Site(root)
-	reactor.listenTCP(8880, b, 200, 'localhost')
+	#reactor.listenTCP(8880, b, 200, 'localhost')
 
 	reactor.run()
 
-	#reactor.listenTCP(8888, DataFactory(), 200, '18.111.45.131')
+	reactor.listenTCP(8000, DataFactory(), 200, '10.0.0.6')

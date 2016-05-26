@@ -35,6 +35,6 @@ class DataProtocol (protocol.Protocol):
 	# 	self.factory.data = "Server manipulation: {0}".format(data)
 	# 	print "The next message Server will send is: {0}".format(self.factory.data)
 
-#reactor.listenTCP(8888, DataFactory(), 200, '18.111.45.131')
-reactor.listenTCP(8888, DataFactory(), 200, 'localhost')
+reactor.listenTCP(8000, DataFactory(), 200, '10.0.0.6')
+#reactor.listenTCP(8000, DataFactory(), 200, 'localhost')
 reactor.run()
