@@ -30,7 +30,7 @@ class takeVideoClass():
 					camera.framerate = inputFramerate
 					for filename in camera.record_sequence(['slavePi2_RW' + str(inputResW) + '_RH' + str(inputResH) + '_TT' +\
 						str(inputTotalTime) + '_FR' + str(inputFramerate) + '_' + \
-						datetime.datetime.now().strftime ('%M_%S_%f') + '.h264']):
+						datetime.datetime.now().strftime ('%M_%S_%f') + '.h264'):
 						for k in range(numCycles)]):
 							camera.wait_recording(inputVidTimeChunk)
 				print "CAMERA IS FINISHED. RETURN FALSE"
