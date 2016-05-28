@@ -62,19 +62,21 @@ class MasterVariables():
 			print "{0} | TotalTime(sec): {1} | ResW: {2} | ResH: {3} | NumPics: {4} | "\
 			"TimeInterval(sec): {5} | FR: {6} | StartTime: {7} | NumRaspies: {8}".format(self.camVid, \
 			self.ServerTotalTimeSec, self.ServerResW, self.ServerResH,\
-			self.ServerNumPics, self.ServerTimeInterval, self.ServerFrameRate, self.ServerStartTime,
+			self.ServerNumPics, self.ServerTimeInterval, self.ServerFrameRate, self.ServerStartTime, \
 			self.numRaspiesInCluster)
 
 		elif self.camVid == "video":
 			self.ServerVidTimeSec = raw_input('Enter individual video time(sec): ')
 			self.ServerResW = raw_input('Enter resolution width: ')
 			self.ServerResH = raw_input('Enter resolution height: ')
-			#self.ServerTotalTimeSec = input('Enter total run time in seconds: ')
+			self.ServerTotalTimeSec = input('Enter total run time in seconds: ')
 			self.ServerFrameRate = raw_input ('Enter framerate: ')
 			print "Thank you for your input. Please check the following"
-			print "{0} | VidTime(sec): {1} | ResW: {2} | ResH: {3} | FR: {4} | StartTime: {5} | NumRaspies: {6}"\
+			print "{0} | VidTime(sec): {1} | ResW: {2} | ResH: {3} | TotalTime (sec): {4} |"\
+			" FR: {5} | StartTime: {6} | NumRaspies: {7}"\
 			.format(self.camVid, self.ServerVidTimeSec, self.ServerResW,\
-			self.ServerResH, self.ServerFrameRate, self.ServerStartTime, self.numRaspiesInCluster)
+			self.ServerResH, self.ServerTotalTimeSec, self.ServerFrameRate, \
+			self.ServerStartTime, self.numRaspiesInCluster)
 
 		elif self.camVid == "multiplexer":
 			print "still working on this feature. Please try again"

@@ -14,21 +14,25 @@ class takeVideoClass():
 	def __init__(self):
 		self.runUpload = True
 
+	# self.camVid, self.ServerVidTimeSec, self.ServerResW,\
+	# self.ServerResH, self.ServerTotalTimeSec, self.ServerFrameRate, \
+	# self.ServerStartTime, self.numRaspiesInCluster
+
 	#def takeVideo (self, inputVidTime, inputResW, inputResH, inputTotalRunTime, inputFramerate, inputStartTime):
-	def takeVideo (self, inputVidTime, inputResW, inputResH, inputFramerate, inputStartTime):
+	def takeVideo (self, inputVidTimeChunk, inputResW, inputResH, inputTotalTime, inputFramerate, inputStartTime):
 		while time.time() < inputStartTime:
 			pass
 		else:
 			try:
-	#			numCycles = (inputTotalRunTime*60)/inputVidTime
+				numCycles = (inputTotalRunTime)/inputVidTime
 				with picamera.PiCamera() as camera:
 					camera.resolution = (inputResW, inputResH)
 					camera.framerate = inputFramerate
-					for filename in camera.record_sequence([
+					for filename in camera.record_sequence(['slavePi2_RW' + str(inputResW) + '_RH' + str(inputResH) + '_TT' +\
+						str(inputTotalTime) + '_FR' + str(inputFramerate) + '_' + \
 						datetime.datetime.now().strftime ('%M_%S_%f') + '.h264']):
-						#datetime.datetime.now().strftime('%d-%m-%Y-%H_%M_%S_%f') + '_TT' + str(inputTotalTime) + '_VT' + str(inputVidTime) + '_RH' + str(inputResH) + '_FR' + str(inputFramerate) + ".h264"]):
-	#					for k in range(numCycles)]):
-						camera.wait_recording(inputVidTime)
+						for k in range(numCycles)]):
+							camera.wait_recording(inputVidTimeChunk)
 				print "CAMERA IS FINISHED. RETURN FALSE"
 				self.runUpload = False
 			except:
@@ -38,38 +42,45 @@ class takeVideoClass():
 				raise
 
 	def curlUpload (self, serverIP):
-		print "curlUpload called"
-		self.fileList = glob.glob('*.jpg')
+		print "curlUploadImg called"
+		self.fileList = glob.glob('*.h264')
+		self.fileList.extend(glob.glob('*.bin'))
+		self.fileList.sort()
 		if len(self.fileList) > 0:
 			print "fileList has customers: ", self.fileList
 			for item in self.fileList:
-				os.system(
+				cmd = \
 					'if balExp=$(curl -X GET http://{0}:8880/upload-image);'\
-					'then curl --header "filename: {1}" -y 10 --max-time 180 -X POST --data-binary @{1} http://{0}:8880/upload-image &'\
-					'wait;'\
-					#'rm {1};'\
-					'else sudo ifup wlan0;'\
-					'fi'.format(serverIP, item)
-					)
+					' then curl -C - --header "filename: {1}" -y 10 --max-time 180 -X POST --data-binary @{1} http://{0}:8880/upload-image &'\
+					' wait;'\
+					' rm {1};'\
+					' wait;'\
+					' else sudo ifup wlan0;'\
+					' fi'.format(serverIP, item)
+				#print "cmd: ", cmd
+				subprocess.call(cmd, shell=True)
 
 	def sendUpload(self, inputStartTimePlusOne, serverIP):
 		while time.time() < inputStartTimePlusOne:
 			pass
 		else:
 			while self.runUpload == True:
-				# print "while loop for runSenditem called"
-				self.fileList = glob.glob('*.jpg')
+				self.fileList = glob.glob('*.h264')
+				self.fileList.extend(glob.glob('*.bin'))
+				self.fileList.sort()
 				if len(self.fileList) > 0:
 					print "fileList has customers: ", self.fileList
 					for item in self.fileList:
-						os.system(
+						cmd = \
 							'if balExp=$(curl -X GET http://{0}:8880/upload-image);'\
-							'then curl -C - --header "filename: {1}" -y 10 --max-time 180 -X POST --data-binary @{1} http://{0}:8880/upload-image &'\
-							'wait;'\
-							#'rm {1};'\
-							'else sudo ifup wlan0;'\
-							'fi'.format(serverIP, item)
-							)
+							' then curl -C - --header "filename: {1}" -y 10 --max-time 180 -X POST --data-binary @{1} http://{0}:8880/upload-image &'\
+							' wait;'\
+							' rm {1};'\
+							' wait;'\
+							' else sudo ifup wlan0;'\
+							' fi'.format(serverIP, item)
+						#print "cmd: ", cmd
+						subprocess.call(cmd, shell=True)
 				print "sleeping for 1 seconds"
 				time.sleep(1)
 			else:
@@ -82,8 +93,8 @@ class takeVideoClass():
 
 if __name__ == '__main__':
 	tv = takeVideoClass()
-	now = time.time() + 1
-	tv.takeVideo(180, 1600, 1200, 15, now)
+	# now = time.time() + 1
+	# tv.takeVideo(180, 1600, 1200, 15, now)
 	# tv.takeVideo(180, 1024, 768, 15, now)
 	# tv.takeVideo(180, 1280, 720, 30, now)
 	# tv.takeVideo(180, 1920, 1080, 30, now)

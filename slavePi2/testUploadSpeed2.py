@@ -72,8 +72,10 @@ class myProtocol(protocol.Protocol):
 				endOfProcess = tp.sendUpload(callLaterTimeCollectImgs, serverIP)
 				print endOfProcess
 				result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, endOfProcess))
-				
-			#VideoTime, ResW, ResH, totalRunTime, framerate, startTime
+			
+			#self.camVid, self.ServerVidTimeSec, self.ServerResW,\
+			#self.ServerResH, self.ServerTotalTimeSec, self.ServerFrameRate, \
+			#self.ServerStartTime, self.numRaspiesInCluster
 			elif msgFromServer[1] == "video":
 				print "this is the video command"
 				tv.runUpload = True

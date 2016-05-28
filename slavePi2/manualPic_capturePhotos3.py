@@ -68,7 +68,9 @@ class takePictureClass():
 					while time.time() < prgmEndTime:
 						print time.time()
 						print prgmEndTime
-						for filename in camera.capture_continuous ('{timestamp:%M_%S_%f}.jpg', burst=True):
+						for filename in camera.capture_continuous ('slavePi2_RW' + str(inputResW) +\
+						'_RH' + str(inputResH) + '_TT' + str(inputTotalTime) + '_FR' + str(inputFramerate) + \
+						'_{timestamp:%M_%S_%f}.jpg', burst=True):
 							print ('Captured {0}'.format(filename))
 							time.sleep(calculatedFpsTimeInterval)
 							if time.time() > prgmEndTime:
