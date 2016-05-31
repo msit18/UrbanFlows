@@ -40,8 +40,9 @@ class MasterVariables():
 			 self.ServerResW, self.ServerResH, self.ServerNumPics, self.ServerTimeInterval,\
 			 self.ServerFrameRate, self.ServerStartTime)
 		elif self.camVid == "video":
-			self.param = "video {0} {1} {2} {3} {4}".format(self.ServerVidTimeSec,\
-			self.ServerResW, self.ServerResH, self.ServerFrameRate, self.ServerStartTime)
+			self.param = "video {0} {1} {2} {3} {4} {5}".format(self.ServerVidTimeSec,\
+			self.ServerResW, self.ServerResH, self.ServerTotalTimeSec, self.ServerFrameRate, \
+			self.ServerStartTime)
 		return self.param
 
 	def userInput(self):
