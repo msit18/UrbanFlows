@@ -18,13 +18,12 @@ class takeVideoClass():
 	# self.ServerResH, self.ServerTotalTimeSec, self.ServerFrameRate, \
 	# self.ServerStartTime, self.numRaspiesInCluster
 
-	#def takeVideo (self, inputVidTime, inputResW, inputResH, inputTotalRunTime, inputFramerate, inputStartTime):
 	def takeVideo (self, inputVidTimeChunk, inputResW, inputResH, inputTotalTime, inputFramerate, inputStartTime):
 		while time.time() < inputStartTime:
 			pass
 		else:
 			try:
-				numCycles = (inputTotalRunTime)/inputVidTime
+				numCycles = (inputTotalTime)/inputVidTimeChunk
 				with picamera.PiCamera() as camera:
 					camera.resolution = (inputResW, inputResH)
 					camera.framerate = inputFramerate

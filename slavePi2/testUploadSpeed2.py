@@ -74,15 +74,15 @@ class myProtocol(protocol.Protocol):
 				result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, endOfProcess))
 			
 			#self.ServerVidTimeSec (2), self.ServerResW (3),\
-			#self.ServerResH (4), self.ServerFrameRate (5), \
-			#self.ServerStartTime (6) (7)
+			#self.ServerResH (4), self.ServerTotalTimeSec (5), self.ServerFrameRate (6),  \
+			#self.ServerStartTime (7) (8)
 			elif msgFromServer[1] == "video":
 				print "this is the video command"
 				tv.runUpload = True
 				#WHAT IS THIS? HOW DO I TAKE CARE OF THIS?
 				startAtTime = self.calculateTimeDifference(msgFromServer[7], msgFromServer[8])
 				callLaterTimeCollectImgs = startAtTime + 1
-				result = threads.deferToThread(tp.takeVideo, int(msgFromServer[2]), int(msgFromServer[3]), int(msgFromServer[4]),\
+				result = threads.deferToThread(tv.takeVideo, int(msgFromServer[2]), int(msgFromServer[3]), int(msgFromServer[4]),\
 					int(msgFromServer[5]), int(msgFromServer[6]), startAtTime)
 				result.addErrback(self.failedMethod)
 				endOfProcess = tv.sendUpload(callLaterTimeCollectImgs, serverIP)
