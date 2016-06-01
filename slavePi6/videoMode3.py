@@ -8,6 +8,7 @@ import datetime
 import glob
 import os
 import sys
+import subprocess
 
 #Takes video
 class takeVideoClass():
