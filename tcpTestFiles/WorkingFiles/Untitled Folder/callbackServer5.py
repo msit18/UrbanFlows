@@ -29,7 +29,16 @@ class DataFactory(Factory):
 		self.ipDictionary = {}
 		self.checkCamPi = 0
 		self.finished = 0
-		self.timesToTakeVideo = []
+		self.timesToTakeVideo = [datetime.datetime.strptime("06/02/16 09:58:00", "%x %X"), \
+								datetime.datetime.strptime("06/02/16 10:58:00", "%x %X"), \
+								datetime.datetime.strptime("06/02/16 11:58:00", "%x %X"), \
+								datetime.datetime.strptime("06/02/16 12:58:00", "%x %X"), \
+								datetime.datetime.strptime("06/02/16 13:58:00", "%x %X"), \
+								datetime.datetime.strptime("06/02/16 14:58:00", "%x %X"), \
+								datetime.datetime.strptime("06/02/16 15:58:00", "%x %X"), \
+								datetime.datetime.strptime("06/02/16 16:58:00", "%x %X"), \
+								datetime.datetime.strptime("06/02/16 19:58:00", "%x %X")]
+		self.videoTotalTimeSecDuration = [1020, 1020, 1020, 1020, 1020, 1020, 1020, 7200, 1020]
 
 	def buildProtocol(self, addr):
 		return DataProtocol(self, d)
@@ -82,8 +91,11 @@ class DataProtocol (protocol.Protocol):
 				if len(self.factory.timesToTakeVideo) > 0:
 					self.factory.finished = int(f.numRaspiesInCluster)
 					self.factory.checkCamPi = 0
+					newStartTime = self.factory.timesToTakeVideo.pop(0)
+					f.ServerStartTime = newStartTime
+					f.ServerTotalTimeSec = self.factory.videoTotalTimeSecDuration.pop(0)
 					print "Running next video time"
-					while datetime.datetime.today() < self.factory.timesToTakeVideo.pop(0):
+					while datetime.datetime.today() < newStartTime:
 						pass
 					else:
 						self.verifyConnections()
