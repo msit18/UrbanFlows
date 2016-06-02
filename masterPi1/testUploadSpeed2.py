@@ -79,9 +79,9 @@ class myProtocol(protocol.Protocol):
 			elif msgFromServer[1] == "video":
 				print "this is the video command"
 				tv.runUpload = True
-				#WHAT IS THIS? HOW DO I TAKE CARE OF THIS?
 				startAtTime = self.calculateTimeDifference(msgFromServer[7], msgFromServer[8])
-				callLaterTimeCollectImgs = startAtTime + 1
+				callLaterTimeCollectImgs = startAtTime + int(msgFromServer[2])
+				print "callLaterTimeCollectImgs: ", callLaterTimeCollectImgs
 				result = threads.deferToThread(tv.takeVideo, int(msgFromServer[2]), int(msgFromServer[3]), int(msgFromServer[4]),\
 					int(msgFromServer[5]), int(msgFromServer[6]), startAtTime)
 				result.addErrback(self.failedMethod)
