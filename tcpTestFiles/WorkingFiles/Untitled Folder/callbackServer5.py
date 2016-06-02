@@ -30,12 +30,12 @@ class DataFactory(Factory):
 		self.ipDictionary = {}
 		self.checkCamPi = 0
 		self.finished = 0
-		# self.timesToTakeVideo = ["06/02/16 05:30:00", "06/02/16 05:40:00"]
-		# self.videoTotalTimeSecDuration = [600, 600]
-		self.timesToTakeVideo = ["06/02/16 09:58:00", "06/02/16 10:58:00", "06/02/16 11:58:00", \
-								"06/02/16 12:58:00", "06/02/16 13:58:00", "06/02/16 14:58:00", \
-								"06/02/16 15:58:00", "06/02/16 16:58:00", "06/02/16 19:58:00"]
-		self.videoTotalTimeSecDuration = [1020, 1020, 1020, 1020, 1020, 1020, 1020, 7200, 1020]
+		self.timesToTakeVideo = ["06/02/16 14:20:00", "06/02/16 14:30:00"]
+		self.videoTotalTimeSecDuration = [1020, 1020]
+		# self.timesToTakeVideo = ["06/02/16 09:58:00", "06/02/16 10:58:00", "06/02/16 11:58:00", \
+		# 						"06/02/16 12:58:00", "06/02/16 13:58:00", "06/02/16 14:58:00", \
+		# 						"06/02/16 15:58:00", "06/02/16 16:58:00", "06/02/16 19:58:00"]
+		# self.videoTotalTimeSecDuration = [1020, 1020, 1020, 1020, 1020, 1020, 1020, 7200, 1020]
 
 	def buildProtocol(self, addr):
 		return DataProtocol(self, d)
@@ -68,7 +68,7 @@ class DataProtocol (protocol.Protocol):
 			print "Echoers: ", self.factory.ipDictionary
 			print "RUNNING CHECKCONNECTIONS"
 			if len(self.factory.ipDictionary) > (totalNumRaspies-1): #Set value to total number of Raspies -1
-			print "verifying Connections with connections"
+				print "verifying Connections with connections"
 				self.verifyConnections()
 		elif msgFromClient[0] == 'CAMERROR':
 			print "ERROR FROM {1} PICAMERA at {0}".format(time.strftime("%Y-%m-%d-%H:%M:%S"), msgFromClient[1])
