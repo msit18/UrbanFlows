@@ -40,7 +40,7 @@ class MasterVariables():
 			 self.ServerResW, self.ServerResH, self.ServerNumPics, self.ServerTimeInterval,\
 			 self.ServerFrameRate, self.ServerStartTime)
 		elif self.camVid == "video":
-			self.param = "video {0} {1} {2} {3} {4} {5}".format(self.ServerVidTimeSec,\
+			self.param = "video {0} {1} {2} {3} {4}".format(\
 			self.ServerResW, self.ServerResH, self.ServerTotalTimeSec, self.ServerFrameRate, \
 			self.ServerStartTime)
 		return self.param
@@ -67,15 +67,15 @@ class MasterVariables():
 			self.numRaspiesInCluster)
 
 		elif self.camVid == "video":
-			self.ServerVidTimeSec = raw_input('Enter individual video time(sec): ')
+			#self.ServerVidTimeSec = raw_input('Enter individual video time(sec): ')
 			self.ServerResW = raw_input('Enter resolution width: ')
 			self.ServerResH = raw_input('Enter resolution height: ')
 			self.ServerTotalTimeSec = input('Enter total run time in seconds: ')
 			self.ServerFrameRate = raw_input ('Enter framerate: ')
 			print "Thank you for your input. Please check the following"
-			print "{0} | VidTime(sec): {1} | ResW: {2} | ResH: {3} | TotalTime (sec): {4} |"\
-			" FR: {5} | StartTime: {6} | NumRaspies: {7}"\
-			.format(self.camVid, self.ServerVidTimeSec, self.ServerResW,\
+			print "{0} | ResW: {1} | ResH: {2} | TotalTime (sec): {3} |"\
+			" FR: {4} | StartTime: {5} | NumRaspies: {6}"\
+			.format(self.camVid, self.ServerResW,\
 			self.ServerResH, self.ServerTotalTimeSec, self.ServerFrameRate, \
 			self.ServerStartTime, self.numRaspiesInCluster)
 
