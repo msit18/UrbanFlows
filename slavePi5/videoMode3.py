@@ -24,15 +24,22 @@ class takeVideoClass():
 			pass
 		else:
 			try:
-				numCycles = (inputTotalTime)/inputVidTimeChunk
+				numCycles = int(inputTotalTime)/int(inputVidTimeChunk)
+				print "inputTotalTime: ", inputTotalTime
+				print "inputVidTimeChunk: ", inputVidTimeChunk
+				print "numCycles: ", numCycles
 				with picamera.PiCamera() as camera:
 					camera.resolution = (inputResW, inputResH)
 					camera.framerate = inputFramerate
-					for filename in camera.record_sequence('slavePi5_RW' + str(inputResW) + '_RH' + str(inputResH) + '_TT' +\
-						str(inputTotalTime) + '_FR' + str(inputFramerate) + '_' + \
-						datetime.datetime.now().strftime ('%M_%S_%f') + '.h264' for k in range(numCycles)):
+					for filename in camera.record_sequence('slavePi5_RW' + str(inputResW) + '_RH' + str(inputResH)\
+						+ '_TT' + str(inputTotalTime) + '_VT' + str(inputVidTimeChunk) + '_FR' + str(inputFramerate)\
+						+ '_' + datetime.datetime.now().strftime ('%H_%M_%S_%f') + '.h264' for k in range(numCycles)):
+						start = time.time()
+						print "camera wait recording"
 						camera.wait_recording(inputVidTimeChunk)
-				camera.stop_recording()
+						end = time.time()
+						total = end-start
+						print "camera is finished: ", total
 				print "CAMERA IS FINISHED. RETURN FALSE"
 				self.runUpload = False
 			except:
@@ -81,7 +88,7 @@ class takeVideoClass():
 							' fi'.format(serverIP, item)
 						#print "cmd: ", cmd
 						subprocess.call(cmd, shell=True)
-				print "sleeping for 1 seconds"
+				#print "sleeping for 1 seconds"
 				time.sleep(1)
 			else:
 				print "runing last glob"
@@ -94,7 +101,7 @@ class takeVideoClass():
 if __name__ == '__main__':
 	tv = takeVideoClass()
 	# now = time.time() + 1
-	# tv.takeVideo(180, 1600, 1200, 15, now)
+	# tv.takeVideo(30, 1600, 1200, 120, 15, now)
 	# tv.takeVideo(180, 1024, 768, 15, now)
 	# tv.takeVideo(180, 1280, 720, 30, now)
 	# tv.takeVideo(180, 1920, 1080, 30, now)
