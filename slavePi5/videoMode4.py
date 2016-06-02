@@ -19,28 +19,28 @@ class takeVideoClass():
 	# self.ServerResH, self.ServerTotalTimeSec, self.ServerFrameRate, \
 	# self.ServerStartTime, self.numRaspiesInCluster
 
-	def takeVideo (self, inputVidTimeChunk, inputResW, inputResH, inputTotalTime, inputFramerate, inputStartTime, serverIP):
+	def takeVideo (self, inputResW, inputResH, inputTotalTime, inputFramerate, inputStartTime, serverIP):
 		while time.time() < inputStartTime:
 			pass
 		else:
 			try:
-				numCycles = int(inputTotalTime)/int(inputVidTimeChunk)
+				#numCycles = int(inputTotalTime)/int(inputVidTimeChunk)
 				print "inputTotalTime: ", inputTotalTime
-				print "inputVidTimeChunk: ", inputVidTimeChunk
-				print "numCycles: ", numCycles
+				#print "inputVidTimeChunk: ", inputVidTimeChunk
+				#print "numCycles: ", numCycles
 				with picamera.PiCamera() as camera:
 					camera.resolution = (inputResW, inputResH)
 					camera.framerate = inputFramerate
-					for filename in camera.record_sequence('slavePi5_RW' + str(inputResW) + '_RH' + str(inputResH)\
-						+ '_TT' + str(inputTotalTime) + '_VT' + str(inputVidTimeChunk) + '_FR' + str(inputFramerate)\
-						+ '_' + datetime.datetime.now().strftime ('%H_%M_%S_%f') + '.h264' for k in range(numCycles)):
-						start = time.time()
-						print "camera wait recording"
-						camera.wait_recording(inputVidTimeChunk)
-						end = time.time()
-						total = end-start
-						print "camera is finished: ", total
-						self.curlUpload(serverIP)
+					camera.start_recording('slavePi5_RW' + str(inputResW) + '_RH' + str(inputResH)\
+						+ '_TT' + str(inputTotalTime) + '_FR' + str(inputFramerate)\
+						+ '_' + datetime.datetime.now().strftime ('%H_%M_%S_%f') + '.h264')
+					start = time.time()
+					print "camera wait recording"
+					camera.wait_recording(inputTotalTime)
+					end = time.time()
+					total = end-start
+					print "camera is finished: ", total
+					self.curlUpload(serverIP)
 				print "CAMERA IS FINISHED. RETURN FALSE"
 				self.runUpload = False
 				return "finished"
