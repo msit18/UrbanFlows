@@ -40,7 +40,7 @@ class takeVideoClass():
 					end = time.time()
 					total = end-start
 					print "camera is finished: ", total
-					self.curlUpload(serverIP)
+					self.curlUpload2(serverIP)
 				print "CAMERA IS FINISHED. RETURN FALSE"
 				self.runUpload = False
 				return "finished"
@@ -68,6 +68,16 @@ class takeVideoClass():
 					' fi'.format(serverIP, item)
 				#print "cmd: ", cmd
 				subprocess.call(cmd, shell=True)
+
+	def curlUpload2 (self, serverIP):
+		print "curlUploadImg called"
+		self.fileList = glob.glob('*.h264')
+		self.fileList.extend(glob.glob('*.bin'))
+		self.fileList.sort()
+		if len(self.fileList) > 0:
+			print "fileList has customers: ", self.fileList
+			for item in self.fileList:
+				subprocess.call('scp {0} msit@18.132.1.9:/home/msit/'.format(item), shell=True)
 
 	def sendUpload(self, inputStartTimePlusOne, serverIP):
 		while time.time() < inputStartTimePlusOne:
