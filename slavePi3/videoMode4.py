@@ -31,7 +31,7 @@ class takeVideoClass():
 				with picamera.PiCamera() as camera:
 					camera.resolution = (inputResW, inputResH)
 					camera.framerate = inputFramerate
-					camera.start_recording('slavePi2_RW' + str(inputResW) + '_RH' + str(inputResH)\
+					camera.start_recording('slavePi3_RW' + str(inputResW) + '_RH' + str(inputResH)\
 						+ '_TT' + str(inputTotalTime) + '_FR' + str(inputFramerate)\
 						+ '_' + datetime.datetime.now().strftime ('%m_%d_%Y_%H_%M_%S_%f') + '.h264')
 					start = time.time()

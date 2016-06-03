@@ -12,7 +12,7 @@ import subprocess
 
 #Threading for picture transfer
 from manualPic_capturePhotos3 import takePictureClass
-from videoMode3 import takeVideoClass
+from videoMode4 import takeVideoClass
 import os
 import glob
 import time
@@ -73,21 +73,17 @@ class myProtocol(protocol.Protocol):
 				print endOfProcess
 				result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, endOfProcess))
 			
-			#self.ServerVidTimeSec (2), self.ServerResW (3),\
-			#self.ServerResH (4), self.ServerTotalTimeSec (5), self.ServerFrameRate (6),  \
-			#self.ServerStartTime (7) (8)
+			#self.ServerResW (2),\
+			#self.ServerResH (3), self.ServerTotalTimeSec (4), self.ServerFrameRate (5),  \
+			#self.ServerStartTime (6) (7)
 			elif msgFromServer[1] == "video":
 				print "this is the video command"
 				tv.runUpload = True
-				startAtTime = self.calculateTimeDifference(msgFromServer[7], msgFromServer[8])
-				callLaterTimeCollectImgs = startAtTime + int(msgFromServer[2])
-				print "callLaterTimeCollectImgs: ", callLaterTimeCollectImgs
+				startAtTime = self.calculateTimeDifference(msgFromServer[6], msgFromServer[7])
 				result = threads.deferToThread(tv.takeVideo, int(msgFromServer[2]), int(msgFromServer[3]), int(msgFromServer[4]),\
-					int(msgFromServer[5]), int(msgFromServer[6]), startAtTime)
+					int(msgFromServer[5]), startAtTime, serverIP)
 				result.addErrback(self.failedMethod)
-				endOfProcess = tv.sendUpload(callLaterTimeCollectImgs, serverIP)
-				print endOfProcess
-				result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, endOfProcess))
+				result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, 'finished'))
 
 			elif msgFromServer[1] == "multiplexer":
 				print "this is the multiplexer method. Has not been implemented"
