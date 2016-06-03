@@ -77,7 +77,7 @@ class takeVideoClass():
 		if len(self.fileList) > 0:
 			print "fileList has customers: ", self.fileList
 			for item in self.fileList:
-				subprocess.call('scp {0} msit@18.132.1.9:/home/msit/'.format(item), shell=True)
+				subprocess.call('sshpass -p 'ravenclaw' scp {0} msit@18.132.1.9:/home/msit/'.format(item), shell=True)
 
 	def sendUpload(self, inputStartTimePlusOne, serverIP):
 		while time.time() < inputStartTimePlusOne:
