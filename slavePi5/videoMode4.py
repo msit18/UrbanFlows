@@ -33,7 +33,7 @@ class takeVideoClass():
 					camera.framerate = inputFramerate
 					camera.start_recording('slavePi5_RW' + str(inputResW) + '_RH' + str(inputResH)\
 						+ '_TT' + str(inputTotalTime) + '_FR' + str(inputFramerate)\
-						+ '_' + datetime.datetime.now().strftime ('%x_%H_%M_%S_%f') + '.h264')
+						+ '_' + datetime.datetime.now().strftime ('%m_%d_%Y_%H_%M_%S_%f') + '.h264')
 					start = time.time()
 					print "camera wait recording"
 					camera.wait_recording(inputTotalTime)
