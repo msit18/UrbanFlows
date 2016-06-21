@@ -40,7 +40,7 @@ class takeVideoClass():
 					end = time.time()
 					total = end-start
 					print "camera is finished: ", total
-					self.curlUpload2(serverIP)
+#					self.curlUpload2(serverIP)
 				print "CAMERA IS FINISHED. RETURN FALSE"
 				self.runUpload = False
 				return "finished"

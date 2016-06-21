@@ -69,9 +69,9 @@ class myProtocol(protocol.Protocol):
 				result = threads.deferToThread(tp.takePicture_filenames, int(msgFromServer[2]), int(msgFromServer[3]),\
 					int(msgFromServer[4]), int(msgFromServer[7]), startAtTime)
 				result.addErrback(self.failedMethod)
-				endOfProcess = tp.sendUpload(callLaterTimeCollectImgs, serverIP)
-				print endOfProcess
-				result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, endOfProcess))
+#				endOfProcess = tp.sendUpload(callLaterTimeCollectImgs, serverIP)
+#				print endOfProcess
+				result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, 'finished'))
 			
 			#self.ServerResW (2),\
 			#self.ServerResH (3), self.ServerTotalTimeSec (4), self.ServerFrameRate (5),  \
