@@ -30,10 +30,11 @@ class DataFactory(Factory):
 		self.ipDictionary = {}
 		self.checkCamPi = 0
 		self.finished = 0
-		self.timesToTakeVideo = ["06/03/16 12:05:00", \
-								"06/03/16 12:58:00", "06/03/16 13:58:00", "06/03/16 14:58:00", \
-								"06/03/16 15:58:00", "06/03/16 16:58:00", "06/03/16 19:58:00"]
-		self.videoTotalTimeSecDuration = [1020, 1020, 1020, 1020, 1020, 1020, 1020, 7200, 1020]
+		self.timesToTakeVideo = []
+		self.videoTotalTimeSecDuration = []
+#		self.timesToTakeVideo =  ["06/14/16 07:00:00", "06/14/16 08:00:00",\
+#					 "06/14/16 09:00:00", "06/14/16 10:00:00"]
+#		self.videoTotalTimeSecDuration = [900, 900, 900, 900]
 
 	def buildProtocol(self, addr):
 		return DataProtocol(self, d)
