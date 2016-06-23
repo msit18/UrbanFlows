@@ -34,17 +34,16 @@ class takeVideoClass():
 					videoName = 'slavePi2_RW' + str(inputResW) + '_RH' + str(inputResH)\
 						+ '_TT' + str(inputTotalTime) + '_FR' + str(inputFramerate)\
 						+ '_' + datetime.datetime.now().strftime ('%m_%d_%Y_%H_%M_%S_%f') + '.h264'
-					camera.start_recording(name)
+					camera.start_recording(videoName)
 					start = time.time()
 					print "camera wait recording"
 					camera.wait_recording(inputTotalTime)
 					end = time.time()
 					total = end-start
 					print "camera is finished: ", total
-					#self.curlUpload2(serverIP)
 				print "CAMERA IS FINISHED. RETURN FALSE"
 				self.runUpload = False
-				return "finished"
+				return videoName
 			except:
 				print "error"
 				self.runUpload = False
@@ -84,7 +83,6 @@ class takeVideoClass():
 	def sendUpload2(self, serverIP):
 		while self.runUpload == True:
 			self.fileList = glob.glob('*.h264')
-			self.fileList.extend(glob.glob('*.bin'))
 			self.fileList.sort()
 			if len(self.fileList) > 0:
 				print "fileList has customers: ", self.fileList

@@ -79,12 +79,12 @@ class myProtocol(protocol.Protocol):
 				print "this is the video command"
 				tv.runUpload = True
 				startAtTime = self.calculateTimeDifference(msgFromServer[6], msgFromServer[7])
+				callLaterTimeCollectImgs = startAtTime + 1
 				result = threads.deferToThread(tv.takeVideo, int(msgFromServer[2]), int(msgFromServer[3]), int(msgFromServer[4]),\
 					int(msgFromServer[5]), startAtTime, serverIP)
-				result.addErrback(self.failedMethod)
-				print "result: ", result
-				result.addCallback(lambda _: self.uploadVideo(result))
-				result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, 'finished'))
+				result.addErrback(lambda _: self.failedMethod)
+				result.addCallback(self.uploadVideo)
+				result.addCallback(lambda _: reactor.callLater(0.8, self.transport.write, 'finished'))
 
 			elif msgFromServer[1] == "multiplexer":
 				print "this is the multiplexer method. Has not been implemented"
@@ -97,6 +97,16 @@ class myProtocol(protocol.Protocol):
 			result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, "checkCamPi"))
 			result.addErrback(self.failedMethod)
 			tp.sendUpload(callLaterTimeCollectImgs, serverIP)
+
+		#msg[1] = filename, msg[2] = serverFilesize
+		elif msgFromServer[0] == "checkFileSizeIsCorrect":
+			slavePiFileSize = os.path.getsize(msgFromServer[1])
+			if slavePiFileSize >= int(msgFromServer[2]) + 1000000:
+				print "File was uploaded correctly. Removing from slavePi: ", msgFromServer[1]
+				subprocess.call("rm {0}".format(msgFromServer[1]), shell=True)
+			else:
+				print "Was not the same file size. Resending"
+				subprocess.call("sshpass -p 'ravenclaw' scp {0} msit@18.132.1.9:/home/msit/".format(msgFromServer[1]), shell=True)
 
 		else:
 			print "Didn't write hi success.jpg to server"
@@ -118,9 +128,12 @@ class myProtocol(protocol.Protocol):
 		difference = endTime - nowTime
 		return time.time() + difference.total_seconds()
 
-	def uploadVideo(self, fileName):
-		print "RUNNING UPLOADVIDEO"
-		print "filename: ", fileName
+	def uploadVideo(self, videoName):
+		print "Uploading video to server: {0}".format(videoName)
+		subprocess.call("sshpass -p 'ravenclaw' scp {0} msit@18.132.1.9:/home/msit/".format(videoName), shell=True)
+		print "finished uploading file to server. Checking with server if completed."
+		self.transport.write("checkingUploadedFileSize {0}".format(videoName))
+		return videoName
 
 if __name__ == '__main__':
 	jobs = DeferredQueue()
