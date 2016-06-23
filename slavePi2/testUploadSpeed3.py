@@ -70,7 +70,6 @@ class myProtocol(protocol.Protocol):
 					int(msgFromServer[4]), int(msgFromServer[7]), startAtTime)
 				result.addErrback(self.failedMethod)
 #				endOfProcess = tp.sendUpload(callLaterTimeCollectImgs, serverIP)
-#				print endOfProcess
 				result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, 'finished'))
 			
 			#self.ServerResW (2),\
@@ -83,6 +82,8 @@ class myProtocol(protocol.Protocol):
 				result = threads.deferToThread(tv.takeVideo, int(msgFromServer[2]), int(msgFromServer[3]), int(msgFromServer[4]),\
 					int(msgFromServer[5]), startAtTime, serverIP)
 				result.addErrback(self.failedMethod)
+				print "result: ", result
+				result.addCallback(lambda _: self.uploadVideo(result))
 				result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, 'finished'))
 
 			elif msgFromServer[1] == "multiplexer":
@@ -117,12 +118,14 @@ class myProtocol(protocol.Protocol):
 		difference = endTime - nowTime
 		return time.time() + difference.total_seconds()
 
+	def uploadVideo(self, fileName):
+		print fileName
+
 if __name__ == '__main__':
 	jobs = DeferredQueue()
 	print sys.argv[1]
 	serverIP = sys.argv[1]
 	piName = sys.argv[2]
-#	serverIP = "18.189.104.190"
 	tp = takePictureClass()
 	tv = takeVideoClass()
 
