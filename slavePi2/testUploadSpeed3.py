@@ -119,7 +119,8 @@ class myProtocol(protocol.Protocol):
 		return time.time() + difference.total_seconds()
 
 	def uploadVideo(self, fileName):
-		print fileName
+		print "RUNNING UPLOADVIDEO"
+		print "filename: ", fileName
 
 if __name__ == '__main__':
 	jobs = DeferredQueue()
