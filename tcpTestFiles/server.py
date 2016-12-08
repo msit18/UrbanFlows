@@ -21,5 +21,5 @@ class UploadImage(Resource):
 root = Resource()
 root.putChild("upload-image", UploadImage())
 factory = Site(root)
-reactor.listenTCP(8888, factory, 200, '18.111.126.196')
+reactor.listenTCP(8888, factory, 200, '18.111.95.22')
 reactor.run()
