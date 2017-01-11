@@ -4,10 +4,11 @@
 #Shows a camera preview for a specified time.  No images or videos recorded
 
 import picamera
-import time
+import time, sys
 
 camera = picamera.PiCamera()
 camera.start_preview()
-time.sleep(10)
+recTime = float(sys.argv[1])
+time.sleep(float(sys.argv[1]))
 camera.stop_preview()
 camera.close()
