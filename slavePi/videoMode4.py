@@ -78,15 +78,7 @@ class takeVideoClass():
 		if len(self.fileList) > 0:
 			print "fileList has customers: ", self.fileList
 			for item in self.fileList:
-				subprocess.call("sshpass -p 'ravenclaw' scp {0} msit@{1}:{2}".format(item, serverIP, serverSaveFilePath), shell=True)
-
-	def curlUpload3 (self, serverIP):
-		print "curlUploadImg called"
-		self.uploadVideo = True
-		self.fileList = glob.glob('*.h264')
-
-		# subprocess.call("./bashTest.sh &", shell=True)
-		print "Done With CurlUpload2"
+				subprocess.call("sshpass -p 'ravenclaw' scp {0} msit@{1}:\"{2}\"".format(item, serverIP, serverSaveFilePath), shell=True)
 
 	def sendUpload(self, inputStartTimePlusOne, serverIP):
 		while time.time() < inputStartTimePlusOne:

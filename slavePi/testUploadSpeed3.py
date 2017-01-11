@@ -115,7 +115,7 @@ class myProtocol(protocol.Protocol):
 					self.transport.write("checkingUploadedFileSize {0}".format(self.fileList.pop()))
 				else:
 					print "Was not the same file size. Resending"
-					subprocess.call("sshpass -p 'ravenclaw' scp {0} msit@{1}:{2}".format(msgFromServer[1], serverIP, serverSaveFilePath), shell=True)
+					subprocess.call("sshpass -p 'ravenclaw' scp {0} msit@{1}:\"{2}\"".format(msgFromServer[1], serverIP, serverSaveFilePath), shell=True)
 				#Continue file-checking process after verifying if the file is acceptable or not.
 				if len(self.fileList) <= 0:
 					self.collectVideos(serverIP, serverSaveFilePath)
@@ -153,20 +153,28 @@ class myProtocol(protocol.Protocol):
 		self.uploadVideos(serverIP, serverSaveFilePath)
 
 	def uploadVideos (self, serverIP, serverSaveFilePath):
-		if len(self.fileList) > 0:
-			self.fileList.sort()
-			print "fileList has customers: ", self.fileList
-			print "fileList len: ", len(self.fileList)
-			_uploadVidThread = threads.deferToThread(subprocess.call, "sshpass -p 'ravenclaw' scp {0} msit@{1}:{2}".format(self.fileList[0], serverIP, serverSaveFilePath), shell=True)
-			_uploadVidThread.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, "checkingUploadedFileSize {0} \n".format(self.fileList[0])))
-			#^ This throws an error occasionally.
-			for item in self.fileList:
-				print "ITeM: ", item
-				_uploadVidThread.addCallback(lambda _: reactor.callLater(0.5, subprocess.call, "sshpass -p 'ravenclaw' scp {0} msit@{1}:{2}".format(item, serverIP, serverSaveFilePath), shell=True))
-		else:
-			print "fileList has no videos left"
-			print "files left to upload: ", glob.glob('*.h264')
-
+		try:
+			if len(self.fileList) > 0:
+				self.fileList.sort()
+				print "fileList has customers: ", self.fileList
+				print "fileList len: ", len(self.fileList)
+				_uploadVidThread = threads.deferToThread(subprocess.call, "sshpass -p 'ravenclaw' scp {0} msit@{1}:\"{2}\"".format(self.fileList[0], serverIP, serverSaveFilePath), shell=True)
+				_uploadVidThread.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, "checkingUploadedFileSize {0} \n".format(self.fileList[0])))
+				#^ This throws an error occasionally.
+				for item in self.fileList:
+					print "ITeM: ", item
+					_uploadVidThread.addCallback(lambda _: reactor.callLater(0.5, subprocess.call, "sshpass -p 'ravenclaw' scp {0} msit@{1}:\"{2}\"".format(item, serverIP, serverSaveFilePath), shell=True))
+			else:
+				print "fileList has no videos left"
+				print "files left to upload: ", glob.glob('*.h264')
+		except:
+			print "pop statement are giving an error"
+			self.fileList = glob.glob('*.h264')
+			if len(self.fileList) > 0:
+				self.transport.write("checkingUploadedFileSize {0}".format(self.fileList.pop()))
+			else:
+				print "FINISHED. NO MORE FILES"
+				print "remaining files: ", glob.glob('*.h264')
 
 
 	def failedMethod(self,failure):
@@ -188,7 +196,7 @@ if __name__ == '__main__':
 	print sys.argv[1]
 	serverIP = sys.argv[1]
 	piName = sys.argv[2]
-	serverSaveFilePath = "/home/msit/"
+	serverSaveFilePath = "/media/msit/Seagate\ Backup\ Plus\ Drive/Lobby7/"
 #	serverIP = "18.189.104.190"
 	tp = takePictureClass()
 	tv = takeVideoClass()
