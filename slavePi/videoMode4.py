@@ -14,37 +14,35 @@ import subprocess
 class takeVideoClass():
 	def __init__(self):
 		self.runUpload = True
+		self.uploadVideo = False
 
 	# self.camVid, self.ServerVidTimeSec, self.ServerResW,\
 	# self.ServerResH, self.ServerTotalTimeSec, self.ServerFrameRate, \
 	# self.ServerStartTime, self.numRaspiesInCluster
 
-	def takeVideo (self, inputResW, inputResH, inputTotalTime, inputFramerate, inputStartTime, serverIP):
+	def takeVideo (self, inputResW, inputResH, inputTotalTime, inputFramerate, inputStartTime, serverIP, piName):
 		while time.time() < inputStartTime:
 			pass
 		else:
 			try:
-				# #numCycles = int(inputTotalTime)/int(inputVidTimeChunk)
-				# print "inputTotalTime: ", inputTotalTime
-				# #print "inputVidTimeChunk: ", inputVidTimeChunk
-				# #print "numCycles: ", numCycles
-				# with picamera.PiCamera() as camera:
-				# 	camera.resolution = (inputResW, inputResH)
-				# 	camera.framerate = inputFramerate
-				# 	camera.start_recording('slavePi6_RW' + str(inputResW) + '_RH' + str(inputResH)\
-				# 		+ '_TT' + str(inputTotalTime) + '_FR' + str(inputFramerate)\
-				# 		+ '_' + datetime.datetime.now().strftime ('%m_%d_%Y_%H_%M_%S_%f') + '.h264')
-				# 	start = time.time()
-				# 	print "camera wait recording"
-				# 	camera.wait_recording(inputTotalTime)
-				# 	end = time.time()
-				# 	total = end-start
-				# 	print "camera is finished: ", total
-				# 	self.curlUpload2(serverIP)
-				# print "CAMERA IS FINISHED. RETURN FALSE"
-				for y in range(20):
-					print "recording num: ", y
-					time.sleep(0.5)
+				#numCycles = int(inputTotalTime)/int(inputVidTimeChunk)
+				print "inputTotalTime: ", inputTotalTime
+				#print "inputVidTimeChunk: ", inputVidTimeChunk
+				#print "numCycles: ", numCycles
+				with picamera.PiCamera() as camera:
+					camera.resolution = (inputResW, inputResH)
+					camera.framerate = inputFramerate
+					camera.start_recording(str(piName) + '_RW' + str(inputResW) + '_RH' + str(inputResH)\
+						+ '_TT' + str(inputTotalTime) + '_FR' + str(inputFramerate)\
+						+ '_' + datetime.datetime.now().strftime ('%m_%d_%Y_%H_%M_%S_%f') + '.h264')
+					start = time.time()
+					print "camera wait recording"
+					camera.wait_recording(inputTotalTime)
+					end = time.time()
+					total = end-start
+					print "camera is finished: ", total
+					# self.curlUpload2(serverIP, serverSaveFilePath)
+				print "CAMERA IS FINISHED. RETURN FALSE"
 				self.runUpload = False
 				return "finished"
 			except:
@@ -72,19 +70,23 @@ class takeVideoClass():
 				#print "cmd: ", cmd
 				subprocess.call(cmd, shell=True)
 
-	def curlUpload2 (self, serverIP):
-		# print "curlUploadImg called"
-		# self.fileList = glob.glob('*.h264')
-		# self.fileList.extend(glob.glob('*.bin'))
-		# self.fileList.sort()
-		# if len(self.fileList) > 0:
-		# 	print "fileList has customers: ", self.fileList
-		# 	for item in self.fileList:
-		# 		subprocess.call("sshpass -p 'ravenclaw' scp {0} msit@{1}:/home/msit/".format(item, serverIP), shell=True)
-		for x in range(20):
-			print "uploading num: ", x
-			time.sleep(0.5)
-		return "finished"
+	def curlUpload2 (self, serverIP, serverSaveFilePath):
+		print "curlUploadImg called"
+		self.fileList = glob.glob('*.h264')
+		self.fileList.extend(glob.glob('*.bin'))
+		self.fileList.sort()
+		if len(self.fileList) > 0:
+			print "fileList has customers: ", self.fileList
+			for item in self.fileList:
+				subprocess.call("sshpass -p 'ravenclaw' scp {0} msit@{1}:{2}".format(item, serverIP, serverSaveFilePath), shell=True)
+
+	def curlUpload3 (self, serverIP):
+		print "curlUploadImg called"
+		self.uploadVideo = True
+		self.fileList = glob.glob('*.h264')
+
+		# subprocess.call("./bashTest.sh &", shell=True)
+		print "Done With CurlUpload2"
 
 	def sendUpload(self, inputStartTimePlusOne, serverIP):
 		while time.time() < inputStartTimePlusOne:
