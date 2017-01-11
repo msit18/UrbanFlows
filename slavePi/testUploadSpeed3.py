@@ -83,7 +83,12 @@ class myProtocol(protocol.Protocol):
 				result = threads.deferToThread(tv.takeVideo, int(msgFromServer[2]), int(msgFromServer[3]), int(msgFromServer[4]),\
 					int(msgFromServer[5]), startAtTime, serverIP)
 				result.addErrback(self.failedMethod)
+				print "FINISHED TAKING VIDEO FROM SLAVEPI. SENDING FINISHED MSG"
 				result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, 'finished'))
+				print "RUNNING ENDOFPROCESS. Uploading videos!!"
+				endOfProcess = tv.curlUpload2(serverIP)
+				print "EndOfProcessFIN: ", endOfProcess
+				result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, 'finishedUploadingVideos'))
 
 			elif msgFromServer[1] == "multiplexer":
 				print "this is the multiplexer method. Has not been implemented"
