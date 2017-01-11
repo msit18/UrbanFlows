@@ -24,24 +24,27 @@ class takeVideoClass():
 			pass
 		else:
 			try:
-				#numCycles = int(inputTotalTime)/int(inputVidTimeChunk)
-				print "inputTotalTime: ", inputTotalTime
-				#print "inputVidTimeChunk: ", inputVidTimeChunk
-				#print "numCycles: ", numCycles
-				with picamera.PiCamera() as camera:
-					camera.resolution = (inputResW, inputResH)
-					camera.framerate = inputFramerate
-					camera.start_recording('slavePi6_RW' + str(inputResW) + '_RH' + str(inputResH)\
-						+ '_TT' + str(inputTotalTime) + '_FR' + str(inputFramerate)\
-						+ '_' + datetime.datetime.now().strftime ('%m_%d_%Y_%H_%M_%S_%f') + '.h264')
-					start = time.time()
-					print "camera wait recording"
-					camera.wait_recording(inputTotalTime)
-					end = time.time()
-					total = end-start
-					print "camera is finished: ", total
-					self.curlUpload2(serverIP)
-				print "CAMERA IS FINISHED. RETURN FALSE"
+				# #numCycles = int(inputTotalTime)/int(inputVidTimeChunk)
+				# print "inputTotalTime: ", inputTotalTime
+				# #print "inputVidTimeChunk: ", inputVidTimeChunk
+				# #print "numCycles: ", numCycles
+				# with picamera.PiCamera() as camera:
+				# 	camera.resolution = (inputResW, inputResH)
+				# 	camera.framerate = inputFramerate
+				# 	camera.start_recording('slavePi6_RW' + str(inputResW) + '_RH' + str(inputResH)\
+				# 		+ '_TT' + str(inputTotalTime) + '_FR' + str(inputFramerate)\
+				# 		+ '_' + datetime.datetime.now().strftime ('%m_%d_%Y_%H_%M_%S_%f') + '.h264')
+				# 	start = time.time()
+				# 	print "camera wait recording"
+				# 	camera.wait_recording(inputTotalTime)
+				# 	end = time.time()
+				# 	total = end-start
+				# 	print "camera is finished: ", total
+				# 	self.curlUpload2(serverIP)
+				# print "CAMERA IS FINISHED. RETURN FALSE"
+				for y in range(20):
+					print "recording num: ", y
+					time.sleep(0.5)
 				self.runUpload = False
 				return "finished"
 			except:
@@ -70,14 +73,17 @@ class takeVideoClass():
 				subprocess.call(cmd, shell=True)
 
 	def curlUpload2 (self, serverIP):
-		print "curlUploadImg called"
-		self.fileList = glob.glob('*.h264')
-		self.fileList.extend(glob.glob('*.bin'))
-		self.fileList.sort()
-		if len(self.fileList) > 0:
-			print "fileList has customers: ", self.fileList
-			for item in self.fileList:
-				subprocess.call("sshpass -p 'ravenclaw' scp {0} msit@{1}:/home/msit/".format(item, serverIP), shell=True)
+		# print "curlUploadImg called"
+		# self.fileList = glob.glob('*.h264')
+		# self.fileList.extend(glob.glob('*.bin'))
+		# self.fileList.sort()
+		# if len(self.fileList) > 0:
+		# 	print "fileList has customers: ", self.fileList
+		# 	for item in self.fileList:
+		# 		subprocess.call("sshpass -p 'ravenclaw' scp {0} msit@{1}:/home/msit/".format(item, serverIP), shell=True)
+		for x in range(20):
+			print "uploading num: ", x
+			time.sleep(0.5)
 		return "finished"
 
 	def sendUpload(self, inputStartTimePlusOne, serverIP):
