@@ -87,7 +87,7 @@ class myProtocol(protocol.Protocol):
 				result.addErrback(self.failedMethod)
 				result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, 'finished'))
 				# result.addCallback(lambda _: reactor.callLater(0.5, threads.deferToThread, tv.curlUpload2, serverIP, serverSaveFilePath))
-				result.addCallback(lambda _: reactor.callLater(0.5, threads.deferToThread, self.collectVideos, serverIP, serverSaveFilePath))
+				# result.addCallback(lambda _: reactor.callLater(0.5, threads.deferToThread, self.collectVideos, serverIP, serverSaveFilePath))
 
 			elif msgFromServer[1] == "multiplexer":
 				print "this is the multiplexer method. Has not been implemented"
@@ -105,40 +105,40 @@ class myProtocol(protocol.Protocol):
 
 
 		#msg[1] = filename, msg[2] = serverFilesize
-		elif msgFromServer[0] == "checkFileSizeIsCorrect":
-			try:
-				slavePiFileSize = os.path.getsize(msgFromServer[1])
-				# if slavePiFileSize >= int(msgFromServer[2]) + 1000000:
-				if slavePiFileSize >= int(msgFromServer[2]):
-					print "File was uploaded correctly. Removing from slavePi: ", msgFromServer[1]
-					subprocess.call("rm {0}".format(msgFromServer[1]), shell=True)
-					self.transport.write("checkingUploadedFileSize {0}".format(self.fileList.pop()))
-				else:
-					print "Was not the same file size. Resending"
-					subprocess.call("sshpass -p 'ravenclaw' scp {0} msit@{1}:\"{2}\"".format(msgFromServer[1], serverIP, serverSaveFilePath), shell=True)
-				#Continue file-checking process after verifying if the file is acceptable or not.
-				if len(self.fileList) <= 0:
-					self.collectVideos(serverIP, serverSaveFilePath)
-				else:
-					self.transport.write("checkingUploadedFileSize {0}".format(self.fileList.pop()))
+		# elif msgFromServer[0] == "checkFileSizeIsCorrect":
+		# 	try:
+		# 		slavePiFileSize = os.path.getsize(msgFromServer[1])
+		# 		# if slavePiFileSize >= int(msgFromServer[2]) + 1000000:
+		# 		if slavePiFileSize >= int(msgFromServer[2]):
+		# 			print "File was uploaded correctly. Removing from slavePi: ", msgFromServer[1]
+		# 			subprocess.call("rm {0}".format(msgFromServer[1]), shell=True)
+		# 			self.transport.write("checkingUploadedFileSize {0}".format(self.fileList.pop()))
+		# 		else:
+		# 			print "Was not the same file size. Resending"
+		# 			subprocess.call("sshpass -p 'ravenclaw' scp {0} msit@{1}:\"{2}\"".format(msgFromServer[1], serverIP, serverSaveFilePath), shell=True)
+		# 		#Continue file-checking process after verifying if the file is acceptable or not.
+		# 		if len(self.fileList) <= 0:
+		# 			self.collectVideos(serverIP, serverSaveFilePath)
+		# 		else:
+		# 			self.transport.write("checkingUploadedFileSize {0}".format(self.fileList.pop()))
 
-			except:
-				print "CheckFileSizeIsCorrect has an Index or OSError. Popping from an empty list or file does not exist"
-				self.fileList = glob.glob('*.h264')
-				if len(self.fileList) > 0:
-					self.transport.write("checkingUploadedFileSize {0}".format(self.fileList.pop()))
-				else:
-					print "FINISHED. NO MORE FILES"
-					print "remaining files: ", glob.glob('*.h264')
+		# 	except:
+		# 		print "CheckFileSizeIsCorrect has an Index or OSError. Popping from an empty list or file does not exist"
+		# 		self.fileList = glob.glob('*.h264')
+		# 		if len(self.fileList) > 0:
+		# 			self.transport.write("checkingUploadedFileSize {0}".format(self.fileList.pop()))
+		# 		else:
+		# 			print "FINISHED. NO MORE FILES"
+		# 			print "remaining files: ", glob.glob('*.h264')
 
-		elif msgFromServer[0] == "uploadingError":
-			time.sleep(5)
-			self.fileList = glob.glob('*.h264')
-			if len(self.fileList) > 0:
-				self.transport.write("checkingUploadedFileSize {0}".format(self.fileList.pop()))
-			else:
-				print "FINISHED. NO MORE FILES"
-				print "remaining files: ", glob.glob('*.h264')
+		# elif msgFromServer[0] == "uploadingError":
+		# 	time.sleep(5)
+		# 	self.fileList = glob.glob('*.h264')
+		# 	if len(self.fileList) > 0:
+		# 		self.transport.write("checkingUploadedFileSize {0}".format(self.fileList.pop()))
+		# 	else:
+		# 		print "FINISHED. NO MORE FILES"
+		# 		print "remaining files: ", glob.glob('*.h264')
 
 		else:
 			print "Didn't write hi success.jpg to server"
