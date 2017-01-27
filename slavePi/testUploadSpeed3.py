@@ -53,7 +53,7 @@ class myProtocol(protocol.Protocol):
 	def connectionMade(self):
 		#ip_address = subprocess.check_output("hostname --all-ip-addresses", shell=True).strip()
 		#msg = "ip piGroup1 {0}".format(ip_address)
-		msg = "ip piGroup1 {0}".format(piName)
+		msg = "clientName piGroup1 {0}".format(piName)
 		print msg
 		self.transport.write(msg)
 
@@ -86,6 +86,13 @@ class myProtocol(protocol.Protocol):
 					int(msgFromServer[5]), startAtTime, serverIP, piName)
 				result.addErrback(self.failedMethod)
 				result.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, 'finished'))
+				uploadingThread = threads.deferToThread(subprocess.call, "./uploadVideosBash.sh {0} {1}".format(serverIP, serverSaveFilePath), shell=True)
+				uploadingThread.addErrback(self.failedMethodUpload)
+				
+				#TODO: How to end upload process once everything is done? How to do error handling?
+
+
+				# subprocess.call("./home/pi/uploadVideosBash.sh {0} {1} &".format(serverIP, serverSaveFilePath), shell=True)
 				# result.addCallback(lambda _: reactor.callLater(0.5, threads.deferToThread, tv.curlUpload2, serverIP, serverSaveFilePath))
 				# result.addCallback(lambda _: reactor.callLater(0.5, threads.deferToThread, self.collectVideos, serverIP, serverSaveFilePath))
 
@@ -103,85 +110,22 @@ class myProtocol(protocol.Protocol):
 			self.transport.write("checkCamPi")
 			print "run the thing"
 
-
-		#msg[1] = filename, msg[2] = serverFilesize
-		# elif msgFromServer[0] == "checkFileSizeIsCorrect":
-		# 	try:
-		# 		slavePiFileSize = os.path.getsize(msgFromServer[1])
-		# 		# if slavePiFileSize >= int(msgFromServer[2]) + 1000000:
-		# 		if slavePiFileSize >= int(msgFromServer[2]):
-		# 			print "File was uploaded correctly. Removing from slavePi: ", msgFromServer[1]
-		# 			subprocess.call("rm {0}".format(msgFromServer[1]), shell=True)
-		# 			self.transport.write("checkingUploadedFileSize {0}".format(self.fileList.pop()))
-		# 		else:
-		# 			print "Was not the same file size. Resending"
-		# 			subprocess.call("sshpass -p 'ravenclaw' scp {0} msit@{1}:\"{2}\"".format(msgFromServer[1], serverIP, serverSaveFilePath), shell=True)
-		# 		#Continue file-checking process after verifying if the file is acceptable or not.
-		# 		if len(self.fileList) <= 0:
-		# 			self.collectVideos(serverIP, serverSaveFilePath)
-		# 		else:
-		# 			self.transport.write("checkingUploadedFileSize {0}".format(self.fileList.pop()))
-
-		# 	except:
-		# 		print "CheckFileSizeIsCorrect has an Index or OSError. Popping from an empty list or file does not exist"
-		# 		self.fileList = glob.glob('*.h264')
-		# 		if len(self.fileList) > 0:
-		# 			self.transport.write("checkingUploadedFileSize {0}".format(self.fileList.pop()))
-		# 		else:
-		# 			print "FINISHED. NO MORE FILES"
-		# 			print "remaining files: ", glob.glob('*.h264')
-
-		# elif msgFromServer[0] == "uploadingError":
-		# 	time.sleep(5)
-		# 	self.fileList = glob.glob('*.h264')
-		# 	if len(self.fileList) > 0:
-		# 		self.transport.write("checkingUploadedFileSize {0}".format(self.fileList.pop()))
-		# 	else:
-		# 		print "FINISHED. NO MORE FILES"
-		# 		print "remaining files: ", glob.glob('*.h264')
-
 		else:
 			print "Didn't write hi success.jpg to server"
-
-	def collectVideos (self, serverIP, serverSaveFilePath):
-		print "self.runuploads check: ", self.runUploadVideo
-		addVideos = glob.glob('*.h264')
-		while len(addVideos) > 0:
-			val = addVideos.pop()
-			if self.fileList.count(val) == 0:
-				self.fileList.append(val)
-		self.uploadVideos(serverIP, serverSaveFilePath)
-
-	def uploadVideos (self, serverIP, serverSaveFilePath):
-		try:
-			if len(self.fileList) > 0:
-				self.fileList.sort()
-				print "fileList has customers: ", self.fileList
-				print "fileList len: ", len(self.fileList)
-				_uploadVidThread = threads.deferToThread(subprocess.call, "sshpass -p 'ravenclaw' scp {0} msit@{1}:\"{2}\"".format(self.fileList[0], serverIP, serverSaveFilePath), shell=True)
-				_uploadVidThread.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, "checkingUploadedFileSize {0} \n".format(self.fileList[0])))
-				#^ This throws an error occasionally.
-				for item in self.fileList:
-					print "ITeM: ", item
-					_uploadVidThread.addCallback(lambda _: reactor.callLater(0.5, subprocess.call, "sshpass -p 'ravenclaw' scp {0} msit@{1}:\"{2}\"".format(item, serverIP, serverSaveFilePath), shell=True))
-			else:
-				print "fileList has no videos left"
-				print "files left to upload: ", glob.glob('*.h264')
-		except:
-			print "pop statement are giving an error"
-			self.fileList = glob.glob('*.h264')
-			if len(self.fileList) > 0:
-				self.transport.write("checkingUploadedFileSize {0}".format(self.fileList.pop()))
-			else:
-				print "FINISHED. NO MORE FILES"
-				print "remaining files: ", glob.glob('*.h264')
 
 
 	def failedMethod(self,failure):
 		print "FAILURE: ERROR WITH PICTURE TAKING METHOD"
 		self.transport.write("CAMERROR {0}".format(piName))
 		os.system('echo "Camera for {1} is broken. Error message: \n {0} \n'\
-			'-------end of message --------- \n" | mail -s "Camera Broken" msit@wellesley.edu'\
+			'-------end of message --------- \n" | mail -s "Camera Broken" urbanFlowsProject@gmail.com'\
+			.format(str(failure), piName))
+
+	def failedMethodUpload(self, failure):
+		print "FAILURE: ERROR WITH UPLOADING METHOD"
+		self.transport.write("UPLOADERROR {0}".format(piName))
+		os.system('echo "Upload method for {1} is broken. Error message: \n {0} \n'\
+			'-------end of message --------- \n" | mail -s "Upload Broken" urbanFlowsProject@gmail.com'\
 			.format(str(failure), piName))
 
 	def calculateTimeDifference(self, dateToEnd, timeToEnd):
@@ -191,19 +135,23 @@ class myProtocol(protocol.Protocol):
 		difference = endTime - nowTime
 		return time.time() + difference.total_seconds()
 
+
 if __name__ == '__main__':
 	jobs = DeferredQueue()
 	print sys.argv[1]
 	serverIP = sys.argv[1]
 	piName = sys.argv[2]
-	serverSaveFilePath = "/media/msit/Seagate\ Backup\ Plus\ Drive/Lobby7/"
-#	serverIP = "18.189.104.190"
+	# serverSaveFilePath = "/media/msit/Seagate\ Backup\ Plus\ Drive/Lobby7/"
+	serverSaveFilePath = "/media/senseable-beast/beast-brain-1/Data/OneWeekData/tmp/"
 	tp = takePictureClass()
 	tv = takeVideoClass()
 
 	#TCP network: Connects on port 8888. HTTP network: Connects on port 8880
 	data = "start"
 	reactor.connectTCP(serverIP, 8888, DataClientFactory(data), timeout=200)
+
+    # loop_upload = LoopingCall(tv.thing_that_does_http)
+    # loop_upload.start(10)
 
 	reactor.run()
 
