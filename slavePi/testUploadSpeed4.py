@@ -1,5 +1,4 @@
 #Written by Michelle Sit
-#SYSTEM IS BROKEN. FIX THE MMAL ERROR
 
 from twisted.internet import reactor, protocol, defer, threads, task
 from twisted.internet.defer import DeferredList, DeferredSemaphore

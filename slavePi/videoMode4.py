@@ -4,7 +4,6 @@
 
 import time, datetime
 import picamera
-
 from twisted.internet import reactor, defer
 
 #Takes video

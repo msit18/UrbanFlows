@@ -1,3 +1,4 @@
+#Written by Michelle Sit
 #Server IP address is 18.89.4.173
 #ServerSaveFilePath => I will email you the path when we receive our external hard drive
 
