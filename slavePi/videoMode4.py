@@ -4,25 +4,20 @@
 
 import time, datetime
 import picamera
-import glob
-import subprocess
 
 from twisted.internet import reactor, defer
 
 #Takes video
-class takeVideoClass():
-	def __init__(self):
-		self.runUpload = True
+class TakeVideoClass():
 		
-#TODO: NEED ERROR HANDLING HERE FOR WHEN CAMERA FUNCTION FAILS. HOW TO HANDLE THIS? SHOULD NOT RAISE THE ISSUE. SHOULD BE ABLE TO WORK AUTONOMOUSLY
 	def takeVideo (self, inputResW, inputResH, inputTotalTime, inputFramerate, inputStartTime, serverIP, piName):
-	# def takeVideo (self, inputStartTime):
 		# d = defer.Deferred()
-		camera = picamera.PiCamera()
+		
 		while time.time() < inputStartTime:
 			pass
 		else:
 			try:
+				camera = picamera.PiCamera()
 				print "inputTotalTime: ", inputTotalTime
 				camera.resolution = (inputResW, inputResH)
 				camera.framerate = inputFramerate
@@ -37,27 +32,26 @@ class takeVideoClass():
 				end = time.time()
 				total = end-start
 				print "CAMERA IS FINISHED: ", total
-				self.runUpload = False
-				# d.addCallback(lambda _: reactor.callLater(0.5, self.transport.write, 'finished'))
 				return "Finished"
 				# return d
-			except:
-				print "error"
-				self.runUpload = False
-				print "Switched runUpload"
-				camera.close()
-				raise
+			except picamera.exc.PiCameraMMALError as err:
+				print "CAMERA ERROR: MMAL ERROR"
+				self.CamError(err)
+				# print "SYS LOG: ", sys.exc_info()
+				errMsg = "Err Type: " + str(type(err)) + "\nFailure msg: " + str(err)
+				print "errMsg: ", errMsg
+				return errMsg
 				# return d
+			except:
+				print "UNHANDLED CAMERA ERROR"
+				raise
 
-	# def curlUpload2 (self, serverIP, serverSaveFilePath):
-	# 	print "curlUploadImg called"
-	# 	self.fileList = glob.glob('*.h264')
-	# 	self.fileList.extend(glob.glob('*.bin'))
-	# 	self.fileList.sort()
-	# 	if len(self.fileList) > 0:
-	# 		print "fileList has customers: ", self.fileList
-	# 		for item in self.fileList:
-	# 			subprocess.call("sshpass -p 'ravenclaw' scp {0} msit@{1}:\"{2}\"".format(item, serverIP, serverSaveFilePath), shell=True)
+	def CamError(self, failure):
+		print 'CAUGHT THE FUCKER'
+		print "Failure: ", failure
+		print "Failure type: ", type(failure)
+		print "mmmmmmmmmmmm"
+		# print "Failure args: ", failure.args
 
 if __name__ == '__main__':
 	tv = takeVideoClass()
