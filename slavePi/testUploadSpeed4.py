@@ -139,8 +139,10 @@ class myProtocol(protocol.Protocol):
 				continue
 			
 		jobs = DeferredList(jobs)
+
 		print "Results: ", jobs.addCallback(self.getResults, piName)
 		jobs.addCallback(lambda _: reactor.callLater(5, reactor.stop))
+
 		# reactor.stop()
 
 	def getResults(self, res, piName):
@@ -148,7 +150,7 @@ class myProtocol(protocol.Protocol):
 		print "We got piName: ", piName
 		recordSuccess = False
 		for resLen in range(len(res)):
-			print res[resLen][1]
+			print  "RESLEN1: ", res[resLen][1]
 			if res[resLen][1] != "Finished":
 				print "errrrrrrrr"
 				reactor.callLater(0.5, self.transport.write, "CAMERROR {0} {1}\n".format(piName, res[resLen][1]))
@@ -157,7 +159,8 @@ class myProtocol(protocol.Protocol):
 			recordSuccess = True
 		if recordSuccess:
 			print "Nothing went wrong. Send Finished message"
-			reactor.callLater(0.5, self.transport.write, 'finished\n') #Does this get sent?
+			reactor.callLater(0.5, self.transport.write, 'finished\n')
+		return "done"
 
 	def failedMethod(self,failure):
 		print "FAILURE: ERROR WITH PICTURE TAKING METHOD"
@@ -192,6 +195,10 @@ class myProtocol(protocol.Protocol):
 if __name__ == '__main__':
 	print sys.argv[1]
 	serverIP = sys.argv[1]
+	if serverIP != "18.89.4.173":
+		print "IP ERROR: This is the wrong IP address. Try again!"
+		reactor.stop()
+
 	piName = sys.argv[2]
 	# serverSaveFilePath = "/media/msit/Seagate\ Backup\ Plus\ Drive/Lobby7/"
 	serverSaveFilePath = "/media/senseable-beast/beast-brain-1/Data/OneWeekData/tmp/"
