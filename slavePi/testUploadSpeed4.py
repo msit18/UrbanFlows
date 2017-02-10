@@ -52,7 +52,7 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 					restartWifiTries += 1
 			else:
 				print "WIFI ERROR: Could not connect to the internet."
-				reactor.stop()
+				# reactor.stop()
 
 	def restartWifi(self):
 		subprocess.call("sudo ifdown eth0; sudo ifdown wlan0; sudo ifup wlan0; sudo ifup eth0", shell=True)
@@ -60,10 +60,16 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 		time.sleep(10)
 		return subprocess.call("[\"$(/bin/ping -c 3 8.8.8.8)\"]", shell=True)
 
+	def connEmailError(self, piName, errorMsg):
+		os.system('echo "Connection for {0} was lost at {2}. Error message: \n {1} \n'\
+			'-------end of message --------- \n" | mail -s "ConnectionLost" urbanFlowsProject@gmail.com'\
+			.format(piName, errorMsg, time.strftime("%Y-%m-%d-%H:%M:%S")))
+
 	#This method runs if the connection to the server has been severed
 	def clientConnectionLost(self, connector, reason):
 		print 'Connection lost at {0}:'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), reason.getErrorMessage()
 		print "CONNECTION ERROR: Connection has been lost but still recording hopefully. Will stop sending files"
+		self.connEmailError(piName, "CONNECTION LOST: {0}".format(reason.getErrorMessage()))
 
 class myProtocol(protocol.Protocol):
 	def __init__(self, factory):
@@ -96,14 +102,14 @@ class myProtocol(protocol.Protocol):
 
 				def uploadThread(serverIP, serverSaveFilePath):
 					uploadThread = threads.deferToThread(up.videoUpload, serverIP, serverSaveFilePath)
-					uploadThread.addErrback(self.upFail)
+					uploadThread.addErrback(self.upFail, piName)
 
 				upload_loop = LoopingCall(uploadThread, serverIP, serverSaveFilePath)
 				upload_loop.start(1800) #seconds
 
 				videoThread = threads.deferToThread(self.recordVideoProcess, int(msgFromServer[2]), int(msgFromServer[3]), int(msgFromServer[4]),\
 					int(msgFromServer[5]), serverIP, piName, self.recordTimes)
-				videoThread.addErrback(self.vtFail)
+				videoThread.addErrback(self.vtFail, piName)
 
 			elif msgFromServer[1] == "multiplexer" or msgFromServer[1] == "camera":
 				print "this is the {0} method. It has been discontinued. Please exit the program and select video".format(msgFromServer[1])
@@ -129,22 +135,26 @@ class myProtocol(protocol.Protocol):
 					print "odd number"
 					recordTimesList.pop(0)
 					print "new len: ", len(recordTimesList)
+					reactor.callLater(0.5, self.transport.write, "TIMEINPUTERROR {0}\n".format(piName))
 				continue
 			
 		jobs = DeferredList(jobs)
-		print "Results: ", jobs.addCallback(self.getResults)
-		return "FINITE"
-		# jobs.addCallback(lambda _: reactor.callLater(5, reactor.stop))
+
+		print "Results: ", jobs.addCallback(self.getResults, piName)
+		jobs.addCallback(lambda _: reactor.callLater(5, reactor.stop))
+
 		# reactor.stop()
 
-	def getResults(self, res):
-		# print "We got: ", res
+	def getResults(self, res, piName):
+		print "We got: ", res
+		print "We got piName: ", piName
 		recordSuccess = False
 		for resLen in range(len(res)):
 			print  "RESLEN1: ", res[resLen][1]
 			if res[resLen][1] != "Finished":
 				print "errrrrrrrr"
-				reactor.callLater(0.5, self.transport.write, "CAMERROR {0}\n".format(piName))
+				reactor.callLater(0.5, self.transport.write, "CAMERROR {0} {1}\n".format(piName, res[resLen][1]))
+				self.emailError(piName, res[resLen][1])
 				break
 			recordSuccess = True
 		if recordSuccess:
@@ -160,17 +170,20 @@ class myProtocol(protocol.Protocol):
 		# 	'-------end of message --------- \n" | mail -s "Camera Broken" urbanFlowsProject@gmail.com'\
 		# 	.format(str(failure), piName))
 
-	def vtFail(self, failure):
+	def vtFail(self, failure, piName):
 		print "VTFAIL"
 		print failure
+		reactor.callLater(0.5, self.transport.write, "THREADERROR {0} {1}\n".format(piName))
 
-	def xvFail(self, failure):
-		print "XVFAIL"
-		print failure
-
-	def upFail(self, failure):
+	def upFail(self, failure, piName):
 		print "UPFAIL"
 		print failure
+		reactor.callLater(0.5, self.transport.write, "THREADERROR {0} {1}\n".format(piName))
+
+	def emailError(self, piName, errorMsg):
+		os.system('echo "Camera for {0} is broken. Error message: \n {1} \n'\
+			'-------end of message --------- \n" | mail -s "Camera Broken" urbanFlowsProject@gmail.com'\
+			.format(piName, errorMsg))
 
 	def calculateTimeDifference(self, dateToEnd, timeToEnd):
 		fullString = dateToEnd + " " + timeToEnd
