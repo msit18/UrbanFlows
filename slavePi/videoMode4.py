@@ -3,7 +3,7 @@
 #Written by Michelle Sit
 
 import time, datetime
-import picamera
+import picamera, itertools
 from twisted.internet import reactor, defer
 
 #Takes video
@@ -23,12 +23,17 @@ class TakeVideoClass():
 				camera.start_recording(str(piName) + '_RW' + str(inputResW) + '_RH' + str(inputResH)\
 					+ '_TT' + str(inputTotalTime) + '_FR' + str(inputFramerate)\
 					+ '_' + datetime.datetime.now().strftime ('%m_%d_%Y_%H_%M_%S_%f') + '.h264')
-				start = time.time()
 				print "camera wait recording"
-				camera.wait_recording(inputTotalTime)
+				# camera.wait_recording(inputTotalTime)
+				start = datetime.datetime.now()
+				camera.annotate_background = picamera.Color('black')
+				camera.annotate_text_size = 18
+				while (datetime.datetime.now() - start).seconds < inputTotalTime:
+					camera.annotate_text = datetime.datetime.now().strftime('%m_%d_%Y_%H_%M_%S_%f')
+					camera.wait_recording(0.01)
 				camera.stop_recording()
 				camera.close()
-				end = time.time()
+				end = datetime.datetime.now()
 				total = end-start
 				print "CAMERA IS FINISHED: ", total
 				return "Finished"
@@ -53,6 +58,6 @@ class TakeVideoClass():
 		# print "Failure args: ", failure.args
 
 if __name__ == '__main__':
-	tv = takeVideoClass()
-	# now = time.time() + 1
-	# tv.takeVideo(1600, 1200, 30, 15, now, '18.89.4.173', 'pi')
+	tv = TakeVideoClass()
+	now = time.time() + 1
+	tv.takeVideo(1600, 1200, 30, 15, now, '18.89.4.173', 'pi')
