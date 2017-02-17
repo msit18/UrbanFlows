@@ -200,8 +200,8 @@ if __name__ == '__main__':
 		reactor.stop()
 
 	piName = sys.argv[2]
-	# serverSaveFilePath = "/media/msit/Seagate\ Backup\ Plus\ Drive/Lobby7/"
-	serverSaveFilePath = "/media/senseable-beast/beast-brain-1/Data/OneWeekData/tmp/"
+	serverSaveFilePath = "/media/msit/PhilipsData/TrafficIntersection17/"
+	#serverSaveFilePath = "/media/senseable-beast/beast-brain-1/Data/OneWeekData/tmp/"
 	tp = takePictureClass()
 	tv = TakeVideoClass()
 	up = UploadClass()
