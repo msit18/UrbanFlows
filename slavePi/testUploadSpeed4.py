@@ -86,7 +86,7 @@ class myProtocol(protocol.Protocol):
 		msgFromServer = [data for data in data.split()]
 		if msgFromServer[0] == "recordTimes":
 			self.recordTimes = msgFromServer[1:]
-			print "recordTimes: ", self.recordTimes
+			# print "recordTimes: ", self.recordTimes
 			self.transport.write("receivedAllTimesReadytoStart\n")
 
 		elif msgFromServer[0] == "startProgram":
@@ -98,7 +98,7 @@ class myProtocol(protocol.Protocol):
 
 				self.recordTimes.insert(0, msgFromServer[7])
 				self.recordTimes.insert(0, msgFromServer[6])
-				print "recordTimes: ", self.recordTimes
+				# print "recordTimes: ", self.recordTimes
 
 				def uploadThread(serverIP, serverSaveFilePath):
 					uploadThread = threads.deferToThread(up.videoUpload, serverIP, serverSaveFilePath)
@@ -187,6 +187,7 @@ class myProtocol(protocol.Protocol):
 
 	def calculateTimeDifference(self, dateToEnd, timeToEnd):
 		fullString = dateToEnd + " " + timeToEnd
+		print "RUNNING RECORDING AT: ", fullString
 		endTime = datetime.datetime.strptime(fullString, "%x %X")
 		nowTime = datetime.datetime.today()
 		difference = endTime - nowTime
