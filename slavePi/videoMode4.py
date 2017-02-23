@@ -17,13 +17,15 @@ class TakeVideoClass():
 		else:
 			try:
 				camera = picamera.PiCamera()
-				print >>file, "inputTotalTime: ", inputTotalTime
+				print "inputTotalTime: ", inputTotalTime
+				file.write( "inputTotalTime: " + str(inputTotalTime) + "\n")
 				camera.resolution = (inputResW, inputResH)
 				camera.framerate = inputFramerate
 				camera.start_recording(str(piName) + '_RW' + str(inputResW) + '_RH' + str(inputResH)\
 					+ '_TT' + str(inputTotalTime) + '_FR' + str(inputFramerate)\
 					+ '_' + datetime.datetime.now().strftime ('%m_%d_%Y_%H_%M_%S_%f') + '.h264')
-				print >>file, "camera wait recording"
+				print "camera wait recording"
+				file.write( "camera wait recording" + "\n")
 				# camera.wait_recording(inputTotalTime)
 				start = datetime.datetime.now()
 				camera.annotate_background = picamera.Color('black')
@@ -35,26 +37,37 @@ class TakeVideoClass():
 				camera.close()
 				end = datetime.datetime.now()
 				total = end-start
-				print >>file, "CAMERA IS FINISHED: ", total
+				print "CAMERA IS FINISHED: ", total
+				file.write( "CAMERA IS FINISHED: " + str(total) + "\n")
 				return "Finished"
 				# return d
 			except picamera.exc.PiCameraMMALError as err:
-				print >>file, "CAMERA ERROR: MMAL ERROR"
+				print "CAMERA ERROR: MMAL ERROR"
+				file.write( "CAMERA ERROR: MMAL ERROR" + "\n")
 				self.CamError(err)
 				# print "SYS LOG: ", sys.exc_info()
 				errMsg = "Err Type: " + str(type(err)) + "\nFailure msg: " + str(err)
-				print >>file, "errMsg: ", errMsg
+				print "errMsg: ", errMsg
+				file.write( "errMsg: " + "\n")
+				file.write(errMsg + "\n")
 				return errMsg
 				# return d
 			except:
-				print >>file, "UNHANDLED CAMERA ERROR"
+				print "UNHANDLED CAMERA ERROR"
+				file.write( "UNHANDLED CAMERA ERROR" + "\n")
 				raise
 
 	def CamError(self, failure):
-		print >>file, 'CAUGHT THE FUCKER'
-		print >>file, "Failure: ", failure
-		print >>file, "Failure type: ", type(failure)
-		print >>file, "mmmmmmmmmmmm"
+		print 'CAUGHT THE FUCKER'
+		print "Failure: ", failure
+		print "Failure type: ", type(failure)
+		print "mmmmmmmmmmmm"
+		file.write( 'CAUGHT THE FUCKER' + "\n")
+		file.write( "Failure: " + "\n")
+		file.write(failure + "\n")
+		file.write( "Failure type: " + "\n")
+		file.write(str(type(failure)) + "\n")
+		file.write( "mmmmmmmmmmmm" + "\n")
 		# print "Failure args: ", failure.args
 
 if __name__ == '__main__':
