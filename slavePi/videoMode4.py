@@ -9,7 +9,7 @@ from twisted.internet import reactor, defer
 #Takes video
 class TakeVideoClass():
 		
-	def takeVideo (self, inputResW, inputResH, inputTotalTime, inputFramerate, inputStartTime, serverIP, piName):
+	def takeVideo (self, inputResW, inputResH, inputTotalTime, inputFramerate, inputStartTime, serverIP, piName, file):
 		# d = defer.Deferred()
 		
 		while time.time() < inputStartTime:
@@ -17,13 +17,13 @@ class TakeVideoClass():
 		else:
 			try:
 				camera = picamera.PiCamera()
-				print "inputTotalTime: ", inputTotalTime
+				print >>file, "inputTotalTime: ", inputTotalTime
 				camera.resolution = (inputResW, inputResH)
 				camera.framerate = inputFramerate
 				camera.start_recording(str(piName) + '_RW' + str(inputResW) + '_RH' + str(inputResH)\
 					+ '_TT' + str(inputTotalTime) + '_FR' + str(inputFramerate)\
 					+ '_' + datetime.datetime.now().strftime ('%m_%d_%Y_%H_%M_%S_%f') + '.h264')
-				print "camera wait recording"
+				print >>file, "camera wait recording"
 				# camera.wait_recording(inputTotalTime)
 				start = datetime.datetime.now()
 				camera.annotate_background = picamera.Color('black')
@@ -35,26 +35,26 @@ class TakeVideoClass():
 				camera.close()
 				end = datetime.datetime.now()
 				total = end-start
-				print "CAMERA IS FINISHED: ", total
+				print >>file, "CAMERA IS FINISHED: ", total
 				return "Finished"
 				# return d
 			except picamera.exc.PiCameraMMALError as err:
-				print "CAMERA ERROR: MMAL ERROR"
+				print >>file, "CAMERA ERROR: MMAL ERROR"
 				self.CamError(err)
 				# print "SYS LOG: ", sys.exc_info()
 				errMsg = "Err Type: " + str(type(err)) + "\nFailure msg: " + str(err)
-				print "errMsg: ", errMsg
+				print >>file, "errMsg: ", errMsg
 				return errMsg
 				# return d
 			except:
-				print "UNHANDLED CAMERA ERROR"
+				print >>file, "UNHANDLED CAMERA ERROR"
 				raise
 
 	def CamError(self, failure):
-		print 'CAUGHT THE FUCKER'
-		print "Failure: ", failure
-		print "Failure type: ", type(failure)
-		print "mmmmmmmmmmmm"
+		print >>file, 'CAUGHT THE FUCKER'
+		print >>file, "Failure: ", failure
+		print >>file, "Failure type: ", type(failure)
+		print >>file, "mmmmmmmmmmmm"
 		# print "Failure args: ", failure.args
 
 if __name__ == '__main__':
