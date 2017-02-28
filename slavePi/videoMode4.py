@@ -17,14 +17,12 @@ class TakeVideoClass():
 		else:
 			try:
 				camera = picamera.PiCamera()
-				print "inputTotalTime: ", inputTotalTime
 				self.writeFile( "inputTotalTime: " + str(inputTotalTime))
 				camera.resolution = (inputResW, inputResH)
 				camera.framerate = inputFramerate
 				camera.start_recording(str(piName) + '_RW' + str(inputResW) + '_RH' + str(inputResH)\
 					+ '_TT' + str(inputTotalTime) + '_FR' + str(inputFramerate)\
 					+ '_' + datetime.datetime.now().strftime ('%m_%d_%Y_%H_%M_%S_%f') + '.h264')
-				print "camera wait recording"
 				self.writeFile( "camera wait recording")
 				# camera.wait_recording(inputTotalTime)
 				start = datetime.datetime.now()
@@ -37,12 +35,10 @@ class TakeVideoClass():
 				camera.close()
 				end = datetime.datetime.now()
 				total = end-start
-				print "CAMERA IS FINISHED: ", total
 				self.writeFile( "CAMERA IS FINISHED: " + str(total))
 				return "Finished"
 				# return d
 			except picamera.exc.PiCameraMMALError as err:
-				print "CAMERA ERROR: MMAL ERROR"
 				self.writeFile( "CAMERA ERROR: MMAL ERROR")
 				self.CamError(err)
 				# print "SYS LOG: ", sys.exc_info()
@@ -53,19 +49,21 @@ class TakeVideoClass():
 				return errMsg
 				# return d
 			except:
-				print "UNHANDLED CAMERA ERROR"
 				self.writeFile( "UNHANDLED CAMERA ERROR")
 				raise
 
 	def writeFile(self, msg):
-		with open("runLog.txt", "a") as myfile:
-			myfile.write(msg + "\n")
+		print msg
+		try:
+			with open("runLog.txt", "a") as myfile:
+				myfile.write(msg + "\n")
+		except:
+			with open("runLog.txt", "a") as myfile:
+				myfile.write("This msg could not be printed." + "\n")
 
 	def CamError(self, failure):
-		print 'CAUGHT THE FUCKER'
 		print "Failure: ", failure
 		print "Failure type: ", type(failure)
-		print "mmmmmmmmmmmm"
 		self.writeFile( 'CAUGHT THE FUCKER')
 		self.writeFile( "Failure: ")
 		self.writeFile(failure)

@@ -25,10 +25,12 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 	def clientConnectionFailed(self, connector, reason):
 		print  'CONNECTION ERROR: Connection failed at {0}: {1}'.format(time.strftime("%Y-%m-%d-%H:%M:%S"), reason.getErrorMessage())
 		self.writeFile('CONNECTION ERROR: Connection failed at {0}:'.format(time.strftime("%Y-%m-%d-%H:%M:%S")))
-		errorReason = reason.getErrorMessage()
-		self.writeFile(str(errorReason))
+		try:
+			errorReason = reason.getErrorMessage()
+			self.writeFile(str(errorReason))
+		else:
+			pass
 		if serverIP != "18.89.4.173":
-			print  "IP ERROR: This is the wrong IP address. Try again!"
 			self.writeFile("IP ERROR: This is the wrong IP address. Try again!")
 			reactor.stop()
 		else:
@@ -36,39 +38,31 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 
 	def fixWifi(self):
 		checkWifiDown = subprocess.call("[\"$(/bin/ping -c 3 8.8.8.8)\"]", shell=True)
-		print  "checkWifiDown ", checkWifiDown
+		self.writeFile(subprocess.check_output(["ping", "-c", "3", "1.1.1.1"]))
 		self.writeFile("checkWifiDown " + str(checkWifiDown))
 		if int(checkWifiDown) == 2:
-			print  "SERVER ERROR: Wifi is working. Check that the server is running."
 			self.writeFile("SERVER ERROR: Wifi is working. Check that the server is running.")
 			reactor.stop()
 		else:
-			print  "---------------Wifi is not working. Restarting wifi process."
 			self.writeFile("---------------Wifi is not working. Restarting wifi process.")
 			restartWifiTries = 0
 			while restartWifiTries < 4:
-				print "---------------Num times tried to restart wifi: {0}/3".format(restartWifiTries)
 				self.writeFile("---------------Num times tried to restart wifi: {0}/3".format(restartWifiTries))
 				_checkWifiDown = self.restartWifi()
-				print  "_checkWifiDown second time: ", _checkWifiDown
 				self.writeFile("_checkWifiDown second time: ", str(_checkWifiDown))
 				if int(_checkWifiDown) == 2:
-					print  "Reconnected successfully. Connecting to server again."
 					self.writeFile("Reconnected successfully. Connecting to server again.")
 					reactor.connectTCP(serverIP, 8888, DataClientFactory(data), timeout=200)
 					break
 				else:
-					print "---------------Wifi did not connect. Restarting again."
 					self.writeFile("---------------Wifi did not connect. Restarting again.")
 					restartWifiTries += 1
 			else:
-				print  "WIFI ERROR: Could not connect to the internet."
 				self.writeFile("WIFI ERROR: Could not connect to the internet.")
 				# reactor.stop()
 
 	def restartWifi(self):
 		subprocess.call("sudo ifdown eth0; sudo ifdown wlan0; sudo ifup wlan0; sudo ifup eth0", shell=True)
-		print  "sleeping..."
 		self.writeFile("sleeping...")
 		time.sleep(10)
 		return subprocess.call("[\"$(/bin/ping -c 3 8.8.8.8)\"]", shell=True)
@@ -84,13 +78,17 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 		self.writeFile('Connection lost at {0}:'.format(time.strftime("%Y-%m-%d-%H:%M:%S")))
 		errorReason = reason.getErrorMessage()
 		self.writeFile(str(errorReason))
-		print  "CONNECTION ERROR: Connection has been lost but still recording hopefully. Will stop sending files"
 		self.writeFile("CONNECTION ERROR: Connection has been lost but still recording hopefully. Will stop sending files")
 		self.connEmailError(piName, "CONNECTION LOST: {0}".format(reason.getErrorMessage()))
 
 	def writeFile(self, msg):
-		with open("runLog.txt", "a") as myfile:
-			myfile.write(msg + "\n")
+		print msg
+		try:
+			with open("runLog.txt", "a") as myfile:
+				myfile.write(msg + "\n")
+		except:
+			with open("runLog.txt", "a") as myfile:
+				myfile.write("This msg could not be printed." + "\n")
 
 class myProtocol(protocol.Protocol):
 	def __init__(self, factory):
@@ -99,7 +97,6 @@ class myProtocol(protocol.Protocol):
 
 	def connectionMade(self):
 		msg = "clientName piGroup1 {0}\n".format(piName)
-		print  msg
 		self.writeFile(msg)
 		self.transport.write(msg)
 
@@ -113,12 +110,10 @@ class myProtocol(protocol.Protocol):
 			self.transport.write("receivedAllTimesReadytoStart\n")
 
 		elif msgFromServer[0] == "startProgram":
-			print  "GOT A STARTTAKINGPICTURES"
 			self.writeFile("GOT A STARTTAKINGPICTURES")
 			#self.ServerResW, self.ServerResH, self.ServerTotalTimeSec, self.ServerFrameRate,  \
 			#self.ServerStartTime, serverIP, piName
 			if msgFromServer[1] == "video":
-				print  "this is the video command"
 				self.writeFile("this is the video command")
 
 				self.recordTimes.insert(0, msgFromServer[7])
@@ -137,7 +132,6 @@ class myProtocol(protocol.Protocol):
 				videoThread.addErrback(self.vtFail, piName)
 
 			elif msgFromServer[1] == "multiplexer" or msgFromServer[1] == "camera":
-				print  "this is the {0} method. It has been discontinued. Please exit the program and select video".format(msgFromServer[1])
 				self.writeFile("this is the {0} method. It has been discontinued. Please exit the program and select video".format(msgFromServer[1]))
 				reactor.callLater(0.5, self.transport.write, "finished\n")
 
@@ -157,15 +151,11 @@ class myProtocol(protocol.Protocol):
 				jobs.append(semi.run(tv.takeVideo, int(resW), int(resH), int(totalTimeSec),\
 						int(framerate), startAtTime, serverIP, piName, file))
 			except:
-				print  "That time was not valid. Calling next time."
 				self.writeFile("That time was not valid. Calling next time.")
-				print "len recordTimesList: ", len(recordTimesList)
 				self.writeFile("len recordTimesList: " + str(len(recordTimesList)))
 				if len(recordTimesList)%2>0:
-					print  "odd number"
 					self.writeFile("odd number")
 					recordTimesList.pop(0)
-					print  "new len: ", len(recordTimesList)
 					self.writeFile("new len: " + str(len(recordTimesList)))
 					reactor.callLater(0.5, self.transport.write, "TIMEINPUTERROR {0}\n".format(piName))
 				continue
@@ -183,27 +173,23 @@ class myProtocol(protocol.Protocol):
 		self.writeFile("We got: ")
 		for x in res:
 			self.writeFile(str(x))
-		print  "We got piName: ", piName
 		self.writeFile("We got piName: " + piName)
 		recordSuccess = False
 		for resLen in range(len(res)):
 			print   "RESLEN1: ", res[resLen][1]
 			self.writeFile("RESLEN1: " + res[resLen][1])
 			if res[resLen][1] != "Finished":
-				print  "errrrrrrrr"
 				self.writeFile("errrrrrrrr")
 				reactor.callLater(0.5, self.transport.write, "CAMERROR {0} {1}\n".format(piName, res[resLen][1]))
 				self.emailError(piName, res[resLen][1])
 				break
 			recordSuccess = True
 		if recordSuccess:
-			print  "Nothing went wrong. Send Finished message"
 			self.writeFile("Nothing went wrong. Send Finished message")
 			reactor.callLater(0.5, self.transport.write, 'finished\n')
 		return "done"
 
 	def failedMethod(self,failure):
-		print  "FAILURE: ERROR WITH PICTURE TAKING METHOD"
 		self.writeFile("FAILURE: ERROR WITH PICTURE TAKING METHOD")
 		print  failure
 		self.writeFile(str(failure))
@@ -213,14 +199,12 @@ class myProtocol(protocol.Protocol):
 		# 	.format(str(failure), piName))
 
 	def vtFail(self, failure, piName):
-		print  "VTFAIL"
 		self.writeFile("VTFAIL")
 		print  failure
 		self.writeFile(str(failure))
 		reactor.callLater(0.5, self.transport.write, "THREADERROR {0} {1}\n".format(piName, failure))
 
 	def upFail(self, failure, piName):
-		print  "UPFAIL"
 		self.writeFile("UPFAIL")
 		print  failure
 		self.writeFile(str(failure))
@@ -241,8 +225,13 @@ class myProtocol(protocol.Protocol):
 		return time.time() + difference.total_seconds()
 
 	def writeFile(self, msg):
-		with open("runLog.txt", "a") as myfile:
-			myfile.write(msg + "\n")
+		print msg
+		try:
+			with open("runLog.txt", "a") as myfile:
+				myfile.write(msg + "\n")
+		except:
+			with open("runLog.txt", "a") as myfile:
+				myfile.write("This msg could not be printed." + "\n")
 
 
 if __name__ == '__main__':
