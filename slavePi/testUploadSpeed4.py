@@ -28,7 +28,7 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 		try:
 			errorReason = reason.getErrorMessage()
 			self.writeFile(str(errorReason))
-		else:
+		except:
 			pass
 		if serverIP != "18.89.4.173":
 			self.writeFile("IP ERROR: This is the wrong IP address. Try again!")
