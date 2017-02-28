@@ -1,6 +1,7 @@
-import subprocess
+import subprocess, datetime
 
 def fixWifi():
+	writeFile("Running check {0}".format(datetime.datetime.now()))
 	try:
 		writeFile(subprocess.check_output(["ping", "-c", "3", "1.1.1.1"]))
 		checkWifiDown = subprocess.call("[\"$(/bin/ping -c 3 8.8.8.8)\"]", shell=True)
