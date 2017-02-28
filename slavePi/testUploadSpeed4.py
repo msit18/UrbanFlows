@@ -25,6 +25,8 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 	def clientConnectionFailed(self, connector, reason):
 		print  'CONNECTION ERROR: Connection failed at {0}: {1}'.format(time.strftime("%Y-%m-%d-%H:%M:%S"), reason.getErrorMessage())
 		self.writeFile('CONNECTION ERROR: Connection failed at {0}:'.format(time.strftime("%Y-%m-%d-%H:%M:%S")))
+		errorReason = reason.getErrorMessage()
+		self.writeFile(str(errorReason))
 		if serverIP != "18.89.4.173":
 			print  "IP ERROR: This is the wrong IP address. Try again!"
 			self.writeFile("IP ERROR: This is the wrong IP address. Try again!")
@@ -79,7 +81,9 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 	#This method runs if the connection to the server has been severed
 	def clientConnectionLost(self, connector, reason):
 		print  'Connection lost at {0}:'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), reason.getErrorMessage()
-		self.writeFile('Connection lost at {0}:'.format(time.strftime("%Y-%m-%d-%H:%M:%S")) + str(reason.getErrorMessage()))
+		self.writeFile('Connection lost at {0}:'.format(time.strftime("%Y-%m-%d-%H:%M:%S")))
+		errorReason = reason.getErrorMessage()
+		self.writeFile(str(errorReason))
 		print  "CONNECTION ERROR: Connection has been lost but still recording hopefully. Will stop sending files"
 		self.writeFile("CONNECTION ERROR: Connection has been lost but still recording hopefully. Will stop sending files")
 		self.connEmailError(piName, "CONNECTION LOST: {0}".format(reason.getErrorMessage()))
