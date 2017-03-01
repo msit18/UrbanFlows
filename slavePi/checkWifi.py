@@ -3,7 +3,7 @@ import subprocess, datetime
 def fixWifi():
 	writeFile("Running check {0}".format(datetime.datetime.now()))
 	try:
-		writeFile(subprocess.check_output(["ping", "-c", "3", "1.1.1.1"]))
+		writeFile(subprocess.check_output(["ping", "-c", "3", "8.8.8.8"]))
 		checkWifiDown = subprocess.call("[\"$(/bin/ping -c 3 8.8.8.8)\"]", shell=True)
 		writeFile("checkWifiDown " + str(checkWifiDown))
 	except subprocess.CalledProcessError, e:
@@ -31,6 +31,7 @@ def restartWifi():
 	subprocess.call("sudo ifdown eth0; sudo ifdown wlan0; sudo ifup wlan0; sudo ifup eth0", shell=True)
 	writeFile("sleeping...")
 	time.sleep(10)
+	writeFile(subprocess.check_output(["ping", "-c", "3", "8.8.8.8"]))
 	return subprocess.call("[\"$(/bin/ping -c 3 8.8.8.8)\"]", shell=True)
 
 def writeFile(msg):
