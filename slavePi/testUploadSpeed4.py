@@ -37,9 +37,15 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 			self.fixWifi()
 
 	def fixWifi(self):
-		checkWifiDown = subprocess.call("[\"$(/bin/ping -c 3 8.8.8.8)\"]", shell=True)
-		self.writeFile(subprocess.check_output(["ping", "-c", "3", "1.1.1.1"]))
-		self.writeFile("checkWifiDown " + str(checkWifiDown))
+		self.writeFile("Running check {0}".format(datetime.datetime.now()))
+		try:
+			self.writeFile(subprocess.check_output(["ping", "-c", "3", "8.8.8.8"]))
+			checkWifiDown = subprocess.call("[\"$(/bin/ping -c 3 8.8.8.8)\"]", shell=True)
+			self.writeFile("checkWifiDown " + str(checkWifiDown))
+		except subprocess.CalledProcessError, e:
+			self.writeFile("Ping stdout output:\n" + e.output)
+			checkWifiDown = 0
+
 		if int(checkWifiDown) == 2:
 			self.writeFile("SERVER ERROR: Wifi is working. Check that the server is running.")
 			reactor.stop()
@@ -61,10 +67,14 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 				self.writeFile("WIFI ERROR: Could not connect to the internet.")
 				# reactor.stop()
 
-	def restartWifi(self):
+	def restartWifi():
 		subprocess.call("sudo ifdown eth0; sudo ifdown wlan0; sudo ifup wlan0; sudo ifup eth0", shell=True)
 		self.writeFile("sleeping...")
 		time.sleep(10)
+		try:
+			self.writeFile(subprocess.check_output(["ping", "-c", "3", "8.8.8.8"]))
+		except subprocess.CalledProcessError, e:
+		    self.writeFile("Ping stdout output:\n" + e.output)
 		return subprocess.call("[\"$(/bin/ping -c 3 8.8.8.8)\"]", shell=True)
 
 	def connEmailError(self, piName, errorMsg):
