@@ -1,0 +1,21 @@
+MAC Addresses (IP)
+
+Pi6: fe80::97ee:17b:b652:6588/64
+Pi7: fe80::df08:b261:e286:3d49/64
+Pi9: fe80::c741:a812:1f78:33af/64
+Pi10: fe80::9c19:debd:f8c5:90a4/64
+Pi11: fe80::256b:3558:2bb0:826d/64
+Pi14: fe80::f283:1999:d4a0:c249/64
+
+mkdir /tmp/stream/
+raspistill --nopreview -w 640 -h 480 -q 5 -o /tmp/stream/pic.jpg -tl 100 -t 18000 -th 0:0:0
+
+LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -w /usr/local/www"
+
+MAC Addresses (Bluetooth)
+Pi6: B8:27:EB:BF:81:F4
+Pi7: B8:27:EB:3D:3A:8F
+Pi9: B8:27:EB:FE:40:3B
+Pi10: B8:27:EB:CB:9F:83
+Pi11: B8:27:EB:56:D9:8A
+Pi14: B8:27:EB:1E:4C:1F
