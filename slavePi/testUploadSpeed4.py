@@ -67,7 +67,7 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 				self.writeFile("WIFI ERROR: Could not connect to the internet.")
 				# reactor.stop()
 
-	def restartWifi():
+	def restartWifi(self):
 		subprocess.call("sudo ifdown eth0; sudo ifdown wlan0; sudo ifup wlan0; sudo ifup eth0", shell=True)
 		self.writeFile("sleeping...")
 		time.sleep(10)
