@@ -24,7 +24,7 @@ class UploadClass():
 
 if __name__ == '__main__':
 	up2 = UploadClass()
-# 	videoUpload(sys.argv[1], sys.argv[2])
+ 	up2.videoUpload(sys.argv[1], sys.argv[2])
 
 #CRON/Flock cmd to run every x seconds
 # * * * * * /usr/bin/flock --nonblock --wait 30 /tmp/fcj.lockfile /home/pi/UrbanFlows/slavePi/uploadScript.py $1 $2

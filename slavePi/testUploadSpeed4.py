@@ -32,7 +32,7 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 			pass
 #		if serverIP != "18.89.4.173":
 		if serverIP != "18.89.7.132":
-			self.writeFile("IP ERROR: This is the wrong IP address. Try again!")
+			self.writeFile("IP ERRORCF: This is the wrong IP address. Try again!")
 			reactor.stop()
 		else:
 			self.fixWifi()
@@ -48,18 +48,17 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 			checkWifiDown = 0
 
 		if int(checkWifiDown) == 2:
-			self.writeFile("SERVER ERROR: Wifi is working. Check that the server is running.")
-			reactor.stop()
+			self.writeFile("SERVER ERROR: Wifi is working. Check that the server is running. END")
+			#reactor.stop()
 		else:
 			self.writeFile("---------------Wifi is not working. Restarting wifi process.")
 			restartWifiTries = 0
 			while restartWifiTries < 4:
 				self.writeFile("---------------Num times tried to restart wifi: {0}/3".format(restartWifiTries))
 				_checkWifiDown = self.restartWifi()
-				self.writeFile("_checkWifiDown second time: ", str(_checkWifiDown))
+				self.writeFile("_checkWifiDown second time: {0}".format(str(_checkWifiDown)))
 				if int(_checkWifiDown) == 2:
-					self.writeFile("Reconnected successfully. Connecting to server again.")
-					reactor.connectTCP(serverIP, 8888, DataClientFactory(data), timeout=200)
+					self.writeFile("Reconnected successfully.")
 					break
 				else:
 					self.writeFile("---------------Wifi did not connect. Restarting again.")
@@ -86,11 +85,11 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 	#This method runs if the connection to the server has been severed
 	def clientConnectionLost(self, connector, reason):
 		print  'Connection lost at {0}:'.format(time.strftime("%Y-%m-%d-%H:%M:%S")), reason.getErrorMessage()
-		self.writeFile('Connection lost at {0}:'.format(time.strftime("%Y-%m-%d-%H:%M:%S")))
 		errorReason = reason.getErrorMessage()
-		self.writeFile(str(errorReason))
+		self.writeFile('Connection lost at {0}: {1}'.format(time.strftime("%Y-%m-%d-%H:%M:%S"), str(errorReason)))
 		self.writeFile("CONNECTION ERROR: Connection has been lost but still recording hopefully. Will stop sending files")
-		self.connEmailError(piName, "CONNECTION LOST: {0}".format(reason.getErrorMessage()))
+		self.fixWifi()
+		#self.connEmailError(piName, "CONNECTION LOST: {0}".format(reason.getErrorMessage())) #throws an error
 
 	def writeFile(self, msg):
 		print msg
@@ -241,8 +240,10 @@ class myProtocol(protocol.Protocol):
 			with open("runLog.txt", "a") as myfile:
 				myfile.write(msg + "\n")
 		except:
+			print "WRITEFILE EXCEPT CLAUSE"
 			with open("runLog.txt", "a") as myfile:
 				myfile.write("This msg could not be printed." + "\n")
+			raise
 
 
 if __name__ == '__main__':
