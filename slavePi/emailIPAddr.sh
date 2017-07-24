@@ -1,7 +1,7 @@
 #!/bin/bash
 
-_IP=$(hostname -I)
-echo "CRON pi address for 10.0.0.9 is $(hostname -I)" | mail -s "Pi9 address" urbanflowsproject@gmail.com
+#_IP=$(hostname -I)
+echo "CRON pi address for 10.0.0.7 is $(hostname -I)" | mail -s "Pi7 address" urbanflowsproject@gmail.com
 
 
 
