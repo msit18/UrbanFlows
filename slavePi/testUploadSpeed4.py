@@ -30,7 +30,8 @@ class DataClientFactory(protocol.ReconnectingClientFactory):
 			self.writeFile(str(errorReason))
 		except:
 			pass
-		if serverIP != "18.89.4.173":
+#		if serverIP != "18.89.4.173":
+		if serverIP != "18.89.7.132":
 			self.writeFile("IP ERRORCF: This is the wrong IP address. Try again!")
 			reactor.stop()
 		else:
@@ -251,14 +252,15 @@ if __name__ == '__main__':
 		print  sys.argv[1]
 		file.write(sys.argv[1] + "\n")
 		serverIP = sys.argv[1]
-		if serverIP != "18.89.4.173":
+#		if serverIP != "18.89.4.173":
+		if serverIP != "18.89.7.132":
 			print  "IP ERROR: This is the wrong IP address. Try again!"
 			file.write("IP ERROR: This is the wrong IP address. Try again!" + "\n")
 			reactor.stop()
 
 		file.close()
 		piName = sys.argv[2]
-		serverSaveFilePath = "/media/msit/PhilipsData/TrafficIntersection17/"
+		serverSaveFilePath = "/media/PhilipsData/ParkingData/secondSite/"
 		#serverSaveFilePath = "/media/senseable-beast/beast-brain-1/Data/OneWeekData/tmp/"
 		tp = takePictureClass()
 		tv = TakeVideoClass()
