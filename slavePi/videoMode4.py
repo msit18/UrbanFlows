@@ -64,7 +64,6 @@ class TakeVideoClass():
 	def CamError(self, failure):
 		print "Failure: ", failure
 		print "Failure type: ", type(failure)
-		self.writeFile( 'CAUGHT THE FUCKER')
 		self.writeFile( "Failure: ")
 		self.writeFile(failure)
 		self.writeFile( "Failure type: ")
